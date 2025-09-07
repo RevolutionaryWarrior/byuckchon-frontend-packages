@@ -11,7 +11,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/lib/index.tsx"),
       name: "index",
-      fileName: "index",
+      fileName: (format) => (format === "es" ? "index.mjs" : "index.umd.js"),
       formats: ["es", "umd"],
     },
     rollupOptions: {
