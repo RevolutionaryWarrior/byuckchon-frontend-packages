@@ -1,13 +1,16 @@
 {
   "name": "byuckchon-frontend-packages",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
+  "description": "Byuckchon Frontend Packages Monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build": "pnpm -r run build",
+    "dev": "pnpm --filter example-app dev",
+    "lint": "pnpm -r run lint"
   },
   "dependencies": {
     "path": "^0.12.7",

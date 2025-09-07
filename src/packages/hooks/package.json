@@ -1,0 +1,49 @@
+{
+  "name": "@byuckchon-frontend/hooks",
+  "version": "0.0.1",
+  "private": false,
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.js",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint src --ext ts,tsx"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-libcss": "^1.1.2",
+    "vite-css-modules": "^1.10.0",
+    "typescript": "^5.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages.git"
+  },
+  "keywords": [
+    "react"
+  ],
+  "author": "Kwon Hyuk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
+  },
+  "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
+  "description": ""
+}
