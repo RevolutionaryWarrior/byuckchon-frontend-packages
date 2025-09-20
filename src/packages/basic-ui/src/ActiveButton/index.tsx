@@ -42,7 +42,6 @@ export default function ActiveButton({
   return (
     <button
       {...props}
-      disabled={disabled}
       className={`${className} ${mergedStyle.bg} w-full cursor-pointer`}
     >
       <p className={`${mergedStyle.text} text-center`}>{children}</p>
