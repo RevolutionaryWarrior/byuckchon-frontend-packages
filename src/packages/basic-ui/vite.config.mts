@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import * as path from "path";
 import { defineConfig } from "vite";
@@ -11,7 +12,7 @@ export default defineConfig({
     cssCodeSplit: true,
     lib: {
       entry: {
-        index: path.resolve(__dirname, "src/index.tsx"),
+        index: path.resolve(__dirname, "src/index.ts"),
         styles: path.resolve(__dirname, "styles.css"),
       },
       name: "index",
@@ -41,6 +42,7 @@ export default defineConfig({
     react({
       jsxRuntime: "automatic",
     }),
+    tailwindcss(),
     patchCssModules(),
     libCss(),
     dts({

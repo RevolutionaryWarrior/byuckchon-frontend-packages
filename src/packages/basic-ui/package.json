@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/basic-ui",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": false,
   "main": "dist/index.mjs",
   "module": "dist/index.mjs",
@@ -14,7 +14,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "scripts": {
     "build": "vite build",
@@ -46,5 +47,9 @@
     "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
 }
