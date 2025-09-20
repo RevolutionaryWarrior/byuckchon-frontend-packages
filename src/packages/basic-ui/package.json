@@ -1,0 +1,56 @@
+{
+  "name": "@byuckchon-frontend/basic-ui",
+  "version": "0.0.2",
+  "private": false,
+  "main": "dist/index.mjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./styles2.css": "./dist/styles2.css"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint src --ext ts,tsx"
+  },
+  "peerDependencies": {
+    "@byuckchon-frontend-monorepo-test/hooks": ">=0.0.1",
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1",
+    "vite-css-modules": "^1.10.0",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-libcss": "^1.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/poiu03290/package-test.git"
+  },
+  "keywords": [
+    "react"
+  ],
+  "author": "Kwon Hyuk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/poiu03290/package-test/issues"
+  },
+  "homepage": "https://github.com/poiu03290/package-test#readme",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "clsx": "^2.1.1",
+    "tailwindcss": "^4.1.13"
+  }
+}
