@@ -1,9 +1,5 @@
 function App() {
-  return (
-    <>
-      <h1>byuckchon-frontend-packages</h1>
-    </>
-  );
+  return <></>;
 }
 
 export default App;

@@ -1,15 +1,15 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import dts from "vite-plugin-dts";
-import { patchCssModules } from "vite-css-modules";
-import libCss from "vite-plugin-libcss";
 import * as path from "path";
+import { defineConfig } from "vite";
+import { patchCssModules } from "vite-css-modules";
+import dts from "vite-plugin-dts";
+import libCss from "vite-plugin-libcss";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/lib/index.tsx"),
+      entry: path.resolve(__dirname, "src/index.ts"),
       name: "index",
       fileName: (format) => (format === "es" ? "index.mjs" : "index.umd.js"),
       formats: ["es", "umd"],
