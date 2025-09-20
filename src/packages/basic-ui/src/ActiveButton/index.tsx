@@ -1,4 +1,5 @@
 import React from "react";
+import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 type Variant = "primary" | "secondary" | "disabled";
 
@@ -30,9 +31,12 @@ export default function ActiveButton({
   className = "",
   ...props
 }: Props) {
+  const theme = useUITheme();
+
   const variantKey = disabled ? "disabled" : variant;
   const mergedStyle = {
     ...baseButtonVariants[variantKey],
+    ...(theme?.button?.[variantKey] ?? {}),
   };
 
   return (
