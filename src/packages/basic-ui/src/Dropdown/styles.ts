@@ -9,7 +9,7 @@ export const baseDropdownStyles = {
   `,
   triggerContent: "flex items-center gap-2",
   icon: "flex-shrink-0",
-  placeholder: "text-gray-[#8F9098]",
+  placeholder: "text-[#8F9098]",
   arrow: "ml-auto transition-transform duration-200",
   arrowOpen: "transform rotate-180",
   disabled: "bg-gray-100 text-gray-400 cursor-not-allowed",
