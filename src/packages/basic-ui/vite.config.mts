@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import * as path from "path";
 import { defineConfig } from "vite";
@@ -8,11 +9,20 @@ import libCss from "vite-plugin-libcss";
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    cssCodeSplit: true,
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
+      entry: {
+        index: path.resolve(__dirname, "src/index.ts"),
+        styles: path.resolve(__dirname, "styles.css"),
+      },
       name: "index",
-      fileName: (format) => (format === "es" ? "index.mjs" : "index.umd.js"),
-      formats: ["es", "umd"],
+      fileName: (format, entryName) => {
+        if (entryName === "styles") {
+          return `${entryName}.css`;
+        }
+        return `${entryName}.${format === "es" ? "mjs" : "umd.js"}`;
+      },
+      formats: ["es"],
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
@@ -32,6 +42,7 @@ export default defineConfig({
     react({
       jsxRuntime: "automatic",
     }),
+    tailwindcss(),
     patchCssModules(),
     libCss(),
     dts({
