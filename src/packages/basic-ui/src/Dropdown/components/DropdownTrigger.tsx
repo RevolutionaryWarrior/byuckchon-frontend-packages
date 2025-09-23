@@ -14,6 +14,7 @@ export function DropdownTrigger({
   placeholder,
   disabled,
   triggerClassName,
+  icon,
   handleKeyDown,
   toggleDropdown,
 }: DropdownTriggerProps) {
@@ -47,7 +48,7 @@ export function DropdownTrigger({
           isOpen ? baseDropdownStyles.arrowOpen : ""
         }`}
       >
-        ▼
+        {icon ? icon : "▼"}
       </span>
     </button>
   );

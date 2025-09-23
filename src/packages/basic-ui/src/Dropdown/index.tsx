@@ -27,6 +27,7 @@ export type TriggerProps = {
   selectedOption?: DropdownOptionType;
   placeholder?: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
 };
 
 export type DropdownProps = {
@@ -37,6 +38,7 @@ export type DropdownProps = {
   variant?: "default" | "outlined" | "filled";
   size?: "small" | "medium" | "large";
   className?: string;
+  icon?: React.ReactNode;
   onChange?: (value: string | number, option: DropdownOptionType) => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -52,6 +54,7 @@ export default function Dropdown({
   variant = "default",
   size = "medium",
   className = "",
+  icon,
   onChange,
   onOpen,
   onClose,
@@ -140,8 +143,9 @@ export default function Dropdown({
       selectedOption,
       placeholder,
       disabled,
+      icon,
     }),
-    [isOpen, selectedOption, placeholder, disabled]
+    [isOpen, selectedOption, placeholder, disabled, icon]
   );
 
   return (
