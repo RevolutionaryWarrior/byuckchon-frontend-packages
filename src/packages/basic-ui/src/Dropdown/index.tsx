@@ -1,18 +1,18 @@
 // src/packages/basic-ui/src/Dropdown/index.tsx
-import React, { useRef, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   baseDropdownSizes,
   baseDropdownStyles,
   baseDropdownVariants,
 } from "./styles";
 import { useDropdownState } from "./hooks/useDropdownState";
-import { useClickOutside } from "./hooks/useClickOutside";
 import { DropdownTrigger } from "./components/DropdownTrigger";
 import { DropdownList } from "./components/DropdownList";
 import { DropdownOption } from "./components/DropdownOption";
 import { EmptyState } from "./components/EmptyState";
 import { KEYBOARD_KEYS } from "./constants";
 import { createClassName } from "./utils/classNameUtils";
+import { useDetectClose } from "../../../hooks/src";
 
 // 타입 정의
 export type DropdownOptionType = {
@@ -61,25 +61,34 @@ export default function Dropdown({
   renderTrigger,
   renderOption,
 }: DropdownProps) {
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
 
-  const {
-    isOpen,
-    selectedOption,
-    openDropdown,
-    closeDropdown,
-    toggleDropdown,
-    selectOption,
-  } = useDropdownState({
+  const { selectedOption, selectOption } = useDropdownState({
     options,
     value,
-    disabled,
     onChange,
-    onOpen,
-    onClose,
   });
 
-  useClickOutside(dropdownRef, closeDropdown, isOpen);
+  // 드롭다운 열기/닫기 함수들
+  const openDropdown = useCallback(() => {
+    if (disabled) return;
+    setIsOpen(true);
+    onOpen?.();
+  }, [disabled, onOpen, setIsOpen]);
+
+  const closeDropdown = useCallback(() => {
+    setIsOpen(false);
+    onClose?.();
+  }, [onClose, setIsOpen]);
+
+  const toggleDropdown = useCallback(() => {
+    if (disabled) return;
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  }, [disabled, isOpen, closeDropdown, openDropdown]);
 
   // 키보드 네비게이션 핸들러
   const handleKeyDown = useCallback(
@@ -109,8 +118,9 @@ export default function Dropdown({
   const handleOptionClick = useCallback(
     (option: DropdownOptionType) => {
       selectOption(option);
+      closeDropdown();
     },
-    [selectOption]
+    [selectOption, closeDropdown]
   );
 
   // 스타일 클래스 메모이제이션
