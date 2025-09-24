@@ -1,12 +1,13 @@
 // src/packages/basic-ui/src/Dropdown/components/DropdownOption.tsx
 import React from "react";
-import { baseDropdownStyles } from "../styles";
+import { baseDropdownSizes, baseDropdownStyles } from "../styles";
 import type { DropdownOptionType } from "../index";
 import { createClassName } from "../utils/classNameUtils";
 
 type DropdownOptionProps = {
   option: DropdownOptionType;
   isSelected: boolean;
+  size: "small" | "medium" | "large";
   handleOptionClick: (option: DropdownOptionType) => void;
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
 };
@@ -14,11 +15,13 @@ type DropdownOptionProps = {
 export function DropdownOption({
   option,
   isSelected,
+  size,
   handleOptionClick,
   renderOption,
 }: DropdownOptionProps) {
   const className = createClassName([
     baseDropdownStyles.option,
+    baseDropdownSizes[size].option,
     option.disabled && baseDropdownStyles.optionDisabled,
     isSelected && baseDropdownStyles.optionSelected,
   ]);

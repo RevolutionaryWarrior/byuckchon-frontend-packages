@@ -1,4 +1,3 @@
-// src/packages/basic-ui/src/Dropdown/index.tsx
 import React, { useCallback, useMemo } from "react";
 import {
   baseDropdownSizes,
@@ -13,6 +12,7 @@ import { EmptyState } from "./components/EmptyState";
 import { KEYBOARD_KEYS } from "./constants";
 import { createClassName } from "./utils/classNameUtils";
 import { useDetectClose } from "../../../hooks/src";
+import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 // 타입 정의
 export type DropdownOptionType = {
@@ -35,7 +35,7 @@ export type DropdownProps = {
   value?: string | number;
   placeholder?: string;
   disabled?: boolean;
-  variant?: "default" | "outlined" | "filled";
+  variant?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
   className?: string;
   icon?: React.ReactNode;
@@ -51,7 +51,7 @@ export default function Dropdown({
   value,
   placeholder = "선택하세요",
   disabled = false,
-  variant = "default",
+  variant = "primary",
   size = "medium",
   className = "",
   icon,
@@ -61,8 +61,8 @@ export default function Dropdown({
   renderTrigger,
   renderOption,
 }: DropdownProps) {
+  const theme = useUITheme();
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
-
   const { selectedOption, selectOption } = useDropdownState({
     options,
     value,
@@ -124,27 +124,43 @@ export default function Dropdown({
   );
 
   // 스타일 클래스 메모이제이션
-  const triggerClassName = useMemo(
-    () =>
-      createClassName([
-        baseDropdownStyles.trigger,
-        baseDropdownVariants[variant].trigger,
-        baseDropdownSizes[size].trigger,
-        disabled && baseDropdownStyles.disabled,
-        className,
-      ]),
-    [variant, size, disabled, className]
-  );
+  const triggerClassName = useMemo(() => {
+    const baseVariant = baseDropdownVariants[variant];
+    const themeVariant = theme?.dropdown?.[variant];
 
-  const dropdownClassName = useMemo(
-    () =>
-      createClassName([
-        baseDropdownStyles.dropdown,
-        baseDropdownVariants[variant].dropdown,
-        baseDropdownSizes[size].dropdown,
-      ]),
-    [variant, size]
-  );
+    const mergedVariant = {
+      ...baseVariant,
+      ...(themeVariant ?? {}),
+    };
+
+    return createClassName([
+      baseDropdownStyles.trigger,
+      mergedVariant.bg,
+      mergedVariant.border,
+      mergedVariant.textColor,
+      baseDropdownSizes[size].trigger,
+      disabled && baseDropdownStyles.disabled,
+      className,
+    ]);
+  }, [variant, size, disabled, className, theme]);
+
+  const dropdownClassName = useMemo(() => {
+    const baseVariant = baseDropdownVariants[variant];
+    const themeVariant = theme?.dropdown?.[variant];
+
+    const mergedVariant = {
+      ...baseVariant,
+      ...(themeVariant ?? {}),
+    };
+
+    return createClassName([
+      baseDropdownStyles.dropdown,
+      mergedVariant.bg,
+      mergedVariant.border,
+      mergedVariant.textColor,
+      baseDropdownSizes[size].dropdown,
+    ]);
+  }, [variant, size, theme]);
 
   // 트리거 props
   const triggerProps: TriggerProps = useMemo(
@@ -181,6 +197,7 @@ export default function Dropdown({
                 key={option.value}
                 option={option}
                 isSelected={selectedOption?.value === option.value}
+                size={size}
                 handleOptionClick={handleOptionClick}
                 renderOption={renderOption}
               />
