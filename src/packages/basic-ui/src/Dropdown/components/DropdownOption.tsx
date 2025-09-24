@@ -1,4 +1,3 @@
-// src/packages/basic-ui/src/Dropdown/components/DropdownOption.tsx
 import React from "react";
 import { baseDropdownSizes, baseDropdownStyles } from "../styles";
 import type { DropdownOptionType } from "../index";

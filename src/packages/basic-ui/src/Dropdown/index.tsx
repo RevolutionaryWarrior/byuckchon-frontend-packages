@@ -6,9 +6,7 @@ import {
 } from "./styles";
 import { useDropdownState } from "./hooks/useDropdownState";
 import { DropdownTrigger } from "./components/DropdownTrigger";
-import { DropdownList } from "./components/DropdownList";
 import { DropdownOption } from "./components/DropdownOption";
-import { EmptyState } from "./components/EmptyState";
 import { KEYBOARD_KEYS } from "./constants";
 import { createClassName } from "./utils/classNameUtils";
 import { useDetectClose } from "../../../hooks/src";
@@ -188,9 +186,15 @@ export default function Dropdown({
       )}
 
       {isOpen && (
-        <DropdownList className={dropdownClassName}>
+        <div
+          className={dropdownClassName}
+          role="listbox"
+          aria-label="옵션 목록"
+        >
           {options.length === 0 ? (
-            <EmptyState />
+            <div className={baseDropdownStyles.empty}>
+              선택할 수 있는 옵션이 없습니다
+            </div>
           ) : (
             options.map((option) => (
               <DropdownOption
@@ -203,7 +207,7 @@ export default function Dropdown({
               />
             ))
           )}
-        </DropdownList>
+        </div>
       )}
     </div>
   );

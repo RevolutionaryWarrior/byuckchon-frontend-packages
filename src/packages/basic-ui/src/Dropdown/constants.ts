@@ -1,4 +1,3 @@
-// src/packages/basic-ui/src/Dropdown/constants.ts
 export const KEYBOARD_KEYS = {
   ENTER: "Enter",
   SPACE: " ",
