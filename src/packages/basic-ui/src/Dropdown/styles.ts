@@ -44,7 +44,7 @@ export const baseDropdownSizes = {
   small: {
     trigger: "px-2 py-2 text-sm",
     dropdown: "text-sm",
-    option: "px-2 py-2",
+    option: "p-2",
   },
   medium: {
     trigger: "px-3 py-4  text-base",
