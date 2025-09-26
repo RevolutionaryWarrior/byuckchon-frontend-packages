@@ -60,7 +60,7 @@ export default function Dropdown({
     DropdownOptionType | undefined
   >();
 
-  // 선택된 옵션 찾기
+  // 기본 값 설정
   useEffect(() => {
     const option = options.find((opt) => opt.value === value);
     setSelectedOption(option);
