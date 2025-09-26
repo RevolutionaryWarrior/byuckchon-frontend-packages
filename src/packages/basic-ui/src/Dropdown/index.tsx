@@ -16,7 +16,6 @@ export interface DropdownOptionType {
   value: string | number;
   label: string;
   disabled?: boolean;
-  icon?: React.ReactNode;
 }
 
 export type TriggerProps = {

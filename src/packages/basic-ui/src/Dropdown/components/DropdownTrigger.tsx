@@ -27,14 +27,7 @@ export function DropdownTrigger({
     >
       <span className={baseDropdownStyles.triggerContent}>
         {selectedOption ? (
-          <>
-            {selectedOption.icon && (
-              <span className={baseDropdownStyles.icon}>
-                {selectedOption.icon}
-              </span>
-            )}
-            <span>{selectedOption.label}</span>
-          </>
+          <span>{selectedOption.label}</span>
         ) : (
           <span className={baseDropdownStyles.placeholder}>{placeholder}</span>
         )}
