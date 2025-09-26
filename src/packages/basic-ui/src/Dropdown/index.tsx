@@ -38,7 +38,6 @@ export type DropdownProps = {
   className?: string;
   icon?: React.ReactNode;
   onChange?: (value: string | number, option: DropdownOptionType) => void;
-  onOpen?: () => void;
   onClose?: () => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
@@ -54,8 +53,6 @@ export default function Dropdown({
   className = "",
   icon,
   onChange,
-  onOpen,
-  onClose,
   renderTrigger,
   renderOption,
 }: DropdownProps) {
@@ -67,26 +64,15 @@ export default function Dropdown({
     onChange,
   });
 
-  // 드롭다운 열기/닫기 함수들
-  const openDropdown = useCallback(() => {
-    if (disabled) return;
-    setIsOpen(true);
-    onOpen?.();
-  }, [disabled, onOpen, setIsOpen]);
-
-  const closeDropdown = useCallback(() => {
-    setIsOpen(false);
-    onClose?.();
-  }, [onClose, setIsOpen]);
-
   const toggleDropdown = useCallback(() => {
     if (disabled) return;
     if (isOpen) {
-      closeDropdown();
+      setIsOpen(false);
     } else {
-      openDropdown();
+      if (disabled) return;
+      setIsOpen(true);
     }
-  }, [disabled, isOpen, closeDropdown, openDropdown]);
+  }, [disabled, isOpen, setIsOpen]);
 
   // 키보드 네비게이션 핸들러
   const handleKeyDown = useCallback(
@@ -100,25 +86,25 @@ export default function Dropdown({
           toggleDropdown();
           break;
         case KEYBOARD_KEYS.ESCAPE:
-          closeDropdown();
+          setIsOpen(false);
           break;
         case KEYBOARD_KEYS.ARROW_DOWN:
         case KEYBOARD_KEYS.ARROW_UP:
           event.preventDefault();
-          if (!isOpen) openDropdown();
+          if (!isOpen) setIsOpen(true);
           break;
       }
     },
-    [disabled, isOpen, openDropdown, closeDropdown, toggleDropdown]
+    [disabled, isOpen, toggleDropdown, setIsOpen]
   );
 
   // 옵션 선택 핸들러
   const handleOptionClick = useCallback(
     (option: DropdownOptionType) => {
       selectOption(option);
-      closeDropdown();
+      setIsOpen(false);
     },
-    [selectOption, closeDropdown]
+    [selectOption, setIsOpen]
   );
 
   // 스타일 클래스 메모이제이션
