@@ -1,10 +1,8 @@
-import React from "react";
 import { baseDropdownStyles } from "../styles";
 import type { TriggerProps } from "../index";
 
 type DropdownTriggerProps = TriggerProps & {
   triggerClassName: string;
-  handleKeyDown: (event: React.KeyboardEvent) => void;
   toggleDropdown: () => void;
 };
 
@@ -15,7 +13,6 @@ export function DropdownTrigger({
   disabled,
   triggerClassName,
   icon,
-  handleKeyDown,
   toggleDropdown,
 }: DropdownTriggerProps) {
   return (
@@ -23,7 +20,6 @@ export function DropdownTrigger({
       type="button"
       className={triggerClassName}
       onClick={toggleDropdown}
-      onKeyDown={handleKeyDown}
       disabled={disabled}
       aria-haspopup="listbox"
       aria-expanded={isOpen}

@@ -7,7 +7,6 @@ import {
 import { useDropdownState } from "./hooks/useDropdownState";
 import { DropdownTrigger } from "./components/DropdownTrigger";
 import { DropdownOption } from "./components/DropdownOption";
-import { KEYBOARD_KEYS } from "./constants";
 import { createClassName } from "./utils/classNameUtils";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 import { useDetectClose } from "@byuckchon-frontend/hooks";
@@ -73,30 +72,6 @@ export default function Dropdown({
       setIsOpen(true);
     }
   }, [disabled, isOpen, setIsOpen]);
-
-  // 키보드 네비게이션 핸들러
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (disabled) return;
-
-      switch (event.key) {
-        case KEYBOARD_KEYS.ENTER:
-        case KEYBOARD_KEYS.SPACE:
-          event.preventDefault();
-          toggleDropdown();
-          break;
-        case KEYBOARD_KEYS.ESCAPE:
-          setIsOpen(false);
-          break;
-        case KEYBOARD_KEYS.ARROW_DOWN:
-        case KEYBOARD_KEYS.ARROW_UP:
-          event.preventDefault();
-          if (!isOpen) setIsOpen(true);
-          break;
-      }
-    },
-    [disabled, isOpen, toggleDropdown, setIsOpen]
-  );
 
   // 옵션 선택 핸들러
   const handleOptionClick = useCallback(
@@ -165,7 +140,6 @@ export default function Dropdown({
       ) : (
         <DropdownTrigger
           triggerClassName={triggerClassName}
-          handleKeyDown={handleKeyDown}
           toggleDropdown={toggleDropdown}
           {...triggerProps}
         />
