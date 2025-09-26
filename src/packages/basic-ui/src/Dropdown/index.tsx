@@ -9,16 +9,16 @@ import { DropdownTrigger } from "./components/DropdownTrigger";
 import { DropdownOption } from "./components/DropdownOption";
 import { KEYBOARD_KEYS } from "./constants";
 import { createClassName } from "./utils/classNameUtils";
-import { useDetectClose } from "../../../hooks/src";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
+import { useDetectClose } from "@byuckchon-frontend/hooks";
 
 // 타입 정의
-export type DropdownOptionType = {
+export interface DropdownOptionType {
   value: string | number;
   label: string;
   disabled?: boolean;
   icon?: React.ReactNode;
-};
+}
 
 export type TriggerProps = {
   isOpen: boolean;
