@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   baseDropdownSizes,
   baseDropdownStyles,
   baseDropdownVariants,
 } from "./styles";
-import { useDropdownState } from "./hooks/useDropdownState";
 import { DropdownTrigger } from "./components/DropdownTrigger";
 import { DropdownOption } from "./components/DropdownOption";
 import { createClassName } from "./utils/classNameUtils";
@@ -56,11 +55,26 @@ export default function Dropdown({
 }: DropdownProps) {
   const theme = useUITheme();
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
-  const { selectedOption, selectOption } = useDropdownState({
-    options,
-    value,
-    onChange,
-  });
+  // useDropdownState 로직을 직접 구현
+  const [selectedOption, setSelectedOption] = useState<
+    DropdownOptionType | undefined
+  >();
+
+  // 선택된 옵션 찾기
+  useEffect(() => {
+    const option = options.find((opt) => opt.value === value);
+    setSelectedOption(option);
+  }, [value, options]);
+
+  const selectOption = useCallback(
+    (option: DropdownOptionType) => {
+      if (option.disabled) return;
+
+      setSelectedOption(option);
+      onChange?.(option.value, option);
+    },
+    [onChange]
+  );
 
   const toggleDropdown = useCallback(() => {
     if (disabled) return;
