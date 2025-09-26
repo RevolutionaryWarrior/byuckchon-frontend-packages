@@ -3,7 +3,7 @@ import { baseDropdownSizes, baseDropdownStyles } from "../styles";
 import type { DropdownOptionType } from "../index";
 import { createClassName } from "../utils/classNameUtils";
 
-type DropdownOptionProps = {
+type Props = {
   option: DropdownOptionType;
   isSelected: boolean;
   size: "small" | "medium" | "large";
@@ -17,7 +17,7 @@ export function DropdownOption({
   size,
   handleOptionClick,
   renderOption,
-}: DropdownOptionProps) {
+}: Props) {
   const className = createClassName([
     baseDropdownStyles.option,
     baseDropdownSizes[size].option,
