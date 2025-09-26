@@ -1,40 +1,39 @@
 import { baseDropdownStyles } from "../styles";
 import type { TriggerProps } from "../index";
 
-type DropdownTriggerProps = TriggerProps & {
+type Props = TriggerProps & {
   triggerClassName: string;
   toggleDropdown: () => void;
 };
 
 export function DropdownTrigger({
-  isOpen,
-  selectedOption,
-  placeholder,
-  disabled,
   triggerClassName,
   icon,
   toggleDropdown,
-}: DropdownTriggerProps) {
+  ...props
+}: Props) {
   return (
     <button
       type="button"
       className={triggerClassName}
       onClick={toggleDropdown}
-      disabled={disabled}
+      disabled={props.disabled}
       aria-haspopup="listbox"
-      aria-expanded={isOpen}
-      aria-label={selectedOption?.label || placeholder}
+      aria-expanded={props.isOpen}
+      aria-label={props.selectedOption?.label || props.placeholder}
     >
       <span className={baseDropdownStyles.triggerContent}>
-        {selectedOption ? (
-          <span>{selectedOption.label}</span>
+        {props.selectedOption ? (
+          <span>{props.selectedOption.label}</span>
         ) : (
-          <span className={baseDropdownStyles.placeholder}>{placeholder}</span>
+          <span className={baseDropdownStyles.placeholder}>
+            {props.placeholder}
+          </span>
         )}
       </span>
       <span
         className={`${baseDropdownStyles.arrow} ${
-          isOpen ? baseDropdownStyles.arrowOpen : ""
+          props.isOpen ? baseDropdownStyles.arrowOpen : ""
         }`}
       >
         {icon ? icon : "▼"}

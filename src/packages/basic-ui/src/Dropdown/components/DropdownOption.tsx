@@ -37,9 +37,6 @@ export function DropdownOption({
       aria-selected={isSelected}
       tabIndex={-1}
     >
-      {option.icon && (
-        <span className={baseDropdownStyles.optionIcon}>{option.icon}</span>
-      )}
       <span>{option.label}</span>
     </div>
   );
