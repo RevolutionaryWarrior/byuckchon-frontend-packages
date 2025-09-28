@@ -1,22 +1,21 @@
 import React from "react";
+import clsx from "clsx";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 type Variant = "activate" | "unactivate";
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   variant?: Variant;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const baseToggleVariants = {
   activate: {
-    bg: "bg-[#ED6D01] border-[#ED6D01]",
-    text: "text-white",
+    bg: "bg-[#0058E4]",
   },
   unactivate: {
-    bg: "bg-[#F5F5F5] border-transparent",
-    text: "text-[#8F9098]",
+    bg: "bg-[#D4D6DD]",
   },
 };
 
@@ -29,20 +28,37 @@ export default function Toggle({
 }: Props) {
   const theme = useUITheme();
 
-  const variantKey = disabled ? "unactivate" : variant;
-  const mergedStyle = {
-    ...baseToggleVariants[variantKey],
-    ...(theme?.toggle?.[variantKey] ?? {}),
+  const inactive = {
+    ...baseToggleVariants.unactivate,
+    ...(theme?.toggle?.unactivate ?? {}),
+  };
+  const active = {
+    ...baseToggleVariants.activate,
+    ...(theme?.toggle?.activate ?? {}),
   };
 
   return (
-    <label className="inline-flex items-center cursor-pointer">
-      <input type="checkbox" {...props} className="sr-only peer" />
-      <span
-        className={`${className} ${mergedStyle} w-12 h-7 rounded-full bg-gray-300 peer-checked:bg-blue-600 relative transition-colors duration-200`}
-      >
-        <span className="absolute left-1 top-1 w-5 h-5 rounded-full bg-white transition-transform duration-200 peer-checked:translate-x-5" />
-      </span>
+    <label
+      className={clsx("flex items-center w-11 h-7 cursor-pointer", className)}
+    >
+      <input
+        type="checkbox"
+        disabled={disabled}
+        className="peer sr-only"
+        {...props}
+      />
+      {children ?? (
+        <span
+          className={clsx(
+            `relative w-full h-full rounded-full transition-colors duration-200 ${inactive.bg}`,
+            `peer-checked:${active.bg} peer-checked:[&>span]:translate-x-4`,
+            // disabled의 경우 아직 따로 디자인이 없어서 임의로 지정했습니다!
+            disabled && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          <span className="absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE] transition-transform duration-200" />
+        </span>
+      )}
     </label>
   );
 }
