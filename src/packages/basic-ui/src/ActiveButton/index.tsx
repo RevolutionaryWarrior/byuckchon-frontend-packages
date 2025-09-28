@@ -40,10 +40,7 @@ export default function ActiveButton({
   };
 
   return (
-    <button
-      {...props}
-      className={`${className} ${mergedStyle.bg} w-full cursor-pointer`}
-    >
+    <button {...props} className={`${className} ${mergedStyle.bg} w-full cursor-pointer`}>
       <p className={`${mergedStyle.text} text-center`}>{children}</p>
     </button>
   );

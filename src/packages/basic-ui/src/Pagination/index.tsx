@@ -7,7 +7,7 @@ import DoubleArrowLeftIcon from "@icons/icon_byuckicon_chevrons_left.svg?react";
 import DoubleArrowRightIcon from "@icons/icon_byuckicon_chevrons_right.svg?react";
 
 interface Props {
-  totalCount: number; 
+  totalCount: number;
   currentPage: number;
   renderCount: number;
   onPageChange: (page: number) => void;
@@ -40,7 +40,10 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
   };
 
   const IconButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
-    <button className='flex cursor-pointer items-center justify-center border border-[#D4D6DD] bg-white p-2 text-xs' onClick={onClick}>
+    <button
+      className="flex cursor-pointer items-center justify-center border border-[#D4D6DD] bg-white p-2 text-xs"
+      onClick={onClick}
+    >
       {children}
     </button>
   );
@@ -50,15 +53,16 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
       <IconButton onClick={actions.doublePrev}>{Icon?.DoublePrev ?? <DoubleArrowLeftIcon />}</IconButton>
       <IconButton onClick={actions.prev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
       <ul>
-      {renderPages.map((page) => (
-        <li key={page}
-            className={`${isPageActive(page) ? mergedTheme.pageItemActive : ''} ${mergedTheme.pageItem} cursor-pointer`}
+        {renderPages.map((page) => (
+          <li
+            key={page}
+            className={`${isPageActive(page) ? mergedTheme.pageItemActive : ""} ${mergedTheme.pageItem} cursor-pointer`}
             onClick={() => onPageChange(page)}
           >
             {page}
-        </li>
-      ))}
-        </ul>
+          </li>
+        ))}
+      </ul>
       <IconButton onClick={actions.next}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
       <IconButton onClick={actions.doubleNext}>{Icon?.DoubleNext ?? <DoubleArrowRightIcon />}</IconButton>
     </nav>
