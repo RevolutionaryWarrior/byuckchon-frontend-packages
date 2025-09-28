@@ -9,6 +9,7 @@ type Props = {
   onClickConfirm: () => void;
   Icon?: React.ReactNode;
   isScrollable?: boolean;
+  customScrollClassName?: string;
 };
 
 const baseTheme = {
@@ -26,6 +27,7 @@ export default function AlertModal({
   onClickConfirm,
   Icon,
   isScrollable = false,
+  customScrollClassName = "",
 }: Props) {
   const theme = useUITheme();
 
@@ -42,9 +44,9 @@ export default function AlertModal({
       <div className="text-center">
         <p className={mergedTheme.title}>{title}</p>
         <p
-          className={`${isScrollable ? "max-h-[100px] overflow-y-auto" : ""} ${
-            mergedTheme.description
-          }`}
+          className={`${isScrollable ? "max-h-[220px] overflow-y-auto" : ""} ${
+            customScrollClassName ?? ""
+          } ${mergedTheme.description}`}
         >
           {description}
         </p>
