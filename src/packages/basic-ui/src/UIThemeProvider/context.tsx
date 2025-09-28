@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import type { ButtonTheme } from "../ActiveButton/theme";
+import type { AlertModalTheme } from "../AlertModal/theme";
 import type { ChoiceModalTheme } from "../ChoiceModal/theme";
 import type { ConfirmModalTheme } from "../ConfirmModal/theme";
 
@@ -7,6 +8,7 @@ export type Theme = {
   button?: ButtonTheme;
   confirmModal?: ConfirmModalTheme;
   choiceModal?: ChoiceModalTheme;
+  alertModal?: AlertModalTheme;
 };
 
 export const UIThemeContext = createContext<Theme | undefined>(undefined);
