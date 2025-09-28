@@ -23,7 +23,8 @@
   },
   "peerDependencies": {
     "react": ">=17.0.0",
-    "react-dom": ">=17.0.0"
+    "react-dom": ">=17.0.0",
+    "@byuckchon-frontend/hooks": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
@@ -50,6 +51,7 @@
   "description": "",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "vite-plugin-svgr": "^4.5.0"
   }
 }
