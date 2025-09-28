@@ -1,33 +1,52 @@
 import React from "react";
+import clsx from "clsx";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
-type Variant = "small" | "medium" | "large";
+type Size = "sm" | "md" | "lg";
+type Variant = "activate" | "inactivate" | "disabled";
 
 type Props = {
-  children: React.ReactNode;
-  className?: string;
+  children?: React.ReactNode;
+  defaultSize?: Size;
   variant?: Variant;
+  className?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
+const baseSizeVariants = {
+  sm: {
+    box: "w-4 h-4",
+    text: "w-2 h-2",
+  },
+  md: {
+    box: "w-5 h-5",
+    text: "w-2.5 h-2.5",
+  },
+  lg: {
+    box: "w-6 h-6",
+    text: "w-3 h-3",
+  },
+};
+
 const baseInputVariants = {
-  small: {
-    text: "text-white",
-    bg: "",
+  activate: {
+    box: "bg-[#0058E4]",
+    text: "bg-[#EEEEEE]",
   },
-  medium: {
-    text: "text-[#ED6D01]",
-    bg: "",
+  inactivate: {
+    box: "bg-transparent border-1 border-[#D4D6DD]",
+    text: "bg-[#D4D6DD]",
   },
-  large: {
-    text: "text-[#8F9098]",
-    bg: "",
+  disabled: {
+    box: "bg-[#D4D6DD]",
+    text: "bg-[#FEFEFE]",
   },
 };
 
 export default function Checkbox({
   children,
   disabled = false,
-  variant = "medium",
+  defaultSize = "md",
+  variant = "inactivate",
   className = "",
   ...props
 }: Props) {
@@ -42,9 +61,22 @@ export default function Checkbox({
     <input
       type={"checkbox"}
       {...props}
-      className={`${className} ${mergedStyle.bg} cursor-pointer`}
+      className={clsx(
+        "cursor-pointer",
+        mergedStyle.box,
+        baseSizeVariants[defaultSize].box,
+        className
+      )}
     >
-      <p className={`${mergedStyle.text} text-center`}>{children}</p>
+      <p
+        className={clsx(
+          "text-center",
+          mergedStyle.text,
+          baseSizeVariants[defaultSize].text
+        )}
+      >
+        {children}
+      </p>
     </input>
   );
 }

@@ -1,14 +1,14 @@
 export type CheckboxTheme = {
-  small?: {
-    text?: string;
+  activate?: {
     box?: string;
+    text?: string;
   };
-  medium?: {
-    text?: string;
+  inactivate?: {
     box?: string;
+    text?: string;
   };
-  large?: {
-    text?: string;
+  disabled?: {
     box?: string;
+    text?: string;
   };
 };
