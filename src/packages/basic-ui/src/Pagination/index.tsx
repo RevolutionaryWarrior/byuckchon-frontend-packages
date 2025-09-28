@@ -22,6 +22,7 @@ interface Props {
 
 const baseTheme = {
   pageList: "flex justify-center gap-2 text-center",
+  actionButton: "flex cursor-pointer items-center justify-center border border-[#D4D6DD] bg-white p-2 text-xs",
   pageItem: "size-[30px] text-[#7B7B7B] text-sm content-center",
   pageItemActive: "bg-[#0058E4] text-white",
 };
@@ -39,11 +40,11 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
     ...(theme?.pagination ?? {}),
   };
 
-  const IconButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
-    <button
-      className="flex cursor-pointer items-center justify-center border border-[#D4D6DD] bg-white p-2 text-xs"
-      onClick={onClick}
-    >
+  const IconButton = ({
+    children,
+    ...props
+  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button className={`${mergedTheme.actionButton}`} {...props}>
       {children}
     </button>
   );
