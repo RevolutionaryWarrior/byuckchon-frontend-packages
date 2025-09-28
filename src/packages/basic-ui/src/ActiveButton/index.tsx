@@ -39,8 +39,6 @@ export default function ActiveButton({
     ...(theme?.button?.[variantKey] ?? {}),
   };
 
-  const age: number = "스물다섯";
-
   return (
     <button
       {...props}
