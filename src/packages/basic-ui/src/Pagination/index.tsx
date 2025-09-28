@@ -28,13 +28,16 @@ const baseTheme = {
 };
 
 const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, className }: Props) => {
-  const { renderPages, isPageActive, actions } = usePagination({
+  const {
+    renderPages,
+    isPageActive,
+    actions: { prev, next, doublePrev, doubleNext },
+  } = usePagination({
     totalCount,
     currentPage,
     renderCount,
     onPageChange,
   });
-  const { prev, next, doublePrev, doubleNext } = actions;
   const theme = useUITheme();
   const mergedTheme = {
     ...baseTheme,
