@@ -34,6 +34,7 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
     renderCount,
     onPageChange,
   });
+  const { prev, next, doublePrev, doubleNext } = actions;
   const theme = useUITheme();
   const mergedTheme = {
     ...baseTheme,
@@ -51,21 +52,19 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
 
   return (
     <nav className={`${mergedTheme.pageList} ${className}`} aria-label="pagination">
-      <IconButton onClick={actions.doublePrev}>{Icon?.DoublePrev ?? <DoubleArrowLeftIcon />}</IconButton>
-      <IconButton onClick={actions.prev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
-      <ul>
-        {renderPages.map((page) => (
-          <li
-            key={page}
-            className={`${isPageActive(page) ? mergedTheme.pageItemActive : ""} ${mergedTheme.pageItem} cursor-pointer`}
-            onClick={() => onPageChange(page)}
-          >
-            {page}
-          </li>
-        ))}
-      </ul>
-      <IconButton onClick={actions.next}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
-      <IconButton onClick={actions.doubleNext}>{Icon?.DoubleNext ?? <DoubleArrowRightIcon />}</IconButton>
+      <IconButton onClick={doublePrev}>{Icon?.DoublePrev ?? <DoubleArrowLeftIcon />}</IconButton>
+      <IconButton onClick={prev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
+      {renderPages.map((page) => (
+        <button
+          key={page}
+          className={`${isPageActive(page) ? mergedTheme.pageItemActive : ""} ${mergedTheme.pageItem} cursor-pointer`}
+          onClick={() => onPageChange(page)}
+        >
+          {page}
+        </button>
+      ))}
+      <IconButton onClick={next}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
+      <IconButton onClick={doubleNext}>{Icon?.DoubleNext ?? <DoubleArrowRightIcon />}</IconButton>
     </nav>
   );
 };

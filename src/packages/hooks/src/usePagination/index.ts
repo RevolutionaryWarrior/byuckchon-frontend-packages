@@ -7,44 +7,35 @@ type Props = {
 
 const usePagination = (props: Props) => {
   const { totalCount, renderCount, currentPage, onPageChange } = props;
-  const start: number = Math.floor((currentPage - 1) / renderCount) * renderCount + 1;
-  const end: number = Math.min(start + renderCount - 1, totalCount);
-  const renderPages: number[] = Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
-  const isPageActive = (page: number) => {
-    return page === currentPage;
+  const generatePaginationRange = () => {
+    const start: number = Math.floor((currentPage - 1) / renderCount) * renderCount + 1;
+    const end: number = Math.min(start + renderCount - 1, totalCount);
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
+  const handlePageChange = (step: number, checkLogic: (page: number) => boolean) => {
+    const selectedPage = currentPage + step;
+    const limitPage = onPageChange(step > 0 ? totalCount : 1);
+
+    if (checkLogic(selectedPage)) {
+      return onPageChange(selectedPage);
+    }
+
+    return limitPage;
   };
 
   const actions = {
-    prev: () => {
-      if (currentPage > 1) {
-        return onPageChange(currentPage - 1);
-      }
-    },
-    next: () => {
-      if (currentPage < totalCount) {
-        return onPageChange(currentPage + 1);
-      }
-    },
-    doublePrev: () => {
-      if (currentPage - renderCount <= 0) {
-        return onPageChange(1);
-      }
-
-      return onPageChange(currentPage - renderCount);
-    },
-    doubleNext: () => {
-      if (currentPage + renderCount <= totalCount) {
-        return onPageChange(currentPage + renderCount);
-      }
-
-      return onPageChange(totalCount);
-    },
+    prev: () => handlePageChange(-1, (page) => page > 1),
+    next: () => handlePageChange(1, (page) => page < totalCount),
+    doublePrev: () => handlePageChange(-renderCount, (page) => page > 1),
+    doubleNext: () => handlePageChange(renderCount, (page) => page < totalCount),
   };
 
   return {
-    renderPages,
-    isPageActive,
+    renderPages: generatePaginationRange(),
+    isPageActive: (page: number) => page === currentPage,
     actions,
   };
 };
