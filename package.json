@@ -13,6 +13,7 @@
     "lint": "pnpm -r run lint"
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "path": "^0.12.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
