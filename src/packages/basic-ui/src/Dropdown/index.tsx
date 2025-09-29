@@ -114,15 +114,20 @@ export default function Dropdown({
           role="listbox"
           aria-label="옵션 목록"
         >
-          {options.map((option) => (
-            <DropdownOption
-              key={option.value}
-              option={option}
-              isSelected={selectedOption?.value === option.value}
-              handleOptionClick={handleOptionClick}
-              renderOption={renderOption}
-            />
-          ))}
+          {options.map((option) => {
+            if (renderOption) {
+              return renderOption(option);
+            }
+
+            return (
+              <DropdownOption
+                key={option.value}
+                option={option}
+                isSelected={selectedOption?.value === option.value}
+                handleOptionClick={handleOptionClick}
+              />
+            );
+          })}
         </div>
       )}
     </div>
