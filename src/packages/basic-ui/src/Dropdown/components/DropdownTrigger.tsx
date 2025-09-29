@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { TriggerProps } from "../index";
 import { twMerge } from "tailwind-merge";
+import ChevronDownIcon from "@icons/icon_byuckicon_chevron_down.svg?react";
 
 type Props = TriggerProps & {
   size: "small" | "medium" | "large";
@@ -50,7 +51,7 @@ export function DropdownTrigger({ size, ...props }: Props) {
           "transition-transform duration-200"
         )}
       >
-        {props.icon ? props.icon : "▼"}
+        {props.icon ? props.icon : <ChevronDownIcon />}
       </span>
     </button>
   );
