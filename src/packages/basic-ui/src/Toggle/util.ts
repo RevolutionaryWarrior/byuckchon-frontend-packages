@@ -28,7 +28,6 @@ export const getBaseBgClasses = (className?: string): string => {
     const parts = t.split(":");
     const last = parts[parts.length - 1];
     if (!last.startsWith("bg-")) continue;
-    // 마지막 프리픽스가 peer-checked 면 체크 상태용으로 분리
     if (parts.includes("peer-checked")) continue;
     base.push(t);
   }
@@ -44,7 +43,6 @@ export const getCheckedBgClasses = (className?: string): string => {
     const parts = t.split(":");
     const last = parts[parts.length - 1];
     if (!last.startsWith("bg-")) continue;
-    // 마지막 프리픽스에 peer-checked 가 포함되어 있으면 그대로 사용
     if (parts.includes("peer-checked")) checked.push(t);
   }
   return checked.join(" ");
