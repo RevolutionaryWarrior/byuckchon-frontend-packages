@@ -109,22 +109,21 @@ export default function Dropdown({
         <DropdownTrigger {...triggerProps} onClick={toggleDropdown} />
       )}
 
-      {isOpen && (
+      {options.length > 0 && isOpen && (
         <div
           className={dropdownClassName}
           role="listbox"
           aria-label="옵션 목록"
         >
-          {options.length > 0 &&
-            options.map((option) => (
-              <DropdownOption
-                key={option.value}
-                option={option}
-                isSelected={selectedOption?.value === option.value}
-                handleOptionClick={handleOptionClick}
-                renderOption={renderOption}
-              />
-            ))}
+          {options.map((option) => (
+            <DropdownOption
+              key={option.value}
+              option={option}
+              isSelected={selectedOption?.value === option.value}
+              handleOptionClick={handleOptionClick}
+              renderOption={renderOption}
+            />
+          ))}
         </div>
       )}
     </div>
