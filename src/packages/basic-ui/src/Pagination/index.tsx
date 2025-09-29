@@ -6,11 +6,17 @@ import ArrowRightIcon from "@icons/icon_byuckicon_chevron_right.svg?react";
 import DoubleArrowLeftIcon from "@icons/icon_byuckicon_chevrons_left.svg?react";
 import DoubleArrowRightIcon from "@icons/icon_byuckicon_chevrons_right.svg?react";
 
-interface Props {
+type IconButtonType = {
+  children: React.ReactNode;
+  showButton?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+type Props = {
   totalCount: number;
   currentPage: number;
   renderCount: number;
   onPageChange: (page: number) => void;
+  showDeepButton?: boolean;
   mode?: "single" | "multi";
   Icon?: {
     DeepPrev?: React.ReactNode;
@@ -19,7 +25,7 @@ interface Props {
     DeepNext?: React.ReactNode;
   };
   className?: string;
-}
+};
 
 const baseTheme = {
   pageList: "flex justify-center gap-2 text-center",
@@ -28,7 +34,16 @@ const baseTheme = {
   pageItemActive: "bg-[#0058E4] text-white",
 };
 
-const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, mode, className }: Props) => {
+const Pagination = ({
+  totalCount,
+  currentPage,
+  renderCount,
+  onPageChange,
+  showDeepButton,
+  mode,
+  Icon,
+  className,
+}: Props) => {
   const {
     renderPages,
     isPageActive,
@@ -46,18 +61,17 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
     ...(theme?.pagination ?? {}),
   };
 
-  const IconButton = ({
-    children,
-    ...props
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button className={`${mergedTheme.actionButton}`} {...props}>
+  const IconButton = ({ children, showButton = true, ...props }: IconButtonType) => (
+    <button className={`${mergedTheme.actionButton} ${showButton ? "block" : "hidden"}`} {...props}>
       {children}
     </button>
   );
 
   return (
     <nav className={`${mergedTheme.pageList} ${className}`} aria-label="pagination">
-      <IconButton onClick={onDeepPrev}>{Icon?.DeepPrev ?? <DoubleArrowLeftIcon />}</IconButton>
+      <IconButton onClick={onDeepPrev} showButton={showDeepButton}>
+        {Icon?.DeepPrev ?? <DoubleArrowLeftIcon />}
+      </IconButton>
       <IconButton onClick={onPrev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
       {renderPages.map((page) => (
         <button
@@ -69,7 +83,9 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
         </button>
       ))}
       <IconButton onClick={onNext}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
-      <IconButton onClick={onDeepNext}>{Icon?.DeepNext ?? <DoubleArrowRightIcon />}</IconButton>
+      <IconButton onClick={onDeepNext} showButton={showDeepButton}>
+        {Icon?.DeepNext ?? <DoubleArrowRightIcon />}
+      </IconButton>
     </nav>
   );
 };
