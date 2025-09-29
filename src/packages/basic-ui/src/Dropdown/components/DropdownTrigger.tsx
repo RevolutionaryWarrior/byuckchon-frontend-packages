@@ -3,9 +3,8 @@ import type { TriggerProps } from "../index";
 import { twMerge } from "tailwind-merge";
 
 type Props = TriggerProps & {
-  toggleDropdown: () => void;
   size: "small" | "medium" | "large";
-};
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const baseDropdownSizes = {
   small: {
@@ -19,7 +18,7 @@ const baseDropdownSizes = {
   },
 };
 
-export function DropdownTrigger({ toggleDropdown, size, ...props }: Props) {
+export function DropdownTrigger({ size, ...props }: Props) {
   const triggerClassName = useMemo(() => {
     return twMerge([
       "cursor-pointer w-full text-left border border-[#CCCCCC] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between",
@@ -32,11 +31,11 @@ export function DropdownTrigger({ toggleDropdown, size, ...props }: Props) {
     <button
       type="button"
       className={triggerClassName}
-      onClick={toggleDropdown}
       disabled={props.disabled}
       aria-haspopup="listbox"
       aria-expanded={props.isOpen}
       aria-label={props.selectedOption?.label || props.placeholder}
+      {...props}
     >
       <span className="w-full text-left">
         {props.selectedOption ? (

@@ -122,9 +122,9 @@ export default function Dropdown({
         renderTrigger(triggerProps)
       ) : (
         <DropdownTrigger
-          toggleDropdown={toggleDropdown}
           size={size}
           {...triggerProps}
+          onClick={toggleDropdown}
         />
       )}
 
