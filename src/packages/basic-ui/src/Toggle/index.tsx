@@ -2,12 +2,9 @@ import React from "react";
 import clsx from "clsx";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
-type Variant = "activate" | "unactivate";
-
 type Props = {
   children?: React.ReactNode;
   className?: string;
-  variant?: Variant;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const baseToggleVariants = {
@@ -19,12 +16,7 @@ const baseToggleVariants = {
   },
 };
 
-export default function Toggle({
-  children,
-  variant = "activate",
-  className = "",
-  ...props
-}: Props) {
+export default function Toggle({ children, className = "", ...props }: Props) {
   const theme = useUITheme();
 
   const inactive = {
