@@ -70,13 +70,10 @@ export default function Dropdown({
   );
 
   // 옵션 선택 핸들러
-  const handleOptionClick = useCallback(
-    (option: DropdownOptionType) => {
-      selectOption(option);
-      setIsOpen(false);
-    },
-    [selectOption, setIsOpen]
-  );
+  const handleOptionClick = (option: DropdownOptionType) => {
+    selectOption(option);
+    setIsOpen(false);
+  };
 
   // 트리거 props
   const triggerProps: TriggerProps = useMemo(
