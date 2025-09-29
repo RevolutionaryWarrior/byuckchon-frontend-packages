@@ -24,8 +24,8 @@ export type Props = {
   value?: string | number;
   placeholder?: string;
   disabled?: boolean;
-  className?: string;
   icon?: React.ReactNode;
+  triggerClassName?: string;
   onChange?: (value: string | number, option: DropdownOptionType) => void;
   onClose?: () => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
@@ -38,10 +38,10 @@ export default function Dropdown({
   placeholder = "선택하세요",
   disabled = false,
   icon,
+  triggerClassName,
   onChange,
   renderTrigger,
   renderOption,
-  className,
 }: Props) {
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
   const [selectedOption, setSelectedOption] = useState<
@@ -85,7 +85,7 @@ export default function Dropdown({
 
   const dropdownClassName = twMerge(
     "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
-    className
+    triggerClassName
   );
 
   // 트리거 props
