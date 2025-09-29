@@ -21,7 +21,6 @@ const baseToggleVariants = {
 
 export default function Toggle({
   children,
-  disabled = false,
   variant = "activate",
   className = "",
   ...props
@@ -41,19 +40,14 @@ export default function Toggle({
     <label
       className={clsx("flex items-center w-11 h-7 cursor-pointer", className)}
     >
-      <input
-        type="checkbox"
-        disabled={disabled}
-        className="peer sr-only"
-        {...props}
-      />
+      <input type="checkbox" className="peer sr-only" {...props} />
       {children ?? (
         <span
           className={clsx(
             `relative w-full h-full rounded-full transition-colors duration-200 ${inactive.bg}`,
-            `peer-checked:${active.bg} peer-checked:[&>span]:translate-x-4`,
+            `peer-checked:${active.bg} peer-checked:[&>span]:translate-x-4`
             // disabled의 경우 아직 따로 디자인이 없어서 임의로 지정했습니다!
-            disabled && "opacity-50 cursor-not-allowed"
+            // disabled && "opacity-50 cursor-not-allowed"
           )}
         >
           <span className="absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE] transition-transform duration-200" />
