@@ -69,16 +69,6 @@ export default function Dropdown({
     [onChange]
   );
 
-  const toggleDropdown = useCallback(() => {
-    if (disabled) return;
-    if (isOpen) {
-      setIsOpen(false);
-    } else {
-      if (disabled) return;
-      setIsOpen(true);
-    }
-  }, [disabled, isOpen, setIsOpen]);
-
   // 옵션 선택 핸들러
   const handleOptionClick = useCallback(
     (option: DropdownOptionType) => {
@@ -107,7 +97,7 @@ export default function Dropdown({
       ) : (
         <DropdownTrigger
           {...triggerProps}
-          onClick={toggleDropdown}
+          onClick={() => setIsOpen((prev) => !prev)}
           className={triggerClassName}
         />
       )}
