@@ -3,15 +3,19 @@ import type { TriggerProps } from "../index";
 import { twMerge } from "tailwind-merge";
 import ChevronDownIcon from "@icons/icon_byuckicon_chevron_down.svg?react";
 
-type Props = TriggerProps & React.ButtonHTMLAttributes<HTMLButtonElement>;
+type Props = TriggerProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    className?: string;
+  };
 
 export function DropdownTrigger({ ...props }: Props) {
   const triggerClassName = useMemo(() => {
     return twMerge([
       "cursor-pointer w-full text-left border border-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between h-[52px] text-base px-3 flex items-center",
       props.disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
+      props.className,
     ]);
-  }, [props.disabled]);
+  }, [props.disabled, props.className]);
 
   return (
     <button

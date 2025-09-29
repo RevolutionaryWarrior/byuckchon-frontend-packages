@@ -17,6 +17,7 @@ export type TriggerProps = {
   placeholder?: string;
   disabled?: boolean;
   icon?: React.ReactNode;
+  className?: string;
 };
 
 export type Props = {
@@ -26,6 +27,8 @@ export type Props = {
   disabled?: boolean;
   icon?: React.ReactNode;
   triggerClassName?: string;
+  optionWrapperClassName?: string;
+  optionClassName?: string;
   onChange?: (value: string | number, option: DropdownOptionType) => void;
   onClose?: () => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
@@ -39,6 +42,8 @@ export default function Dropdown({
   disabled = false,
   icon,
   triggerClassName,
+  optionWrapperClassName,
+  optionClassName,
   onChange,
   renderTrigger,
   renderOption,
@@ -83,11 +88,6 @@ export default function Dropdown({
     [selectOption, setIsOpen]
   );
 
-  const dropdownClassName = twMerge(
-    "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
-    triggerClassName
-  );
-
   // 트리거 props
   const triggerProps: TriggerProps = useMemo(
     () => ({
@@ -105,12 +105,19 @@ export default function Dropdown({
       {renderTrigger ? (
         renderTrigger(triggerProps)
       ) : (
-        <DropdownTrigger {...triggerProps} onClick={toggleDropdown} />
+        <DropdownTrigger
+          {...triggerProps}
+          onClick={toggleDropdown}
+          className={triggerClassName}
+        />
       )}
 
       {options.length > 0 && isOpen && (
         <div
-          className={dropdownClassName}
+          className={twMerge(
+            "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
+            optionWrapperClassName
+          )}
           role="listbox"
           aria-label="옵션 목록"
         >
@@ -125,6 +132,7 @@ export default function Dropdown({
                 option={option}
                 isSelected={selectedOption?.value === option.value}
                 handleOptionClick={handleOptionClick}
+                className={optionClassName}
               />
             );
           })}
