@@ -11,11 +11,12 @@ interface Props {
   currentPage: number;
   renderCount: number;
   onPageChange: (page: number) => void;
+  mode?: "single" | "multi";
   Icon?: {
-    DoublePrev?: React.ReactNode;
+    DeepPrev?: React.ReactNode;
     Prev?: React.ReactNode;
     Next?: React.ReactNode;
-    DoubleNext?: React.ReactNode;
+    DeepNext?: React.ReactNode;
   };
   className?: string;
 }
@@ -27,16 +28,17 @@ const baseTheme = {
   pageItemActive: "bg-[#0058E4] text-white",
 };
 
-const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, className }: Props) => {
+const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, mode, className }: Props) => {
   const {
     renderPages,
     isPageActive,
-    actions: { prev, next, doublePrev, doubleNext },
+    actions: { onPrev, onNext, onDeepPrev, onDeepNext },
   } = usePagination({
     totalCount,
     currentPage,
     renderCount,
     onPageChange,
+    mode: mode ?? "multi",
   });
   const theme = useUITheme();
   const mergedTheme = {
@@ -55,8 +57,8 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
 
   return (
     <nav className={`${mergedTheme.pageList} ${className}`} aria-label="pagination">
-      <IconButton onClick={doublePrev}>{Icon?.DoublePrev ?? <DoubleArrowLeftIcon />}</IconButton>
-      <IconButton onClick={prev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
+      <IconButton onClick={onDeepPrev}>{Icon?.DeepPrev ?? <DoubleArrowLeftIcon />}</IconButton>
+      <IconButton onClick={onPrev}>{Icon?.Prev ?? <ArrowLeftIcon />}</IconButton>
       {renderPages.map((page) => (
         <button
           key={page}
@@ -66,8 +68,8 @@ const Pagination = ({ totalCount, currentPage, renderCount, onPageChange, Icon, 
           {page}
         </button>
       ))}
-      <IconButton onClick={next}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
-      <IconButton onClick={doubleNext}>{Icon?.DoubleNext ?? <DoubleArrowRightIcon />}</IconButton>
+      <IconButton onClick={onNext}>{Icon?.Next ?? <ArrowRightIcon />}</IconButton>
+      <IconButton onClick={onDeepNext}>{Icon?.DeepNext ?? <DoubleArrowRightIcon />}</IconButton>
     </nav>
   );
 };
