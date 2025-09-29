@@ -5,11 +5,11 @@ import { useDetectClose } from "@byuckchon-frontend/hooks";
 import { twMerge } from "tailwind-merge";
 
 // 타입 정의
-export interface DropdownOptionType {
+export type DropdownOptionType = {
   value: string | number;
   label: string;
   disabled?: boolean;
-}
+};
 
 export type TriggerProps = {
   isOpen: boolean;
@@ -19,7 +19,7 @@ export type TriggerProps = {
   icon?: React.ReactNode;
 };
 
-export type DropdownProps = {
+export type Props = {
   options: DropdownOptionType[];
   value?: string | number;
   placeholder?: string;
@@ -33,29 +33,17 @@ export type DropdownProps = {
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
 };
 
-const baseDropdownSizes = {
-  small: {
-    dropdown: "text-sm",
-  },
-  medium: {
-    dropdown: "text-base",
-  },
-  large: {
-    dropdown: "text-lg",
-  },
-};
-
 export default function Dropdown({
   options = [],
   value,
   placeholder = "선택하세요",
   disabled = false,
-  size = "medium",
   icon,
   onChange,
   renderTrigger,
   renderOption,
-}: DropdownProps) {
+  className,
+}: Props) {
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
   // useDropdownState 로직을 직접 구현
   const [selectedOption, setSelectedOption] = useState<
@@ -97,12 +85,10 @@ export default function Dropdown({
     [selectOption, setIsOpen]
   );
 
-  const dropdownClassName = useMemo(() => {
-    return twMerge([
-      "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto",
-      baseDropdownSizes[size].dropdown,
-    ]);
-  }, [size]);
+  const dropdownClassName = twMerge(
+    "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
+    className
+  );
 
   // 트리거 props
   const triggerProps: TriggerProps = useMemo(
@@ -121,11 +107,7 @@ export default function Dropdown({
       {renderTrigger ? (
         renderTrigger(triggerProps)
       ) : (
-        <DropdownTrigger
-          size={size}
-          {...triggerProps}
-          onClick={toggleDropdown}
-        />
+        <DropdownTrigger {...triggerProps} onClick={toggleDropdown} />
       )}
 
       {isOpen && (
@@ -144,7 +126,6 @@ export default function Dropdown({
                 key={option.value}
                 option={option}
                 isSelected={selectedOption?.value === option.value}
-                size={size}
                 handleOptionClick={handleOptionClick}
                 renderOption={renderOption}
               />
