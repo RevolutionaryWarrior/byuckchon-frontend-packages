@@ -17,7 +17,6 @@ export function DropdownTrigger({ ...props }: Props) {
     <button
       type="button"
       className={triggerClassName}
-      disabled={props.disabled}
       aria-haspopup="listbox"
       aria-expanded={props.isOpen}
       aria-label={props.selectedOption?.label || props.placeholder}

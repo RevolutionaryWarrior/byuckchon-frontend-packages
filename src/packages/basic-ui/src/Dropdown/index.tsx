@@ -44,7 +44,6 @@ export default function Dropdown({
   className,
 }: Props) {
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
-  // useDropdownState 로직을 직접 구현
   const [selectedOption, setSelectedOption] = useState<
     DropdownOptionType | undefined
   >();
