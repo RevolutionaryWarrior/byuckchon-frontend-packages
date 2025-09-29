@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 type Props = {
-  children?: React.ReactNode;
   className?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
@@ -16,7 +15,7 @@ const baseToggleVariants = {
   },
 };
 
-export default function Toggle({ children, className = "", ...props }: Props) {
+export default function Toggle({ className = "", ...props }: Props) {
   const theme = useUITheme();
 
   const inactive = {
@@ -38,19 +37,17 @@ export default function Toggle({ children, className = "", ...props }: Props) {
         aria-label={props["aria-label"]}
         {...props}
       />
-      {children ?? (
-        <span
-          className={clsx(
-            `relative w-full h-full rounded-full transition-colors duration-200 ${inactive.bg}`,
-            `peer-checked:${active.bg} peer-checked:[&>span]:translate-x-4`
-            // disabled의 경우 아직 따로 디자인이 없어서 임의로 지정했습니다!
-            // disabled && "opacity-50 cursor-not-allowed"
-          )}
-          aria-hidden
-        >
-          <span className="absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE] transition-transform duration-200" />
-        </span>
-      )}
+      <span
+        className={clsx(
+          `relative w-full h-full rounded-full transition-colors duration-200 ${inactive.bg}`,
+          `peer-checked:${active.bg} peer-checked:[&>span]:translate-x-4`
+          // disabled의 경우 아직 따로 디자인이 없어서 임의로 지정했습니다!
+          // disabled && "opacity-50 cursor-not-allowed"
+        )}
+        aria-hidden
+      >
+        <span className="absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE] transition-transform duration-200" />
+      </span>
     </label>
   );
 }
