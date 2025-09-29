@@ -1,7 +1,6 @@
 import React from "react";
-import { baseDropdownSizes, baseDropdownStyles } from "../styles";
 import type { DropdownOptionType } from "../index";
-import { createClassName } from "../utils/classNameUtils";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   option: DropdownOptionType;
@@ -11,6 +10,18 @@ type Props = {
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
 };
 
+const baseDropdownSizes = {
+  small: {
+    option: "p-1 text-sm",
+  },
+  medium: {
+    option: "p-2 text-base",
+  },
+  large: {
+    option: "p-3 text-lg",
+  },
+};
+
 export function DropdownOption({
   option,
   isSelected,
@@ -18,11 +29,11 @@ export function DropdownOption({
   handleOptionClick,
   renderOption,
 }: Props) {
-  const className = createClassName([
-    baseDropdownStyles.option,
+  const className = twMerge([
+    option.disabled && "opacity-50",
     baseDropdownSizes[size].option,
-    option.disabled && baseDropdownStyles.optionDisabled,
-    isSelected && baseDropdownStyles.optionSelected,
+    isSelected && "bg-blue-500 text-white",
+    "cursor-pointer",
   ]);
 
   if (renderOption) {
