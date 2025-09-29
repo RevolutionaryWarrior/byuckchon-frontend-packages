@@ -99,7 +99,7 @@ export default function Dropdown({
 
   const dropdownClassName = useMemo(() => {
     return twMerge([
-      "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-60 overflow-auto",
+      "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto",
       baseDropdownSizes[size].dropdown,
     ]);
   }, [size]);

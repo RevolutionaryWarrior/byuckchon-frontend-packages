@@ -12,13 +12,13 @@ type Props = {
 
 const baseDropdownSizes = {
   small: {
-    option: "p-1 text-sm",
+    option: "h-[40px] text-sm px-3 flex items-center",
   },
   medium: {
-    option: "p-2 text-base",
+    option: "h-[52px] text-base flex items-center px-3",
   },
   large: {
-    option: "p-3 text-lg",
+    option: "h-[60px] text-lg flex items-center px-3",
   },
 };
 
@@ -33,7 +33,7 @@ export function DropdownOption({
     option.disabled && "opacity-50",
     baseDropdownSizes[size].option,
     isSelected && "bg-blue-500 text-white",
-    "cursor-pointer",
+    "cursor-pointer border-b border-[#CCCCCC]",
   ]);
 
   if (renderOption) {

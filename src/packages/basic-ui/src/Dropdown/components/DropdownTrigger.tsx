@@ -9,20 +9,20 @@ type Props = TriggerProps & {
 
 const baseDropdownSizes = {
   small: {
-    trigger: "px-2 py-2 text-sm",
+    trigger: "h-[40px] text-sm px-3 flex items-center",
   },
   medium: {
-    trigger: "px-3 py-4  text-base",
+    trigger: "h-[52px] text-base px-3 flex items-center",
   },
   large: {
-    trigger: "px-5 py-6 text-lg",
+    trigger: "h-[60px] text-lg px-3 flex items-center",
   },
 };
 
 export function DropdownTrigger({ size, ...props }: Props) {
   const triggerClassName = useMemo(() => {
     return twMerge([
-      "cursor-pointer w-full text-left border border-[#CCCCCC] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between",
+      "cursor-pointer w-full text-left border border-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between",
       baseDropdownSizes[size].trigger,
       props.disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
     ]);
