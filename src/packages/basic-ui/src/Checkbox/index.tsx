@@ -14,9 +14,9 @@ type Props = {
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const baseSizeVariants = {
-  sm: { box: "w-4 h-4 ", text: "w-2.5 h-2.5" },
+  sm: { box: "w-4 h-4 ", text: "w-2.5 h-2.75" },
   md: { box: "w-5 h-5 ", text: "w-3 h-3.25" },
-  lg: { box: "w-6 h-6 ", text: "w-4 h-4" },
+  lg: { box: "w-6 h-6 ", text: "w-4 h-4.25" },
 };
 
 const baseInputVariants = {
@@ -85,7 +85,7 @@ export default function Checkbox({
           <label
             htmlFor={checkboxId}
             className={clsx(
-              "relative inline-flex items-center justify-center border-[1px] transition-all duration-200 cursor-pointer",
+              "relative inline-flex items-center justify-center transition-all duration-200 cursor-pointer",
 
               mergedStyle.box,
               baseSizeVariants[defaultSize].box,
@@ -95,7 +95,7 @@ export default function Checkbox({
               `[&>svg]:${baseSizeVariants[defaultSize].text}`,
 
               disabled &&
-                `cursor-not-allowed bg-transparent ${baseInputVariants["disabled"].box} [&>svg]:${baseInputVariants["disabled"].text}`,
+                `cursor-not-allowed bg-transparent border-[1px] ${baseInputVariants["disabled"].box} [&>svg]:${baseInputVariants["disabled"].text}`,
               className
             )}
           >
