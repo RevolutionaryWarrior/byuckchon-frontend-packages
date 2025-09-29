@@ -24,7 +24,6 @@ export type Props = {
   value?: string | number;
   placeholder?: string;
   disabled?: boolean;
-  size?: "small" | "medium" | "large";
   className?: string;
   icon?: React.ReactNode;
   onChange?: (value: string | number, option: DropdownOptionType) => void;
@@ -116,11 +115,7 @@ export default function Dropdown({
           role="listbox"
           aria-label="옵션 목록"
         >
-          {options.length === 0 ? (
-            <div className="px-3 py-2 text-gray-500 text-center">
-              선택할 수 있는 옵션이 없습니다
-            </div>
-          ) : (
+          {options.length > 0 &&
             options.map((option) => (
               <DropdownOption
                 key={option.value}
@@ -129,8 +124,7 @@ export default function Dropdown({
                 handleOptionClick={handleOptionClick}
                 renderOption={renderOption}
               />
-            ))
-          )}
+            ))}
         </div>
       )}
     </div>
