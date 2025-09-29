@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 type Size = "sm" | "md" | "lg";
@@ -13,39 +14,30 @@ type Props = {
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const baseSizeVariants = {
-  sm: {
-    box: "w-4 h-4",
-    text: "w-2 h-2",
-  },
-  md: {
-    box: "w-5 h-5",
-    text: "w-2.5 h-2.5",
-  },
-  lg: {
-    box: "w-6 h-6",
-    text: "w-3 h-3",
-  },
+  sm: { box: "w-4 h-4 ", text: "w-2.5 h-2.5" },
+  md: { box: "w-5 h-5 ", text: "w-3 h-3.25" },
+  lg: { box: "w-6 h-6 ", text: "w-4 h-4" },
 };
 
 const baseInputVariants = {
   activate: {
     box: "bg-[#0058E4]",
-    text: "bg-[#EEEEEE]",
+    text: "text-[#EEEEEE]",
   },
   inactivate: {
-    box: "bg-transparent border-1 border-[#D4D6DD]",
-    text: "bg-[#D4D6DD]",
+    box: "bg-[#D4D6DD]",
+    text: "text-[#FEFEFE]",
   },
   disabled: {
-    box: "bg-[#D4D6DD]",
-    text: "bg-[#FEFEFE]",
+    box: "border-[#D4D6DD]",
+    text: "text-[#D4D6DD]",
   },
 };
 
 export default function Checkbox({
   children,
   disabled = false,
-  defaultSize = "md",
+  defaultSize = "lg",
   variant = "inactivate",
   className = "",
   ...props
@@ -57,26 +49,75 @@ export default function Checkbox({
     ...(theme?.checkbox?.[variant] ?? {}),
   };
 
+  // input 과 label 연동을 위해 (커스텀) 임의로 해시 값 아이디 생성
+  const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+
   return (
-    <input
-      type={"checkbox"}
-      {...props}
-      className={clsx(
-        "cursor-pointer",
-        mergedStyle.box,
-        baseSizeVariants[defaultSize].box,
-        className
+    <div className="inline-flex items-center">
+      {children ? (
+        <div className={clsx("inline-flex items-center", className)}>
+          <input
+            type="checkbox"
+            id={checkboxId}
+            disabled={disabled}
+            className="sr-only peer"
+            {...props}
+          />
+          <label
+            htmlFor={checkboxId}
+            className={clsx(
+              "flex items-center cursor-pointer appearance-none",
+              disabled && "cursor-not-allowed opacity-50"
+            )}
+          >
+            {children}
+          </label>
+        </div>
+      ) : (
+        <>
+          <input
+            type="checkbox"
+            id={checkboxId}
+            disabled={disabled}
+            className="sr-only peer"
+            {...props}
+          />
+          <label
+            htmlFor={checkboxId}
+            className={clsx(
+              "relative inline-flex items-center justify-center border-[1px] transition-all duration-200 cursor-pointer",
+
+              mergedStyle.box,
+              baseSizeVariants[defaultSize].box,
+
+              `peer-checked:${baseInputVariants["activate"].box} peer-checked:border-0`,
+              `peer-checked:[&>svg]:bg-transparent peer-checked:[&>svg]:${baseInputVariants[variant].text} peer-checked:[&>svg]:${baseSizeVariants[defaultSize].text}`,
+              `[&>svg]:${baseSizeVariants[defaultSize].text}`,
+
+              disabled &&
+                `cursor-not-allowed bg-transparent ${baseInputVariants["disabled"].box} [&>svg]:${baseInputVariants["disabled"].text}`,
+              className
+            )}
+          >
+            <svg
+              className={clsx(
+                "block",
+
+                baseSizeVariants[defaultSize].text,
+                baseInputVariants[variant].text
+              )}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </label>
+        </>
       )}
-    >
-      <p
-        className={clsx(
-          "text-center",
-          mergedStyle.text,
-          baseSizeVariants[defaultSize].text
-        )}
-      >
-        {children}
-      </p>
-    </input>
+    </div>
   );
 }
