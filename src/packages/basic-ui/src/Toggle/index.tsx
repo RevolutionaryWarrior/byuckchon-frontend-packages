@@ -40,7 +40,7 @@ export default function Toggle({
     <label
       className={clsx("flex items-center w-11 h-7 cursor-pointer", className)}
     >
-      <input type="checkbox" className="peer sr-only" {...props} />
+      <input type="checkbox" className="peer" {...props} />
       {children ?? (
         <span
           className={clsx(
