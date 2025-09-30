@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { DropdownTrigger } from "./components/DropdownTrigger";
-import { DropdownOption } from "./components/DropdownOption";
+import ChevronDownIcon from "@icons/icon_byuckicon_chevron_down.svg?react";
 import { useDetectClose } from "@byuckchon-frontend/hooks";
 import { twMerge } from "tailwind-merge";
 
@@ -81,11 +80,37 @@ export default function Dropdown({
       {renderTrigger ? (
         renderTrigger(triggerProps)
       ) : (
-        <DropdownTrigger
-          {...triggerProps}
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-label={selectedOption?.label || placeholder}
+          className={twMerge(
+            // 기본 스타일
+            "cursor-pointer w-full text-left border border-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between h-[52px] text-base px-3",
+            // 비활성화 상태
+            disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
+            // 외부에서 전달받은 클래스
+            triggerClassName
+          )}
           onClick={() => setIsOpen((prev) => !prev)}
-          className={triggerClassName}
-        />
+          disabled={disabled}
+        >
+          <span className="w-full text-left">
+            {selectedOption && <span>{selectedOption.label}</span>}
+            {!selectedOption && (
+              <span className="text-gray-500">{placeholder}</span>
+            )}
+          </span>
+          <span
+            className={twMerge(
+              isOpen ? "rotate-180" : "",
+              "transition-transform duration-200"
+            )}
+          >
+            {icon ? icon : <ChevronDownIcon />}
+          </span>
+        </button>
       )}
 
       {options.length > 0 && isOpen && (
@@ -103,13 +128,27 @@ export default function Dropdown({
             }
 
             return (
-              <DropdownOption
+              <div
                 key={`${option.label}-${option.value}-${index}`}
-                option={option}
-                isSelected={selectedOption?.value === option.value}
-                handleOptionClick={handleOptionClick}
-                className={optionClassName}
-              />
+                className={twMerge(
+                  // 기본 스타일
+                  "cursor-pointer border-b border-[#CCCCCC] h-[52px] text-base flex items-center px-3 hover:bg-gray-50 transition-colors duration-150",
+                  // 선택된 상태
+                  selectedOption?.value === option.value &&
+                    "bg-blue-500 text-white hover:bg-blue-600",
+                  // 비활성화 상태
+                  option.disabled &&
+                    "opacity-50 cursor-not-allowed hover:bg-transparent",
+                  // 외부에서 전달받은 클래스
+                  optionClassName
+                )}
+                onClick={() => handleOptionClick(option)}
+                role="option"
+                aria-selected={selectedOption?.value === option.value}
+                tabIndex={-1}
+              >
+                <span>{option.label}</span>
+              </div>
             );
           })}
         </div>
