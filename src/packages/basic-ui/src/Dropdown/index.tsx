@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { DropdownTrigger } from "./components/DropdownTrigger";
 import { DropdownOption } from "./components/DropdownOption";
 import { useDetectClose } from "@byuckchon-frontend/hooks";
@@ -22,14 +22,17 @@ export type TriggerProps = {
 
 export type Props = {
   options: DropdownOptionType[];
-  value?: string | number;
+  selectedOption?: {
+    value: string | number;
+    label: string;
+  };
   placeholder?: string;
   disabled?: boolean;
   icon?: React.ReactNode;
   triggerClassName?: string;
   optionWrapperClassName?: string;
   optionClassName?: string;
-  onChange?: (value: string | number, option: DropdownOptionType) => void;
+  onChange?: (option: DropdownOptionType) => void;
   onClose?: () => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
@@ -37,7 +40,7 @@ export type Props = {
 
 export default function Dropdown({
   options = [],
-  value,
+  selectedOption,
   placeholder = "선택하세요",
   disabled = false,
   icon,
@@ -49,25 +52,11 @@ export default function Dropdown({
   renderOption,
 }: Props) {
   const { isOpen, setIsOpen, ref: dropdownRef } = useDetectClose();
-  const [selectedOption, setSelectedOption] = useState<
-    DropdownOptionType | undefined
-  >();
 
-  // 기본 값 설정
-  useEffect(() => {
-    const option = options.find((opt) => opt.value === value);
-    setSelectedOption(option);
-  }, [value, options]);
-
-  const selectOption = useCallback(
-    (option: DropdownOptionType) => {
-      if (option.disabled) return;
-
-      setSelectedOption(option);
-      onChange?.(option.value, option);
-    },
-    [onChange]
-  );
+  const selectOption = (option: DropdownOptionType) => {
+    if (option.disabled) return;
+    onChange?.(option);
+  };
 
   // 옵션 선택 핸들러
   const handleOptionClick = (option: DropdownOptionType) => {
