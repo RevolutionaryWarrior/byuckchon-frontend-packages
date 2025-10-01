@@ -1,5 +1,5 @@
 import React from "react";
-import { usePagination } from "@byuckchon-frontend/hooks";
+import usePagination from "./hooks";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 import ArrowLeftIcon from "@icons/icon_byuckicon_chevron_left.svg?react";
 import ArrowRightIcon from "@icons/icon_byuckicon_chevron_right.svg?react";
