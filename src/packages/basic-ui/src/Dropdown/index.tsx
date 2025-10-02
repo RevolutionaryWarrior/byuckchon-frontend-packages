@@ -87,7 +87,9 @@ export default function Dropdown({
           aria-label={selectedOption?.label || placeholder}
           className={twMerge(
             // 기본 스타일
-            "cursor-pointer w-full text-left border border-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 flex items-center justify-between h-[52px] text-base px-3",
+            "cursor-pointer w-full text-left border border-[#CCCCCC] flex items-center justify-between h-[52px] text-base px-3",
+            // 포커스 상태
+            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
             // 비활성화 상태
             disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
             // 외부에서 전달받은 클래스
