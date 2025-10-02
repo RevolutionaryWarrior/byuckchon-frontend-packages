@@ -22,7 +22,6 @@
     "lint": "eslint src --ext ts,tsx"
   },
   "peerDependencies": {
-    "@byuckchon-frontend/hooks": "workspace:*",
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"
   },
