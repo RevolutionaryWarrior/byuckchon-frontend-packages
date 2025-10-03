@@ -47,8 +47,10 @@ export default function Toggle({ className = "", ...props }: Props) {
       />
       <span
         style={{
-          ["--knob-x" as any]: `${Math.max(0, (wNum - hNum) * 0.25)}rem`,
-          ["--knob-size" as any]: `${Math.max(0, hNum * 0.25 - 0.5)}rem`,
+          ...({
+            ["--knob-x"]: `${Math.max(0, (wNum - hNum) * 0.25)}rem`,
+            ["--knob-size"]: `${Math.max(0, hNum * 0.25 - 0.5)}rem`,
+          } as React.CSSProperties),
         }}
         className={clsx(
           "relative w-full h-full rounded-full transition-colors duration-200",
