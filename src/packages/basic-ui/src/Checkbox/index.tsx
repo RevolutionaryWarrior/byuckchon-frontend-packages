@@ -2,7 +2,6 @@ import React from "react";
 import clsx from "clsx";
 
 import { useUITheme } from "../UIThemeProvider/useUITheme";
-import { pickNumber, sizeRatios } from "./util";
 
 type Size = "sm" | "md" | "lg";
 type Variant = "activate" | "inactivate" | "disabled";
@@ -38,95 +37,69 @@ const baseInputVariants = {
 export default function Checkbox({
   children,
   disabled = false,
-  defaultSize = "lg",
-  variant = "inactivate",
+  defaultSize = "md",
   className = "",
   ...props
 }: Props) {
   const theme = useUITheme();
 
-  const mergedStyle = {
-    ...baseInputVariants[variant],
-    ...(theme?.checkbox?.[variant] ?? {}),
+  const mergedInactiveStyle = {
+    ...baseInputVariants["inactivate"],
+    ...(theme?.checkbox?.["inactivate"] ?? {}),
   };
 
-  const combinedForParse = clsx(baseSizeVariants[defaultSize].box, className);
+  const mergedActiveStyle = {
+    ...baseInputVariants["activate"],
+    ...(theme?.checkbox?.["activate"] ?? {}),
+  };
 
-  const wNum =
-    pickNumber(combinedForParse, "w") ??
-    (defaultSize === "lg" ? 6 : defaultSize === "md" ? 5 : 4);
-  const hNum =
-    pickNumber(combinedForParse, "h") ??
-    (defaultSize === "lg" ? 6 : defaultSize === "md" ? 5 : 4);
-
-  // 현재 지정해둔 사이즈에 맞춰 비율 그대로 크기가 커질 수 있게끔
-  const { rw, rh } = sizeRatios[defaultSize];
-  const textWNum = wNum * rw;
-  const textHNum = hNum * rh;
-
-  const toRem = (n: number) => `${n * 0.25}rem`;
+  const mergedDisabledStyle = {
+    ...baseInputVariants["disabled"],
+    ...(theme?.checkbox?.["disabled"] ?? {}),
+  };
 
   // input 과 label 연동을 위해 (커스텀) 임의로 해시 값 아이디 생성
-  const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  const checkboxId = `checkbox-${Math.random().toString(36).slice(2, 9)}`;
 
   return (
     <div className="inline-flex items-center">
-      {children ? (
-        <div className={clsx("inline-flex items-center", className)}>
-          <input
-            type="checkbox"
-            id={checkboxId}
-            disabled={disabled}
-            className="sr-only peer"
-            {...props}
-          />
-          <label
-            htmlFor={checkboxId}
-            className={clsx(
-              "flex items-center cursor-pointer appearance-none",
-              disabled && "cursor-not-allowed opacity-50"
-            )}
-          >
-            {children}
-          </label>
-        </div>
-      ) : (
-        <>
-          <input
-            type="checkbox"
-            id={checkboxId}
-            disabled={disabled}
-            className="sr-only peer"
-            {...props}
-          />
-          <label
-            htmlFor={checkboxId}
-            style={{
-              ["--check-w" as any]: toRem(textWNum),
-              ["--check-h" as any]: toRem(textHNum),
-            }}
-            className={clsx(
-              "relative inline-flex items-center justify-center transition-all duration-200 cursor-pointer",
+      <>
+        <input
+          type="checkbox"
+          id={checkboxId}
+          disabled={disabled}
+          className="sr-only peer"
+          checked={props.checked}
+          onChange={props.onChange}
+        />
 
-              mergedStyle.box,
-              baseSizeVariants[defaultSize].box,
+        <label
+          htmlFor={checkboxId}
+          className={clsx(
+            "relative inline-flex items-center justify-center transition-all duration-200 cursor-pointer",
 
-              `peer-checked:${baseInputVariants["activate"].box} peer-checked:border-0`,
-              `peer-checked:[&>svg]:bg-transparent peer-checked:[&>svg]:${baseInputVariants[variant].text}`,
+            baseSizeVariants[defaultSize].box,
+            disabled
+              ? `cursor-not-allowed border-2 bg-transparent ${mergedDisabledStyle.box}`
+              : props.checked
+              ? `${mergedActiveStyle.box} border-0`
+              : mergedInactiveStyle.box,
 
-              `peer-checked:[&>svg]:w-[var(--check-w)] peer-checked:[&>svg]:h-[var(--check-h)]`,
-              `[&>svg]:w-[var(--check-w)] [&>svg]:h-[var(--check-h)]`,
-
-              disabled &&
-                `cursor-not-allowed bg-transparent border-[1px] ${baseInputVariants["disabled"].box} [&>svg]:${baseInputVariants["disabled"].text}`,
-
-              className
-            )}
-          >
+            className
+          )}
+        >
+          {children ? (
+            <>{children}</>
+          ) : (
             <svg
               className={clsx(
                 baseSizeVariants[defaultSize].text,
-                baseInputVariants[variant].text
+
+                disabled
+                  ? mergedDisabledStyle.text
+                  : props.checked
+                  ? mergedActiveStyle.text
+                  : mergedInactiveStyle.text
               )}
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -137,9 +110,9 @@ export default function Checkbox({
                 clipRule="evenodd"
               />
             </svg>
-          </label>
-        </>
-      )}
+          )}
+        </label>
+      </>
     </div>
   );
 }
