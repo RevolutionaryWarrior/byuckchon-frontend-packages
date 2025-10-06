@@ -2,7 +2,7 @@ export type ToggleTheme = {
   activate?: {
     bg?: string;
   };
-  unactivate: {
+  inactivate: {
     bg?: string;
   };
 };

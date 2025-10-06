@@ -12,7 +12,7 @@ const baseToggleVariants = {
   activate: {
     bg: "bg-[#0058E4]",
   },
-  unactivate: {
+  inactivate: {
     bg: "bg-[#D4D6DD]",
   },
 };
@@ -20,17 +20,19 @@ const baseToggleVariants = {
 export default function Toggle({ className = "", ...props }: Props) {
   const theme = useUITheme();
 
-  const inactive = {
-    ...baseToggleVariants.unactivate,
-    ...(theme?.toggle?.unactivate ?? {}),
+  const inactivate = {
+    ...baseToggleVariants.inactivate,
+    ...(theme?.toggle?.inactivate ?? {}),
   };
-  const active = {
+  const activate = {
     ...baseToggleVariants.activate,
     ...(theme?.toggle?.activate ?? {}),
   };
 
   const wNum = checkNumber(clsx("w-11 h-7", className), "w") ?? 11;
   const hNum = checkNumber(clsx("w-11 h-7", className), "h") ?? 7;
+
+  const isChecked = !!props.checked;
 
   return (
     <label
@@ -53,19 +55,28 @@ export default function Toggle({ className = "", ...props }: Props) {
           } as React.CSSProperties),
         }}
         className={clsx(
-          "relative w-full h-full rounded-full transition-colors duration-200",
-          getBaseBgClasses(className) || inactive.bg,
-          getCheckedBgClasses(className) || `peer-checked:${active.bg}`,
-          "peer-checked:[&>span]:translate-x-[var(--knob-x)]"
+          "relative w-full h-full rounded-full",
+          "transition-colors duration-200",
 
-          // disabled의 경우 아직 따로 디자인이 없어서 임의로 지정했습니다!
-          // disabled && "opacity-50 cursor-not-allowed"
+          isChecked
+            ? getCheckedBgClasses(className) || activate.bg
+            : getBaseBgClasses(className) || inactivate.bg
         )}
         aria-hidden
       >
         <span
-          className="absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE] transition-transform duration-200"
-          style={{ width: "var(--knob-size)", height: "var(--knob-size)" }}
+          className={clsx(
+            "absolute w-5 h-5 left-1 top-1 rounded-full bg-[#FEFEFE]",
+            "transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          )}
+          style={{
+            width: "var(--knob-size)",
+            height: "var(--knob-size)",
+            transform: isChecked
+              ? "translateX(var(--knob-x))"
+              : "translateX(0)",
+            willChange: "transform",
+          }}
         />
       </span>
     </label>
