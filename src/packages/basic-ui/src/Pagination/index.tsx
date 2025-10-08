@@ -1,5 +1,5 @@
 import React from "react";
-import usePagination from "./hooks";
+import paginationUtil from "./util";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 import ArrowLeftIcon from "@icons/icon_byuckicon_chevron_left.svg?react";
 import ArrowRightIcon from "@icons/icon_byuckicon_chevron_right.svg?react";
@@ -48,7 +48,7 @@ const Pagination = ({
     renderPages,
     isPageActive,
     actions: { onPrev, onNext, onDeepPrev, onDeepNext },
-  } = usePagination({
+  } = paginationUtil({
     totalCount,
     currentPage,
     renderCount,
