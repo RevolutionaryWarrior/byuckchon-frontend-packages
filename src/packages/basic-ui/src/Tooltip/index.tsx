@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useUITheme } from "../UIThemeProvider/useUITheme";
 
 type Placement =
   | "top-left"
@@ -42,14 +43,19 @@ const arrowClasses: Record<Placement, string> = {
 };
 
 // TODO: 폰트 스타일 추후 삭제
-const fontStyles =
-  "font-pretendard text-[12px] font-bold leading-[16px] tracking-[-0.12px] not-italic";
+const fontStyles = "text-[12px] font-bold leading-[16px] tracking-[-0.12px]";
+
+const baseTooltipStyles = {
+  bg: "bg-black",
+  text: "text-white",
+};
 
 type Props = {
   content: React.ReactNode;
   placement?: Placement;
   trigger?: "hover" | "click";
-  children: React.ReactElement;
+  children: React.ReactNode;
+  variant?: string;
   className?: string;
   offset?: number;
 };
@@ -59,18 +65,40 @@ export default function Tooltip({
   placement = "top-center",
   trigger = "hover",
   children,
+  variant = "default",
   className = "",
   offset = 8,
 }: Props) {
   const [open, setOpen] = useState<boolean>(false);
+  const theme = useUITheme();
 
-  const triggerProps =
-    trigger === "hover"
-      ? {
-          onMouseEnter: () => setOpen(true),
-          onMouseLeave: () => setOpen(false),
-        }
-      : { onClick: () => setOpen((prev) => !prev) };
+  const getTooltipStyles = () => {
+    const variantTheme = theme?.tooltip?.variant?.[variant];
+    const defaultTheme = theme?.tooltip?.default;
+
+    return {
+      ...baseTooltipStyles,
+      ...defaultTheme,
+      ...variantTheme,
+    };
+  };
+
+  const tooltipStyles = getTooltipStyles();
+
+  const triggerHandlers: Record<
+    NonNullable<Props["trigger"]>,
+    React.HTMLAttributes<HTMLElement>
+  > = {
+    hover: {
+      onMouseEnter: () => setOpen(true),
+      onMouseLeave: () => setOpen(false),
+    },
+    click: {
+      onClick: () => setOpen((prev) => !prev),
+    },
+  };
+
+  const triggerProps = triggerHandlers[trigger];
 
   const offsetStyle: React.CSSProperties = {};
   if (placement.startsWith("top")) offsetStyle.marginBottom = offset;
@@ -78,23 +106,42 @@ export default function Tooltip({
   if (placement.startsWith("left")) offsetStyle.marginRight = offset;
   if (placement.startsWith("right")) offsetStyle.marginLeft = offset;
 
+  const arrowColor =
+    theme?.tooltip?.variant?.[variant]?.arrowColor ??
+    theme?.tooltip?.default?.arrowColor ??
+    "#000"; // fallback
+
+  const arrowStyle: React.CSSProperties = (() => {
+    if (placement.startsWith("top")) return { borderTopColor: arrowColor };
+    if (placement.startsWith("bottom"))
+      return { borderBottomColor: arrowColor };
+    if (placement.startsWith("left")) return { borderLeftColor: arrowColor };
+    if (placement.startsWith("right")) return { borderRightColor: arrowColor };
+    return {};
+  })();
+
   return (
     <div className="relative inline-block" {...triggerProps}>
       {children}
       {open && (
-        <div
+        <aside
+          role="tooltip"
           className={`${positionClasses[placement]} absolute z-50`}
           style={offsetStyle}
         >
-          <div className="relative">
-            <div
-              className={`${className} ${fontStyles} bg-black text-white px-2 py-1`}
+          <div className={`${tooltipStyles.bg} relative rounded`}>
+            <p
+              className={`${fontStyles} ${tooltipStyles.text} px-2 py-1 ${className}`}
             >
               {content}
-            </div>
-            <div className={`${arrowClasses[placement]}`} />
+            </p>
+            <div
+              className={`${arrowClasses[placement]}`}
+              aria-hidden="true"
+              style={arrowStyle}
+            />
           </div>
-        </div>
+        </aside>
       )}
     </div>
   );
