@@ -2,25 +2,30 @@ export const checkNumber = (
   className: string,
   prefix: "w" | "h"
 ): number | null => {
+  // 동적 변환이 없다면 유지
   if (!className) return null;
 
+  let last = null;
   const re = new RegExp(
     `(?:^|\\s)(?:[\\w-]+:)*${prefix}-(\\d+(?:\\.\\d+)?)(?=\\s|$)`,
     "g"
   );
 
-  let m: RegExpExecArray | null;
-  let last: number | null = null;
+  while (true) {
+    const matchNumber = re.exec(className);
+    if (!matchNumber) break;
 
-  while ((m = re.exec(className))) {
-    const n = parseFloat(m[1]);
-    if (!isNaN(n)) last = n;
+    const sizeNum = parseFloat(matchNumber[1]);
+    if (!isNaN(sizeNum)) last = sizeNum;
   }
 
   return last;
 };
 
-export const getBaseBgClasses = (className?: string): string => {
+export const getBgClasses = (
+  isChecked: boolean,
+  className?: string
+): string => {
   // 동적 변환이 없다면 유지
   if (!className) return "";
 
@@ -33,31 +38,19 @@ export const getBaseBgClasses = (className?: string): string => {
     const parts = t.split(":");
     const last = parts[parts.length - 1];
 
-    if (!last.startsWith("bg-")) continue;
-    if (parts.includes("peer-checked")) continue;
+    // check 여부로 bgClass를 정의
+    if (isChecked) {
+      // peer-checked에서 bg를 return
+      if (!last.startsWith("bg-")) continue;
+      if (parts.includes("peer-checked")) base.push(parts[parts.length - 1]);
+    } else {
+      // peer-checked 가 없는 순수 bg만을 return
+      if (!last.startsWith("bg-")) continue;
+      if (parts.includes("peer-checked")) continue;
 
-    base.push(t);
+      base.push(t);
+    }
   }
 
   return base.join(" ");
-};
-
-export const getCheckedBgClasses = (className?: string): string => {
-  // 동적 변환이 없다면 유지
-  if (!className) return "";
-
-  const tokens = className.trim().split(/\s+/);
-  const checked = [];
-
-  for (const t of tokens) {
-    if (!/bg-(?:\[[^\]]+\]|[A-Za-z0-9-]+)/.test(t)) continue;
-
-    const parts = t.split(":");
-    const last = parts[parts.length - 1];
-
-    if (!last.startsWith("bg-")) continue;
-    if (parts.includes("peer-checked")) checked.push(parts[parts.length - 1]);
-  }
-
-  return checked.join(" ");
 };
