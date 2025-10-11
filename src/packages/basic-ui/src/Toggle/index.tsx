@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 
 import { useUITheme } from "../UIThemeProvider/useUITheme";
-import { checkNumber, getBaseBgClasses, getCheckedBgClasses } from "./util";
+import { checkNumber, getBgClasses } from "./util";
 
 type Props = {
   className?: string;
@@ -32,18 +32,21 @@ export default function Toggle({ className = "", ...props }: Props) {
 
   const bgClass = React.useMemo(() => {
     return isChecked
-      ? getCheckedBgClasses(className) || activate.bg
-      : getBaseBgClasses(className) || inactivate.bg;
+      ? getBgClasses(isChecked, className) || activate.bg
+      : getBgClasses(isChecked, className) || inactivate.bg;
   }, [isChecked, className, activate.bg, inactivate.bg]);
 
-  const wNum = checkNumber(clsx("w-11 h-7", className), "w") ?? 11;
-  const hNum = checkNumber(clsx("w-11 h-7", className), "h") ?? 7;
+  // full, [..px] 과 같은 경우는 고려하지 않음
+  // 오직 tailwindCSS에서 제공하는 width, height만 취급
+  // ex) w-10 h-10
+  const widthNum = checkNumber(className, "w") ?? 11;
+  const heightNum = checkNumber(className, "h") ?? 7;
 
   return (
     <label
       className={clsx(
         "flex items-center cursor-pointer",
-        `w-${wNum} h-${hNum}`
+        `w-${widthNum} h-${heightNum}`
       )}
     >
       <input
@@ -55,8 +58,8 @@ export default function Toggle({ className = "", ...props }: Props) {
       <span
         style={{
           ...({
-            ["--knob-x"]: `${Math.max(0, (wNum - hNum) * 0.25)}rem`,
-            ["--knob-size"]: `${Math.max(0, hNum * 0.25 - 0.5)}rem`,
+            ["--knob-x"]: `${Math.max(0, (widthNum - heightNum) * 0.25)}rem`,
+            ["--knob-size"]: `${Math.max(0, heightNum * 0.25 - 0.5)}rem`,
           } as React.CSSProperties),
         }}
         className={clsx(
