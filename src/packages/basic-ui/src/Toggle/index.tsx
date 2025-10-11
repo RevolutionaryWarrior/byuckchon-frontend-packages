@@ -19,6 +19,7 @@ const baseToggleVariants = {
 
 export default function Toggle({ className = "", ...props }: Props) {
   const theme = useUITheme();
+  const isChecked = !!props.checked;
 
   const inactivate = {
     ...baseToggleVariants.inactivate,
@@ -29,10 +30,14 @@ export default function Toggle({ className = "", ...props }: Props) {
     ...(theme?.toggle?.activate ?? {}),
   };
 
+  const bgClass = React.useMemo(() => {
+    return isChecked
+      ? getCheckedBgClasses(className) || activate.bg
+      : getBaseBgClasses(className) || inactivate.bg;
+  }, [isChecked, className, activate.bg, inactivate.bg]);
+
   const wNum = checkNumber(clsx("w-11 h-7", className), "w") ?? 11;
   const hNum = checkNumber(clsx("w-11 h-7", className), "h") ?? 7;
-
-  const isChecked = !!props.checked;
 
   return (
     <label
@@ -57,10 +62,7 @@ export default function Toggle({ className = "", ...props }: Props) {
         className={clsx(
           "relative w-full h-full rounded-full",
           "transition-colors duration-200",
-
-          isChecked
-            ? getCheckedBgClasses(className) || activate.bg
-            : getBaseBgClasses(className) || inactivate.bg
+          bgClass
         )}
         aria-hidden
       >
