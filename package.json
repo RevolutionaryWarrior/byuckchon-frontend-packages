@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "tsc -b && pnpm -r run build",
     "dev": "pnpm --filter example-app dev",
     "lint": "pnpm -r run lint"
   },
