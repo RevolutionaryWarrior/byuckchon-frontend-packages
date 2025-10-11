@@ -5,21 +5,21 @@ export const checkNumber = (
   // 동적 변환이 없다면 유지
   if (!className) return null;
 
-  let last = null;
-  const re = new RegExp(
+  let lastNumber = null;
+  const tmp = new RegExp(
     `(?:^|\\s)(?:[\\w-]+:)*${prefix}-(\\d+(?:\\.\\d+)?)(?=\\s|$)`,
     "g"
   );
 
   while (true) {
-    const matchNumber = re.exec(className);
+    const matchNumber = tmp.exec(className);
     if (!matchNumber) break;
 
-    const sizeNum = parseFloat(matchNumber[1]);
-    if (!isNaN(sizeNum)) last = sizeNum;
+    const sizeNumber = parseFloat(matchNumber[1]);
+    if (!isNaN(sizeNumber)) lastNumber = sizeNumber;
   }
 
-  return last;
+  return lastNumber;
 };
 
 export const getBgClasses = (
