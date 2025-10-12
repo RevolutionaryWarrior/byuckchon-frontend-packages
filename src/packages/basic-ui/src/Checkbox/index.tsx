@@ -42,6 +42,7 @@ export default function Checkbox({
   ...props
 }: Props) {
   const theme = useUITheme();
+  const isChecked = !!props.checked;
 
   const mergedInactiveStyle = {
     ...baseInputVariants["inactivate"],
@@ -60,6 +61,13 @@ export default function Checkbox({
 
   // input 과 label 연동을 위해 (커스텀) 임의로 해시 값 아이디 생성
   const checkboxId = `checkbox-${Math.random().toString(36).slice(2, 9)}`;
+  const hasCustomChild = !!children;
+
+  const stateTextColor = disabled
+    ? mergedDisabledStyle.text
+    : isChecked
+    ? mergedActiveStyle.text
+    : mergedInactiveStyle.text;
 
   return (
     <div className="inline-flex items-center">
@@ -76,25 +84,32 @@ export default function Checkbox({
         <label
           htmlFor={checkboxId}
           className={clsx(
-            "relative inline-flex items-center justify-center transition-all duration-200 cursor-pointer",
-
+            "relative inline-flex items-center justify-center transition-all duration-200",
+            disabled ? "cursor-not-allowed" : "cursor-pointer",
             baseSizeVariants[defaultSize].box,
-            disabled
-              ? `cursor-not-allowed border-2 bg-transparent ${mergedDisabledStyle.box}`
-              : props.checked
-              ? `${mergedActiveStyle.box} border-0`
-              : mergedInactiveStyle.box,
+
+            hasCustomChild
+              ? clsx(
+                  "bg-transparent border-0 outline-none ring-0",
+                  stateTextColor
+                )
+              : clsx(
+                  disabled
+                    ? `border-2 bg-transparent ${mergedDisabledStyle.box}`
+                    : props.checked
+                    ? `${mergedActiveStyle.box} border-0`
+                    : mergedInactiveStyle.box
+                ),
 
             className
           )}
         >
-          {children ? (
-            <>{children}</>
+          {hasCustomChild ? (
+            children
           ) : (
             <svg
               className={clsx(
                 baseSizeVariants[defaultSize].text,
-
                 disabled
                   ? mergedDisabledStyle.text
                   : props.checked
