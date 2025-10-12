@@ -100,16 +100,18 @@ export default function Tooltip({
 
   const triggerProps = triggerHandlers[trigger];
 
-  const offsetStyle: React.CSSProperties = {};
-  if (placement.startsWith("top")) offsetStyle.marginBottom = offset;
-  if (placement.startsWith("bottom")) offsetStyle.marginTop = offset;
-  if (placement.startsWith("left")) offsetStyle.marginRight = offset;
-  if (placement.startsWith("right")) offsetStyle.marginLeft = offset;
+  const offsetStyle: React.CSSProperties = (() => {
+    if (placement.startsWith("top")) return { marginBottom: offset };
+    if (placement.startsWith("bottom")) return { marginTop: offset };
+    if (placement.startsWith("left")) return { marginRight: offset };
+    if (placement.startsWith("right")) return { marginLeft: offset };
+    return {};
+  })();
 
   const arrowColor =
     theme?.tooltip?.variant?.[variant]?.arrowColor ??
     theme?.tooltip?.default?.arrowColor ??
-    "#000"; // fallback
+    "#000";
 
   const arrowStyle: React.CSSProperties = (() => {
     if (placement.startsWith("top")) return { borderTopColor: arrowColor };
