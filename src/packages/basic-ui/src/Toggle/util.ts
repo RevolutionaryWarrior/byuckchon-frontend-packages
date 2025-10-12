@@ -38,19 +38,16 @@ export const getBgClasses = (
     const parts = t.split(":");
     const last = parts[parts.length - 1];
 
-    // check 여부로 bgClass를 정의
-    if (isChecked) {
-      // peer-checked에서 bg를 return
-      if (!last.startsWith("bg-")) continue;
-      if (parts.includes("peer-checked")) base.push(parts[parts.length - 1]);
-    } else {
-      // peer-checked 가 없는 순수 bg만을 return
-      if (!last.startsWith("bg-")) continue;
-      if (parts.includes("peer-checked")) continue;
+    if (!last.startsWith("bg-")) continue;
+    const hasPeerChecked = parts.includes("peer-checked");
 
+    if (isChecked && hasPeerChecked) {
+      base.push(last);
+    }
+
+    if (!isChecked && !hasPeerChecked) {
       base.push(t);
     }
   }
-
   return base.join(" ");
 };
