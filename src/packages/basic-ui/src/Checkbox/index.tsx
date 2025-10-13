@@ -75,10 +75,9 @@ export default function Checkbox({
         <input
           type="checkbox"
           id={checkboxId}
-          disabled={disabled}
           className="sr-only peer"
-          checked={props.checked}
           onChange={props.onChange}
+          {...props}
         />
 
         <label
