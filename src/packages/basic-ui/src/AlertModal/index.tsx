@@ -44,9 +44,9 @@ export default function AlertModal({
       <div className="text-center">
         <p className={mergedTheme.title}>{title}</p>
         <p
-          className={`${isScrollable ? "max-h-[220px] overflow-y-auto" : ""} ${
-            customScrollClassName ?? ""
-          } ${mergedTheme.description}`}
+          className={`${
+            isScrollable ? "max-h-[220px] overflow-y-auto" : ""
+          } ${customScrollClassName} ${mergedTheme.description}`}
         >
           {description}
         </p>
