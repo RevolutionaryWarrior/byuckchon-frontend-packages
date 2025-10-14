@@ -39,6 +39,8 @@ export default function ActiveButton({
     ...(theme?.button?.[variantKey] ?? {}),
   };
 
+  console.log(mergedStyle);
+
   return (
     <button
       {...props}
