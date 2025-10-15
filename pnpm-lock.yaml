@@ -3067,8 +3067,6 @@ dot-case@3.0.4:
       no-case: 3.0.4
       tslib: 2.8.1
 
-  electron-to-chromium@1.5.234: {}
-
   enhanced-resolve@5.18.3:
     dependencies:
       graceful-fs: 4.2.11
