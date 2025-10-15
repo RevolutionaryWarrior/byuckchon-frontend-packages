@@ -26,7 +26,7 @@ export type Props = {
   };
   placeholder?: string;
   disabled?: boolean;
-  icon?: React.ReactNode;
+  Icon?: React.ReactNode;
   triggerClassName?: string;
   optionWrapperClassName?: string;
   optionClassName?: string;
