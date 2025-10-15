@@ -60,6 +60,7 @@ export default defineConfig({
     alias: {
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "@icons": path.resolve(__dirname, "src/_assets"),
     },
   },
 });
