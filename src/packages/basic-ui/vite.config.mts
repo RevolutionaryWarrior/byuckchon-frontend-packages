@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 import { patchCssModules } from "vite-css-modules";
 import dts from "vite-plugin-dts";
 import libCss from "vite-plugin-libcss";
+import svgr from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -43,6 +44,11 @@ export default defineConfig({
       jsxRuntime: "automatic",
     }),
     tailwindcss(),
+    svgr({
+      svgrOptions: {
+        icon: true,
+      },
+    }),
     patchCssModules(),
     libCss(),
     dts({
