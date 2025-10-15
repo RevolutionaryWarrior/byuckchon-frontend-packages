@@ -11,16 +11,16 @@ type Props = {
 
 const baseButtonVariants = {
   primary: {
-    bg: "bg-[#ED6D01] border-[#ED6D01]",
-    text: "text-white",
+    bg: "bg-[#0058E4] border-[#0054DA] border-2",
+    text: "text-white text-button-active",
   },
   secondary: {
-    bg: "bg-white border-[#ED6D01]",
-    text: "text-[#ED6D01]",
+    bg: "bg-white border-[#D4D6DD] border",
+    text: "text-[#222] text-button-choice",
   },
   disabled: {
-    bg: "bg-[#F5F5F5] border-transparent",
-    text: "text-[#8F9098]",
+    bg: "bg-[#D4D6DD] border-transparent",
+    text: "text-[#8F9098] text-button-choice",
   },
 };
 
@@ -42,7 +42,7 @@ export default function ActiveButton({
   return (
     <button
       {...props}
-      className={`${className} ${mergedStyle.bg} w-full cursor-pointer`}
+      className={`${className} ${mergedStyle.bg} w-full cursor-pointer py-4`}
     >
       <p className={`${mergedStyle.text} text-center`}>{children}</p>
     </button>
