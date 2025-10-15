@@ -67,13 +67,11 @@ export default function Dropdown({
     onChange?.(option);
   };
 
-  // 옵션 선택 핸들러
   const handleOptionClick = (option: DropdownOptionType) => {
     selectOption(option);
     setIsOpen(false);
   };
 
-  // 트리거 props
   const triggerProps: TriggerProps = useMemo(
     () => ({
       isOpen,
@@ -96,13 +94,9 @@ export default function Dropdown({
           aria-expanded={isOpen}
           aria-label={selectedOption?.label || placeholder}
           className={twMerge(
-            // 기본 스타일
             "cursor-pointer w-full text-left border border-[#CCCCCC] flex items-center justify-between h-[52px] text-base px-3",
-            // 포커스 상태
             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
-            // 비활성화 상태
             disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
-            // 외부에서 전달받은 클래스
             triggerClassName
           )}
           onClick={() => setIsOpen((prev) => !prev)}
@@ -143,15 +137,11 @@ export default function Dropdown({
               <div
                 key={`${option.label}-${option.value}-${index}`}
                 className={twMerge(
-                  // 기본 스타일
                   "cursor-pointer border-b border-[#CCCCCC] h-[52px] text-base flex items-center px-3 hover:bg-gray-50 transition-colors duration-150",
-                  // 선택된 상태
                   selectedOption?.value === option.value &&
                     "bg-blue-500 text-white hover:bg-blue-600",
-                  // 비활성화 상태
                   option.disabled &&
                     "opacity-50 cursor-not-allowed hover:bg-transparent",
-                  // 외부에서 전달받은 클래스
                   optionClassName
                 )}
                 onClick={() => handleOptionClick(option)}
