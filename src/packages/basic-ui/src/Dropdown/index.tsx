@@ -102,8 +102,9 @@ export default function Dropdown({
           disabled={disabled}
         >
           <span className="w-full text-left">
-            {selectedOption && <span>{selectedOption.label}</span>}
-            {!selectedOption && (
+            {selectedOption ? (
+              <span>{selectedOption.label}</span>
+            ) : (
               <span className="text-gray-500">{placeholder}</span>
             )}
           </span>
