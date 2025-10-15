@@ -50,6 +50,16 @@ export default function Dropdown({
 }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
+  const triggerProps: TriggerProps = useMemo(
+    () => ({
+      isOpen,
+      selectedOption,
+      placeholder,
+      disabled,
+      Icon,
+    }),
+    [isOpen, selectedOption, placeholder, disabled, Icon]
+  );
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -71,17 +81,6 @@ export default function Dropdown({
     selectOption(option);
     setIsOpen(false);
   };
-
-  const triggerProps: TriggerProps = useMemo(
-    () => ({
-      isOpen,
-      selectedOption,
-      placeholder,
-      disabled,
-      Icon,
-    }),
-    [isOpen, selectedOption, placeholder, disabled, Icon]
-  );
 
   return (
     <div ref={ref} className="relative inline-block w-full">
