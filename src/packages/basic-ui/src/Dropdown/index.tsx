@@ -30,7 +30,7 @@ export type Props = {
   triggerClassName?: string;
   optionWrapperClassName?: string;
   optionClassName?: string;
-  onChange?: (option: DropdownOptionType) => void;
+  onChange: (option: DropdownOptionType) => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
 };
