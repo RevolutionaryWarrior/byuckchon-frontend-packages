@@ -14,7 +14,7 @@ export type TriggerProps = {
   selectedOption?: DropdownOptionType;
   placeholder?: string;
   disabled?: boolean;
-  icon?: React.ReactNode;
+  Icon?: React.ReactNode;
   className?: string;
 };
 
@@ -31,7 +31,6 @@ export type Props = {
   optionWrapperClassName?: string;
   optionClassName?: string;
   onChange?: (option: DropdownOptionType) => void;
-  onClose?: () => void;
   renderTrigger?: (props: TriggerProps) => React.ReactNode;
   renderOption?: (option: DropdownOptionType) => React.ReactNode;
 };
@@ -41,7 +40,7 @@ export default function Dropdown({
   selectedOption,
   placeholder = "선택하세요",
   disabled = false,
-  icon,
+  Icon,
   triggerClassName,
   optionWrapperClassName,
   optionClassName,
@@ -81,9 +80,9 @@ export default function Dropdown({
       selectedOption,
       placeholder,
       disabled,
-      icon,
+      Icon,
     }),
-    [isOpen, selectedOption, placeholder, disabled, icon]
+    [isOpen, selectedOption, placeholder, disabled, Icon]
   );
 
   return (
@@ -121,7 +120,7 @@ export default function Dropdown({
               "transition-transform duration-200"
             )}
           >
-            {icon ? icon : <ChevronDownIcon />}
+            {Icon ? Icon : <ChevronDownIcon />}
           </span>
         </button>
       )}
