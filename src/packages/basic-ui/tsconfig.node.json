@@ -17,6 +17,13 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* Paths */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@icons/*": ["src/_assets/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
