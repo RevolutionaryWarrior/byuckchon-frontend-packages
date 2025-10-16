@@ -20,7 +20,7 @@
     font-size: var(--text-lg);
     line-height: var(--leading-xl);
     letter-spacing: var(--traking-base);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-bold);
   }
   .text-h-3 {
     font-size: var(--text-lg);
