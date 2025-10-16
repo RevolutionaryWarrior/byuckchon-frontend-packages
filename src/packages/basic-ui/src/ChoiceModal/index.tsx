@@ -10,6 +10,7 @@ type Props = {
   onClickFirstOption: () => void;
   onClickSecondOption: () => void;
   Icon?: React.ReactNode;
+  onClose?: () => void;
 };
 
 const baseTheme = {
@@ -28,6 +29,7 @@ export default function ChoiceModal({
   onClickFirstOption,
   onClickSecondOption,
   Icon,
+  onClose,
 }: Props) {
   const theme = useUITheme();
 
@@ -39,7 +41,7 @@ export default function ChoiceModal({
   return (
     <article className={`${mergedTheme.modal} relative`}>
       <div className={`${mergedTheme.icon} absolute cursor-pointer`}>
-        {Icon ? Icon : <CloseIcon className="size-5" />}
+        {Icon ? Icon : <CloseIcon className="size-5" onClick={onClose} />}
       </div>
       <div className="text-center">
         <p className={mergedTheme.title}>{title}</p>
