@@ -10,6 +10,7 @@ import type { ToggleTheme } from "../Toggle/theme";
 
 export type Theme = {
   button?: ButtonTheme;
+  tooltip?: TooltipTheme;
   toggle?: ToggleTheme;
   pagination?: PaginationTheme;
   checkbox?: CheckboxTheme;
