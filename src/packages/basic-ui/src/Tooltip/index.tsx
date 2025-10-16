@@ -67,7 +67,6 @@ export default function Tooltip({
   children,
   variant = "default",
   className = "",
-  offset = 8,
 }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const theme = useUITheme();
@@ -100,14 +99,6 @@ export default function Tooltip({
 
   const triggerProps = triggerHandlers[trigger];
 
-  const offsetStyle: React.CSSProperties = (() => {
-    if (placement.startsWith("top")) return { marginBottom: offset };
-    if (placement.startsWith("bottom")) return { marginTop: offset };
-    if (placement.startsWith("left")) return { marginRight: offset };
-    if (placement.startsWith("right")) return { marginLeft: offset };
-    return {};
-  })();
-
   const arrowColor =
     theme?.tooltip?.variant?.[variant]?.arrowColor ??
     theme?.tooltip?.default?.arrowColor ??
@@ -128,21 +119,16 @@ export default function Tooltip({
       {open && (
         <aside
           role="tooltip"
-          className={`${positionClasses[placement]} absolute z-50`}
-          style={offsetStyle}
+          className={`${className} ${positionClasses[placement]} ${tooltipStyles.bg} ${tooltipStyles.text} absolute z-50 rounded`}
         >
-          <div className={`${tooltipStyles.bg} relative rounded`}>
-            <p
-              className={`${fontStyles} ${tooltipStyles.text} px-2 py-1 ${className}`}
-            >
-              {content}
-            </p>
-            <div
-              className={`${arrowClasses[placement]}`}
-              aria-hidden="true"
-              style={arrowStyle}
-            />
-          </div>
+          <p className={`${fontStyles} whitespace-pre-line px-2 py-1`}>
+            {content}
+          </p>
+          <div
+            className={`${arrowStyle} ${arrowClasses[placement]}`}
+            aria-hidden="true"
+            style={arrowStyle}
+          />
         </aside>
       )}
     </div>
