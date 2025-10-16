@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@icons/*": ["src/_assets/*"]
-    },
     "target": "ES2022",
     "lib": ["ES2023", "DOM"],
     "module": "ESNext",
