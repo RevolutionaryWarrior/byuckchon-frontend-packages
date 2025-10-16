@@ -13,18 +13,11 @@
     "moduleDetection": "force",
     "noEmit": true,
 
-    /* Paths */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@icons/*": ["src/_assets/*"]
-    },
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.mts", "src"]
+  "include": ["vite.config.ts", "src"]
 }
