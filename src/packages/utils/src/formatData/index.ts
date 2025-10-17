@@ -43,8 +43,16 @@ export const FormatData = () => {
     return String(value ?? "");
   };
 
-  const formatDate = (value: Date) => {
-    return value;
+  const formatDate = (value: Date): string => {
+    if (!(value instanceof Date) || isNaN(value.getTime())) return "";
+
+    const h = value.getHours();
+    const m = value.getMinutes();
+
+    const meridiem = h < 12 ? "오전" : "오후";
+    const hour12 = h % 12 === 0 ? 12 : h % 12; // 0,12 -> 12시
+
+    return `${meridiem} ${hour12}시 ${m}분`;
   };
 
   const Masker = {
