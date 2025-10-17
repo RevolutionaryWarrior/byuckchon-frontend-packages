@@ -102,8 +102,20 @@ export const FormatData = () => {
     },
   };
 
-  const commanizeData = (value: string | number) => {
-    return value;
+  const commanizeData = (value: string | number): string => {
+    const raw = String(value ?? "").trim();
+    if (!raw) return "";
+
+    // 기존 콤마 제거 후 부호/정수/소수 분리
+    const cleaned = raw.replace(/,/g, "");
+    const sign = cleaned.startsWith("-") ? "-" : "";
+    const body = cleaned.replace(/^-/, "");
+    const [intPart, fracPart] = body.split(".");
+
+    // 정수부에만 콤마 삽입
+    const intWithComma = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    return sign + intWithComma + (fracPart !== undefined ? `.${fracPart}` : "");
   };
 
   const decommanizeData = (value: string) => {
