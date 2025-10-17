@@ -27,8 +27,20 @@ export const FormatData = () => {
     return value;
   };
 
-  const formatBizNumber = (value: number) => {
-    return value;
+  const formatBizNumber = (value: string): string => {
+    const d = (value ?? "").replace(/\D/g, "");
+
+    // 사업자등록번호 (10자리)
+    if (d.length === 10) {
+      return d.replace(/^(\d{3})(\d{2})(\d{5})$/, "$1-$2-$3");
+    }
+
+    // 법인등록번호 (13자리)
+    if (d.length === 13) {
+      return d.replace(/^(\d{6})(\d{7})$/, "$1-$2");
+    }
+
+    return String(value ?? "");
   };
 
   const formatDate = (value: Date) => {
