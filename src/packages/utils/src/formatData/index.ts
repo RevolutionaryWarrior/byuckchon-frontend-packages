@@ -50,14 +50,56 @@ export const FormatData = () => {
     const m = value.getMinutes();
 
     const meridiem = h < 12 ? "오전" : "오후";
-    const hour12 = h % 12 === 0 ? 12 : h % 12; // 0,12 -> 12시
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
 
     return `${meridiem} ${hour12}시 ${m}분`;
   };
 
   const Masker = {
-    maskName: (value: string) => value,
-    maskPhoneNumber: (value: number) => value,
+    maskName: (raw: string): string => {
+      const value = (raw ?? "").trim();
+      const len = [...value].length;
+
+      if (len <= 0) return "";
+      if (len === 1) return "*";
+      if (len === 2) {
+        const [f] = [...value];
+        return `${f}*`;
+      }
+      const chars = [...value];
+      const first = chars[0];
+      const last = chars[len - 1];
+      const midStars = "*".repeat(len - 2);
+      return `${first}${midStars}${last}`;
+    },
+
+    maskPhoneNumber: (input: string): string => {
+      const s = input ?? "";
+
+      if (s.includes("-")) {
+        const parts = s.split("-");
+        if (parts.length === 3) {
+          const [a, b, c] = parts;
+          return `${a}-${"*".repeat(b.replace(/\D/g, "").length || 4)}-${c}`;
+        }
+        if (parts.length === 2) {
+          const [a, b] = parts;
+          const digitsB = b.replace(/\D/g, "");
+          const keepTail = digitsB.slice(-4);
+          const starLen = Math.max(1, digitsB.length - keepTail.length);
+          return `${a}-${"*".repeat(starLen)}${keepTail}`;
+        }
+        return s;
+      }
+
+      const d = s.replace(/\D/g, "");
+      if (d.length < 8) return s;
+
+      const head = d.slice(0, 3);
+      const tail = d.slice(-4);
+      const midLen = Math.max(1, d.length - (head.length + tail.length));
+      return `${head}${"*".repeat(midLen)}${tail}`;
+    },
   };
 
   const commanizeData = (value: string | number) => {
