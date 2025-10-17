@@ -6,7 +6,7 @@ const meta: Meta<typeof ActiveButton> = {
   component: ActiveButton,
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
+    layout: "padded",
   },
   argTypes: {
     variant: {
@@ -21,6 +21,10 @@ const meta: Meta<typeof ActiveButton> = {
     disabled: {
       control: "boolean",
       description: "버튼 비활성화 여부",
+    },
+    onClick: {
+      action: "clicked",
+      description: "버튼 클릭 이벤트",
     },
   },
 };
