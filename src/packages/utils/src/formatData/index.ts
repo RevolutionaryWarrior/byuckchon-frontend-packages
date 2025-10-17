@@ -16,6 +16,7 @@ export const FormatData = () => {
     }
 
     // - 그 외(0xx): 10자리 → 0xx-xxx-xxxx, 11자리 → 0xx-xxxx-xxxx
+    // - 여기에 집 전화번호 자동 하이픈 추가도 포함
     if (/^0\d+/.test(d)) {
       if (d.length === 10)
         return d.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
@@ -26,18 +27,11 @@ export const FormatData = () => {
     return value;
   };
 
-  const formatTelNumber = (value: number) => {
-    console.log(value);
-    return value;
-  };
-
   const formatBizNumber = (value: number) => {
-    console.log(value);
     return value;
   };
 
   const formatDate = (value: Date) => {
-    console.log(value);
     return value;
   };
 
@@ -47,18 +41,15 @@ export const FormatData = () => {
   };
 
   const commanizeData = (value: string | number) => {
-    console.log(value);
     return value;
   };
 
   const decommanizeData = (value: string) => {
-    console.log(value);
     return value;
   };
 
   return {
     formatPhoneNumber,
-    formatTelNumber,
     formatBizNumber,
     formatDate,
     Masker,
