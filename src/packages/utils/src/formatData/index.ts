@@ -66,34 +66,38 @@ export const FormatData = () => {
         const [f] = [...value];
         return `${f}*`;
       }
+
+      // 3글자 이상부터는 사이에 *로 채우기
       const chars = [...value];
       const first = chars[0];
       const last = chars[len - 1];
+
       const midStars = "*".repeat(len - 2);
       return `${first}${midStars}${last}`;
     },
 
     maskPhoneNumber: (input: string): string => {
-      const s = input ?? "";
-
-      if (s.includes("-")) {
-        const parts = s.split("-");
+      if (input.includes("-")) {
+        const parts = input.split("-");
         if (parts.length === 3) {
-          const [a, b, c] = parts;
-          return `${a}-${"*".repeat(b.replace(/\D/g, "").length || 4)}-${c}`;
+          const [first, second, third] = parts;
+          return `${first}-${"*".repeat(
+            second.replace(/\D/g, "").length || 4
+          )}-${third}`;
         }
         if (parts.length === 2) {
-          const [a, b] = parts;
-          const digitsB = b.replace(/\D/g, "");
+          const [start, last] = parts;
+          const digitsB = last.replace(/\D/g, "");
           const keepTail = digitsB.slice(-4);
           const starLen = Math.max(1, digitsB.length - keepTail.length);
-          return `${a}-${"*".repeat(starLen)}${keepTail}`;
+          return `${start}-${"*".repeat(starLen)}${keepTail}`;
         }
-        return s;
+        return input;
       }
 
-      const d = s.replace(/\D/g, "");
-      if (d.length < 8) return s;
+      // -가 없는 경우
+      const d = input.replace(/\D/g, "");
+      if (d.length < 8) return input;
 
       const head = d.slice(0, 3);
       const tail = d.slice(-4);
