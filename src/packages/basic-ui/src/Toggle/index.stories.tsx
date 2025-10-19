@@ -10,7 +10,7 @@ const meta: Meta<typeof Toggle> = {
     layout: "centered",
     docs: {
       controls: {
-        include: ["checked", , "className", "onChange"],
+        include: ["checked", "className", "onChange"],
       },
     },
   },
