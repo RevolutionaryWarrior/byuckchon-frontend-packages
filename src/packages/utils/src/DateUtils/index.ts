@@ -40,7 +40,9 @@ export const afterDate = (date1: Date, date2: Date): Date => {
 
 export const relativeTime = (
   date: Date,
-  labels?: Record<"direction" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "months" | "years", string>
+  labels?: Partial<
+    Record<"direction" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "months" | "years", string>
+  >
 ): string => {
   const now = new Date();
   const isAgo = now >= date;
