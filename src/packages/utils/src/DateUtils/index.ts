@@ -43,10 +43,10 @@ export const relativeTime = (
   labels?: Record<"direction" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "months" | "years", string>
 ): string => {
   const now = new Date();
-  const isAgo = now > date;
+  const isAgo = now >= date;
   const defaultLabels = {
     direction: isAgo ? "전" : "후",
-    seconds: isAgo ? "방금 전" : "잠시 후",
+    seconds: isAgo ? "방금" : "잠시",
     minutes: "분",
     hours: "시간",
     days: "일",
@@ -71,5 +71,7 @@ export const relativeTime = (
     if (diff >= 1 && diff < timeUnit.limit) return `${diff}${timeUnit.label} ${TIME_UNIT_LABELS.direction}`;
   }
 
-  return isAgo ? TIME_UNIT_LABELS.seconds : TIME_UNIT_LABELS.seconds;
+  return isAgo
+    ? `${TIME_UNIT_LABELS.seconds} ${TIME_UNIT_LABELS.direction}`
+    : `${TIME_UNIT_LABELS.seconds} ${TIME_UNIT_LABELS.direction}`;
 };
