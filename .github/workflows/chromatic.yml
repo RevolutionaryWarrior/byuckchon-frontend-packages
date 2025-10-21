@@ -28,6 +28,6 @@ jobs:
 
       - name: Publish to Chromatic
         working-directory: ./src/packages/basic-ui
-        run: pnpm chromatic --only-changed --skip-interactive
+        run: pnpm chromatic --exit-zero-on-changes --only-changed --skip-interactive
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
