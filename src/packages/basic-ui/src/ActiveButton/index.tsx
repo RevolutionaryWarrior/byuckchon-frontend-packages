@@ -11,7 +11,7 @@ type Props = {
 
 const baseButtonVariants = {
   primary: {
-    bg: "bg-[#0058E4] border-[#0054DA] border-2",
+    bg: "bg-black border-[#0054DA] border-2",
     text: "text-white text-button-active",
   },
   secondary: {
