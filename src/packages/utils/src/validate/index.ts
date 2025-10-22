@@ -85,6 +85,14 @@ function validateWithRegex(value: string, regex: RegExp): boolean {
 }
 
 export const validate = ({ type, value, maxSizeInMB }: Props) => {
+  if (type === "corporateRegiNumber") {
+    return checkCorporateRegiNumber(value as string);
+  }
+
+  if (type === "file") {
+    return validateFile(value as File | string, maxSizeInMB);
+  }
+
   const regexMap = {
     email: emailRegex,
     phone: phoneRegex,
@@ -95,14 +103,6 @@ export const validate = ({ type, value, maxSizeInMB }: Props) => {
     jumin: juminRegex,
     url: urlRegex,
   };
-
-  if (type === "corporateRegiNumber") {
-    return checkCorporateRegiNumber(value as string);
-  }
-
-  if (type === "file") {
-    return validateFile(value as File | string, maxSizeInMB);
-  }
 
   return validateWithRegex(value as string, regexMap[type]);
 };
