@@ -11,8 +11,11 @@ const birthRegex8 =
 // 영문(대소문자) + 숫자 + 특수문자가 각 1회 이상 입력되어 있고 10자리 이상
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/\\]).{10,}$/;
+// 2020년 이전 주민등록번호
+const juminRegexBefore2020 =
+  /^d{2}([0]\d|[1][0-2])([0][1-9]|[1-2]\d|[3][0-1])[-]*[1-4]\d{6}$/;
 // 2020년생 이후 주민등록번호도 통과 되도록
-const juminRegex =
+const juminRegexAfter2020 =
   /^(?:[0-9]{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[1,2][0-9]|3[0,1]))-[1-8][0-9]{6}$/;
 const urlRegex =
   /^https?:\/\/(?:[-\w.])+(?:\.[a-zA-Z]{2,})+(?::\d+)?(?:\/[^\s]*)?$/i;
@@ -27,7 +30,8 @@ type Props = {
     | "birth6"
     | "birth8"
     | "password"
-    | "jumin"
+    | "juminAfter2020"
+    | "juminBefore2020"
     | "corporateRegiNumber"
     | "url"
     | "file";
@@ -100,7 +104,8 @@ export const validate = ({ type, value, maxSizeInMB }: Props) => {
     birth6: birthRegex6,
     birth8: birthRegex8,
     password: passwordRegex,
-    jumin: juminRegex,
+    juminAfter2020: juminRegexAfter2020,
+    juminBefore2020: juminRegexBefore2020,
     url: urlRegex,
   };
 
