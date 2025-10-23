@@ -30,7 +30,7 @@ const defaultFileExtensionRegex =
  * validateEmail('test@example.com') // true
  * validateEmail('invalid-email') // false
  */
-export function validateEmail(email: string): boolean {
+function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
@@ -42,7 +42,7 @@ export function validateEmail(email: string): boolean {
  * validatePhone('01012345678') // true
  * validatePhone('010-1234-5678') // false
  */
-export function validatePhone(phone: string): boolean {
+function validatePhone(phone: string): boolean {
   return phoneRegex.test(phone);
 }
 
@@ -54,7 +54,7 @@ export function validatePhone(phone: string): boolean {
  * validateHomePhone('0212345678') // true
  * validateHomePhone('03112345678') // true
  */
-export function validateHomePhone(homePhone: string): boolean {
+function validateHomePhone(homePhone: string): boolean {
   return homePhoneRegex.test(homePhone);
 }
 
@@ -66,7 +66,7 @@ export function validateHomePhone(homePhone: string): boolean {
  * validateBirth6('990101') // true
  * validateBirth6('001231') // true
  */
-export function validateBirth6(birth: string): boolean {
+function validateBirth6(birth: string): boolean {
   return birthRegex6.test(birth);
 }
 
@@ -78,7 +78,7 @@ export function validateBirth6(birth: string): boolean {
  * validateBirth8('19990101') // true
  * validateBirth8('20001231') // true
  */
-export function validateBirth8(birth: string): boolean {
+function validateBirth8(birth: string): boolean {
   return birthRegex8.test(birth);
 }
 
@@ -90,7 +90,7 @@ export function validateBirth8(birth: string): boolean {
  * validatePassword('MyPassword123!') // true
  * validatePassword('weak') // false
  */
-export function validatePassword(password: string): boolean {
+function validatePassword(password: string): boolean {
   return passwordRegex.test(password);
 }
 
@@ -101,7 +101,7 @@ export function validatePassword(password: string): boolean {
  * @example
  * validateJuminBefore2020('990101-1234567') // true
  */
-export function validateJuminBefore2020(jumin: string): boolean {
+function validateJuminBefore2020(jumin: string): boolean {
   return juminRegexBefore2020.test(jumin);
 }
 
@@ -112,7 +112,7 @@ export function validateJuminBefore2020(jumin: string): boolean {
  * @example
  * validateJuminAfter2020('200101-5234567') // true
  */
-export function validateJuminAfter2020(jumin: string): boolean {
+function validateJuminAfter2020(jumin: string): boolean {
   return juminRegexAfter2020.test(jumin);
 }
 
@@ -124,7 +124,7 @@ export function validateJuminAfter2020(jumin: string): boolean {
  * validateCorporateRegiNumber('123-45-67890') // 유효성 검사 후 결과 반환
  * validateCorporateRegiNumber('1234567890') // 유효성 검사 후 결과 반환
  */
-export function validateCorporateRegiNumber(number: string): boolean {
+function validateCorporateRegiNumber(number: string): boolean {
   const numberMap = number
     .replace(/-/gi, "")
     .split("")
@@ -161,7 +161,7 @@ export function validateCorporateRegiNumber(number: string): boolean {
  * validateUrl('http://example.com/path') // true
  * validateUrl('not-a-url') // false
  */
-export function validateUrl(url: string): boolean {
+function validateUrl(url: string): boolean {
   return urlRegex.test(url);
 }
 
@@ -175,10 +175,7 @@ export function validateUrl(url: string): boolean {
  * validateFile(new File(['content'], 'document.pdf'), 5) // true (5MB 이하)
  * validateFile('image.jpg', 10) // true (확장자 검증만)
  */
-export function validateFile(
-  file: File | string,
-  maxSizeInMB: number = 10
-): boolean {
+function validateFile(file: File | string, maxSizeInMB: number = 10): boolean {
   const fileName = typeof file === "string" ? file : file.name;
 
   if (!defaultFileExtensionRegex.test(fileName)) {
@@ -194,3 +191,17 @@ export function validateFile(
 
   return true;
 }
+
+export const validate = {
+  email: validateEmail,
+  phone: validatePhone,
+  homePhone: validateHomePhone,
+  birth6: validateBirth6,
+  birth8: validateBirth8,
+  password: validatePassword,
+  juminAfter2020: validateJuminAfter2020,
+  juminBefore2020: validateJuminBefore2020,
+  corporateRegiNumber: validateCorporateRegiNumber,
+  url: validateUrl,
+  file: validateFile,
+};
