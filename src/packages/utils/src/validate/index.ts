@@ -22,24 +22,39 @@ const urlRegex =
 const defaultFileExtensionRegex =
   /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar)$/i;
 
-type Props = {
-  type:
-    | "email"
-    | "phone"
-    | "homePhone"
-    | "birth6"
-    | "birth8"
-    | "password"
-    | "juminAfter2020"
-    | "juminBefore2020"
-    | "corporateRegiNumber"
-    | "url"
-    | "file";
-  value: string | File;
-  maxSizeInMB?: number;
-};
+function validateEmail(email: string): boolean {
+  return emailRegex.test(email);
+}
 
-function checkCorporateRegiNumber(number: string): boolean {
+function validatePhone(phone: string): boolean {
+  return phoneRegex.test(phone);
+}
+
+function validateHomePhone(homePhone: string): boolean {
+  return homePhoneRegex.test(homePhone);
+}
+
+function validateBirth6(birth: string): boolean {
+  return birthRegex6.test(birth);
+}
+
+function validateBirth8(birth: string): boolean {
+  return birthRegex8.test(birth);
+}
+
+function validatePassword(password: string): boolean {
+  return passwordRegex.test(password);
+}
+
+function validateJuminBefore2020(jumin: string): boolean {
+  return juminRegexBefore2020.test(jumin);
+}
+
+function validateJuminAfter2020(jumin: string): boolean {
+  return juminRegexAfter2020.test(jumin);
+}
+
+function validateCorporateRegiNumber(number: string): boolean {
   const numberMap = number
     .replace(/-/gi, "")
     .split("")
@@ -67,6 +82,10 @@ function checkCorporateRegiNumber(number: string): boolean {
   return false;
 }
 
+function validateUrl(url: string): boolean {
+  return urlRegex.test(url);
+}
+
 function validateFile(file: File | string, maxSizeInMB: number = 10): boolean {
   const fileName = typeof file === "string" ? file : file.name;
 
@@ -84,30 +103,16 @@ function validateFile(file: File | string, maxSizeInMB: number = 10): boolean {
   return true;
 }
 
-function validateWithRegex(value: string, regex: RegExp): boolean {
-  return regex.test(value);
-}
-
-export const validate = ({ type, value, maxSizeInMB }: Props) => {
-  if (type === "corporateRegiNumber") {
-    return checkCorporateRegiNumber(value as string);
-  }
-
-  if (type === "file") {
-    return validateFile(value as File | string, maxSizeInMB);
-  }
-
-  const regexMap = {
-    email: emailRegex,
-    phone: phoneRegex,
-    homePhone: homePhoneRegex,
-    birth6: birthRegex6,
-    birth8: birthRegex8,
-    password: passwordRegex,
-    juminAfter2020: juminRegexAfter2020,
-    juminBefore2020: juminRegexBefore2020,
-    url: urlRegex,
-  };
-
-  return validateWithRegex(value as string, regexMap[type]);
+export const validate = {
+  email: validateEmail,
+  phone: validatePhone,
+  homePhone: validateHomePhone,
+  birth6: validateBirth6,
+  birth8: validateBirth8,
+  password: validatePassword,
+  juminAfter2020: validateJuminAfter2020,
+  juminBefore2020: validateJuminBefore2020,
+  corporateRegiNumber: validateCorporateRegiNumber,
+  url: validateUrl,
+  file: validateFile,
 };
