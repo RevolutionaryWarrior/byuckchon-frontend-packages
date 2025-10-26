@@ -30,12 +30,12 @@ export const parseDate = (date: string): Date => {
   return parse(date, "yyyy-MM-dd", new Date());
 };
 
-export const beforeDate = (date1: Date, date2: Date): Date => {
-  return dfIsBefore(date1, date2) ? date1 : date2;
+export const beforeDate = (firstDate: Date, secondDate: Date): Date => {
+  return dfIsBefore(firstDate, secondDate) ? firstDate : secondDate;
 };
 
-export const afterDate = (date1: Date, date2: Date): Date => {
-  return dfIsAfter(date1, date2) ? date1 : date2;
+export const afterDate = (firstDate: Date, secondDate: Date): Date => {
+  return dfIsAfter(firstDate, secondDate) ? firstDate : secondDate;
 };
 
 export const relativeTime = (
