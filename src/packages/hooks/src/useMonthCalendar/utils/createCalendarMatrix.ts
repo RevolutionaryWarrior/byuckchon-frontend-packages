@@ -26,7 +26,7 @@ export const createCalendarMatrix = (
   const nextYear = nextMonth > 11 ? year + 1 : year;
   const adjustedNextMonth = nextMonth > 11 ? 0 : nextMonth;
 
-  const matrix: number[][] = Array(6)
+  let matrix: number[][] = Array(6)
     .fill(null)
     .map(() => Array(7).fill(0));
 
@@ -60,34 +60,15 @@ export const createCalendarMatrix = (
     }
   }
 
-  return { matrix, year, month, prevMonthDates, nextMonthDates };
-};
+  if (includeAdjacentMonths && matrix[5][0] < 0) {
+    matrix = matrix.slice(0, 5);
 
-export const getWeekFromMatrix = (
-  matrix: number[][],
-  year: number,
-  month: number,
-  targetDate: number,
-  prevMonthDates: { [key: number]: string },
-  nextMonthDates: { [key: number]: string }
-): string[] => {
-  let targetWeek = matrix.find((week) => week.includes(targetDate));
-
-  if (!targetWeek && targetDate > 28) {
-    targetWeek = matrix[matrix.length - 1];
+    if (matrix[4][0] < 0) {
+      matrix = matrix.slice(0, 4);
+    }
   }
 
-  if (!targetWeek) return [];
-
-  return targetWeek.map((day) => {
-    if (day > 0) {
-      return new Date(Date.UTC(year, month, day)).toISOString();
-    } else if (day < 0) {
-      const absDay = Math.abs(day);
-      return prevMonthDates[absDay] || nextMonthDates[absDay] || "0";
-    }
-    return "0";
-  });
+  return { matrix, year, month, prevMonthDates, nextMonthDates };
 };
 
 export const formatMatrixDates = (
