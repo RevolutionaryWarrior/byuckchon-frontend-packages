@@ -1,0 +1,62 @@
+/* 전체 캘린더 크기 조정 */
+.custom-calendar {
+  width: 312px; /* 캘린더 전체 너비 */
+  padding: 16px;
+  font-size: 14px; /* 전체 폰트 크기 조정 */
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 드롭 쉐도우 추가 */
+  border-radius: 12px; /* 모서리 둥글게 */
+}
+
+/* 네비게이션 크기 조정 */
+.custom-calendar .react-calendar__navigation {
+  margin-bottom: 0.5rem; /* 아래 여백 조정 */
+}
+
+.custom-calendar .react-calendar__navigation button:disabled {
+  background-color: #fff;
+}
+
+.custom-calendar .react-calendar__navigation button {
+}
+
+/* 년도, 월 선택 영역 크기 조정 */
+.custom-calendar .react-calendar__year-view__months__month,
+.custom-calendar .react-calendar__month-view__weekdays__weekday {
+  font-size: 0.75rem; /* 폰트 크기 조정 */
+}
+
+/* 날짜 셀 크기 조정 */
+.custom-calendar .react-calendar__tile {
+  width: 40px;
+  height: 40px; /* 날짜 셀 높이 */
+  font-size: 0.75rem; /* 폰트 크기 */
+  padding: 0.25rem; /* 셀 패딩 */
+}
+
+/* 오늘 날짜 셀 스타일 조정 */
+.custom-calendar .react-calendar__tile--now {
+  border-color: transparent;
+  color: #0058e4;
+  background: transparent;
+  position: relative;
+}
+
+.custom-calendar .react-calendar__tile--now::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background-color: #0058e4;
+  z-index: 1;
+}
+
+/* 선택된 날짜 셀 스타일 조정 */
+.custom-calendar .react-calendar__tile--active {
+  background: #0058e4; /* 선택된 날짜 배경색 */
+  font-weight: 800;
+  color: white; /* 선택된 날짜 텍스트 색 */
+}
