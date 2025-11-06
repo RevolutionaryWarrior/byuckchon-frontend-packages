@@ -13,6 +13,7 @@ import { ToastUI } from "./ToastUI";
  *   isCloseButton: true,
  *   Icon: <Icon />
  *   iconPosition: 'center',
+ *   valriant: 'default' | 'error' | 'success' | 'warning',
  * });
  */
 export function ShowToast(
