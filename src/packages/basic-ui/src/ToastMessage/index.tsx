@@ -1,6 +1,5 @@
 import { ToastContainer } from "react-toastify";
-// eslint-disable-next-line react-refresh/only-export-components
-export { showToast } from "./showToast";
+export { ShowToast } from "./ShowToast";
 
 export interface ToastContainerProps {
   autoClose?: number | false;
@@ -13,12 +12,15 @@ export interface ToastContainerProps {
     | "bottom-right";
 }
 
+type Variant = "default" | "error" | "success" | "warning";
+
 export interface ToastMessageProps {
   message: string;
   textAlign?: "left" | "center" | "right";
   isCloseButton?: boolean;
   Icon?: React.ReactNode;
   iconPosition?: "start" | "center";
+  variant?: Variant;
 }
 
 export default function ToastMessage({

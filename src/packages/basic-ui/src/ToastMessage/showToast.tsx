@@ -1,13 +1,13 @@
 import { toast, type ToastContentProps } from "react-toastify";
-import CloseIcon from "@icons/icon_byuckicon_close_white.svg?react";
 import type { ToastMessageProps } from ".";
+import { ToastUI } from "./ToastUI";
 
 /**
  * Toast 메시지를 표시하는 함수
  * @param options - Toast 메시지 옵션
  * @returns Toast ID
  * @example
- * showToast({
+ * ShowToast({
  *   message: '저장되었습니다.',
  *   textAlign: 'left',
  *   isCloseButton: true,
@@ -15,8 +15,7 @@ import type { ToastMessageProps } from ".";
  *   iconPosition: 'center',
  * });
  */
-
-export function showToast(
+export function ShowToast(
   options: ToastMessageProps
 ): ReturnType<typeof toast> {
   const {
@@ -25,30 +24,29 @@ export function showToast(
     isCloseButton = true,
     Icon,
     iconPosition = "center",
+    variant,
   } = options;
 
-  function ToastUI({ closeToast }: ToastContentProps) {
+  // ShowToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
+  function ToastContent(props: ToastContentProps) {
     return (
-      <div className="w-full px-[16px] py-[12px]">
-        <div
-          className={`flex gap-[12px] items-${iconPosition} text-white text-[16px] font-medium text-${textAlign}`}
-        >
-          {Icon && <div className="size-5">{Icon}</div>}
-          <span className="flex-1 leading-[20px] pt-[5px] break-keep">
-            {message}
-          </span>
-          {isCloseButton && (
-            <button onClick={closeToast}>
-              <CloseIcon className="size-5 fill-white" />
-            </button>
-          )}
-        </div>
-      </div>
+      <ToastUI
+        {...props}
+        message={message}
+        textAlign={textAlign}
+        isCloseButton={isCloseButton}
+        Icon={Icon}
+        iconPosition={iconPosition}
+        variant={variant}
+      />
     );
   }
 
-  return toast(ToastUI, {
+  // 기본 className 설정 (react-toastify 컨테이너용)
+  const defaultClassName = `!p-0 !w-[335px] !rounded-none !min-h-[44px]`;
+
+  return toast(ToastContent, {
     closeButton: false,
-    className: "!p-0 !w-[335px] !bg-[#00000099] !rounded-none !min-h-[44px]",
+    className: defaultClassName,
   });
 }

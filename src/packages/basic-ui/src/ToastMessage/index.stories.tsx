@@ -1,5 +1,5 @@
 import type { ToastContainerProps } from "react-toastify";
-import ToastMessage, { showToast, type ToastMessageProps } from ".";
+import ToastMessage, { ShowToast, type ToastMessageProps } from ".";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 interface ToastStoryArgs extends ToastMessageProps, ToastContainerProps {}
@@ -47,6 +47,16 @@ const meta: Meta<ToastStoryArgs> = {
       table: {
         type: { summary: "'start' | 'center'" },
         defaultValue: { summary: "center" },
+      },
+    },
+    variant: {
+      control: "select",
+      options: ["default", "error", "success", "warning"],
+      description:
+        "Toast 메시지의 스타일 변형 (showToast 컴포넌트의 props로 전달됩니다.)",
+      table: {
+        type: { summary: "'default' | 'error' | 'success' | 'warning'" },
+        defaultValue: { summary: "default" },
       },
     },
     autoClose: {
@@ -98,7 +108,7 @@ export const Default: Story = {
     const { autoClose, position, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      ShowToast(toastOptions);
     }
 
     return (
@@ -127,7 +137,7 @@ export const CenterAlign: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      ShowToast(toastOptions);
     }
 
     return (
@@ -157,7 +167,7 @@ export const WithoutCloseButton: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      ShowToast(toastOptions);
     }
 
     return (
@@ -202,7 +212,7 @@ export const WithIcon: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      ShowToast(toastOptions);
     }
 
     return (
