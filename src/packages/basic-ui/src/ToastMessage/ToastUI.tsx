@@ -47,18 +47,30 @@ export function ToastUI({
     ...(theme?.toastMessageTheme?.[variantKey] ?? {}),
   };
 
+  const textAlignClass =
+    textAlign === "center"
+      ? "text-center"
+      : textAlign === "right"
+      ? "text-right"
+      : "text-left";
+
+  const iconPositionClass =
+    iconPosition === "start" ? "items-start" : "items-center";
+
   return (
     <div className={`w-full px-[16px] py-[12px] ${mergedStyle.bg}`}>
       <div
-        className={`flex gap-[12px] items-${iconPosition} ${mergedStyle.text} text-[16px] font-medium text-${textAlign}`}
+        className={`flex gap-[12px] ${iconPositionClass} ${mergedStyle.text} text-[16px] font-medium`}
       >
         {Icon && <div className="size-5">{Icon}</div>}
-        <span className="flex-1 leading-[20px] pt-[5px] break-keep">
+        <span
+          className={`flex-1 leading-[20px] pt-[5px] break-keep ${textAlignClass}`}
+        >
           {message}
         </span>
         {isCloseButton && (
-          <button onClick={closeToast}>
-            <CloseIcon className="size-5 fill-white" />
+          <button onClick={closeToast} className="size-5 cursor-pointer">
+            <CloseIcon className="fill-white" />
           </button>
         )}
       </div>
