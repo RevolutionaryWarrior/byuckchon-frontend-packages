@@ -6,18 +6,22 @@ const baseToastMessageVariants = {
   default: {
     bg: "bg-[#00000099] rounded-none min-h-[44px]",
     text: "text-white",
+    border: "border-none",
   },
   error: {
-    bg: "bg-[#FF000099] rounded-none min-h-[44px]",
-    text: "text-white",
+    bg: "bg-[#FF00004D] rounded-none min-h-[44px]",
+    text: "text-[#FF0000]",
+    border: "border-[#FF0000] border-2",
   },
   success: {
-    bg: "bg-[#10B98199] rounded-none min-h-[44px]",
-    text: "text-white",
+    bg: "bg-[#2BFF004D] rounded-none min-h-[44px]",
+    text: "text-[#222222]",
+    border: "border-[#1BA200] border-2",
   },
   warning: {
-    bg: "bg-[#F59E0B99] rounded-none min-h-[44px]",
-    text: "text-white",
+    bg: "bg-[#FFE1004D] rounded-none min-h-[44px]",
+    text: "text-[#222222]",
+    border: "border-[#F5D800] border-2",
   },
 };
 
@@ -58,7 +62,9 @@ export function ToastUI({
     iconPosition === "start" ? "items-start" : "items-center";
 
   return (
-    <div className={`w-full px-[16px] py-[12px] ${mergedStyle.bg}`}>
+    <div
+      className={`w-full px-[16px] py-[12px] ${mergedStyle.bg} ${mergedStyle.border}`}
+    >
       <div
         className={`flex gap-[12px] ${iconPositionClass} ${mergedStyle.text} text-[16px] font-medium`}
       >
