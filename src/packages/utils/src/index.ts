@@ -1,2 +1,2 @@
 export * from "./generateCalendar";
-export * from "./DateUtils";
+export * as dateUtils from "./DateUtils";
