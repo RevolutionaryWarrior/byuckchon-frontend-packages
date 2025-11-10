@@ -20,7 +20,7 @@ export const utcToKst = (utcDate: Date): Date => {
 };
 
 /** 날짜 형식 변환 함수 ( ex: yyyy-MM-dd ) */
-export const formatData = (date: Date, pattern: string = "yyyy-MM-dd"): string => {
+export const formatDate = (date: Date, pattern: string = "yyyy-MM-dd"): string => {
   return format(date, pattern);
 };
 
