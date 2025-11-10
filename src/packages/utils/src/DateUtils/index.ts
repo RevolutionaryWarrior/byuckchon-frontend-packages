@@ -12,32 +12,39 @@ import {
   differenceInYears,
 } from "date-fns";
 
+/** utc -> kst 시간 변환 함수 */
 export const utcToKst = (utcDate: Date): Date => {
   const timezoneOffset = 9 * 60 * 60 * 1000;
 
   return new Date(utcDate.getTime() + timezoneOffset);
 };
 
+/** 날짜 형식 변환 함수 ( ex: yyyy-MM-dd ) */
 export const formatData = (date: Date, pattern: string = "yyyy-MM-dd"): string => {
   return format(date, pattern);
 };
 
+/** 날짜 ISO 형식 변환 함수  */
 export const toISO = (date: Date): string => {
   return formatISO(date);
 };
 
-export const parseDate = (date: string): Date => {
-  return parse(date, "yyyy-MM-dd", new Date());
+/** 날짜 파싱 함수 */
+export const parseDate = (date: string, pattern?: string): Date => {
+  return parse(date, pattern ?? "yyyy-MM-dd", new Date());
 };
 
+/** 이전 날짜 반환 함수 */
 export const beforeDate = (firstDate: Date, secondDate: Date): Date => {
   return dfIsBefore(firstDate, secondDate) ? firstDate : secondDate;
 };
 
+/** 이후 날짜 반환 함수 */
 export const afterDate = (firstDate: Date, secondDate: Date): Date => {
   return dfIsAfter(firstDate, secondDate) ? firstDate : secondDate;
 };
 
+/** 현재 시간을 기준으로 상대 시간 반환 함수 */
 export const relativeTime = (
   date: Date,
   labels?: Partial<
