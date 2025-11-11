@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
-type Placement =
+export type Placement =
   | "top-left"
   | "top-center"
   | "top-right"
@@ -57,7 +57,6 @@ type Props = {
   children: React.ReactNode;
   variant?: string;
   className?: string;
-  offset?: number;
 };
 
 export default function Tooltip({
@@ -119,7 +118,7 @@ export default function Tooltip({
       {open && (
         <aside
           role="tooltip"
-          className={`${className} ${positionClasses[placement]} ${tooltipStyles.bg} ${tooltipStyles.text} absolute z-50 rounded`}
+          className={`${className} ${positionClasses[placement]} ${tooltipStyles.bg} ${tooltipStyles.text} absolute z-50`}
         >
           <p className={`${fontStyles} whitespace-pre-line px-2 py-1`}>
             {content}
