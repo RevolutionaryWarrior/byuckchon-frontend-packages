@@ -31,6 +31,7 @@
 .custom-calendar .react-calendar__navigation button:enabled:hover,
 .custom-calendar .react-calendar__navigation button:enabled:focus {
   background-color: transparent;
+  color: #222222;
 }
 
 /* 일반 요일 스타일 */
