@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 interface UseCheckListOptions {
-  items?: boolean | boolean[];
-  initialCount?: number;
+  initialCount: number;
+  initialItems?: boolean | boolean[];
 }
 
 interface UseCheckListReturn {
@@ -17,19 +17,21 @@ interface UseCheckListReturn {
  * 체크리스트 상태를 관리하는 React 훅
  *
  * @param options - 체크리스트 옵션
- * @param options.items - 초기 체크 상태 배열 또는 단일 값
- * @param options.initialCount - 초기 항목 개수 (items가 없을 때 사용)
+ * @param options.initialCount - 초기 항목 개수 (필수값)
+ * @param options.initialItems - 초기 체크될 항목들, boolean[] 타입으로 넣어주세요 (선택값)
+ *
+ * initialCount 를 넣어주어야 toggleAll 함수가 정상적으로 작동합니다!
  *
  * @returns 체크리스트 상태와 제어 함수들
  **/
 
 const useCheckList = ({
-  items,
   initialCount = 0,
-}: UseCheckListOptions = {}): UseCheckListReturn => {
+  initialItems,
+}: UseCheckListOptions): UseCheckListReturn => {
   const getInitialItems = () => {
-    if (items !== undefined) {
-      return Array.isArray(items) ? items : [items];
+    if (initialItems !== undefined) {
+      return Array.isArray(initialItems) ? initialItems : [initialItems];
     }
 
     return Array(initialCount).fill(false);
