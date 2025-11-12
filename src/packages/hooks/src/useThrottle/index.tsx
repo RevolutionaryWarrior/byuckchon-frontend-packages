@@ -41,9 +41,10 @@ import { useCallback, useRef } from "react";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useThrottle = <T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay?: number
 ): T => {
   const isWaiting = useRef(false);
+  const DELAY = delay ? delay : 500;
 
   return useCallback(
     ((...args: Parameters<T>) => {
@@ -52,10 +53,10 @@ const useThrottle = <T extends (...args: any[]) => any>(
         isWaiting.current = true;
         setTimeout(() => {
           isWaiting.current = false;
-        }, delay);
+        }, DELAY);
       }
     }) as T,
-    [callback, delay]
+    [callback, DELAY]
   );
 };
 

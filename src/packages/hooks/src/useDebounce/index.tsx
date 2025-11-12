@@ -27,17 +27,18 @@ import { useCallback, useRef } from "react";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useDebounce = <T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay?: number
 ): T => {
   const schedule = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const DELAY = delay ? delay : 500;
 
   return useCallback(
     ((...args: Parameters<T>) => {
       if (schedule.current !== null) clearTimeout(schedule.current);
-      schedule.current = setTimeout(() => callback(...args), delay);
+      schedule.current = setTimeout(() => callback(...args), DELAY);
     }) as T,
 
-    [callback, delay]
+    [callback, DELAY]
   );
 };
 
