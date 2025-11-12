@@ -33,7 +33,7 @@ const useDebounce = <T extends (...args: any[]) => any>(
   const [isFirstCall, setIsFirstCall] = useState<boolean>(true);
 
   const FIRST_DELAY = 300;
-  const DELAY = delay ?? 10000;
+  const DELAY = delay ?? 500;
   const CURRENT_DELAY = isFirstCall ? FIRST_DELAY : DELAY;
 
   return useCallback(
