@@ -9,7 +9,7 @@ type Props = {
   includeAdjacentMonths?: boolean;
 };
 
-const MonthCalendar = ({
+const useMonthCalendar = ({
   initialDate,
   includeAdjacentMonths = false,
 }: Props = {}) => {
@@ -45,6 +45,10 @@ const MonthCalendar = ({
     setCurrentDate(newDate);
   };
 
+  const moveToToday = () => {
+    setCurrentDate(new Date());
+  };
+
   return {
     currentDate: currentDate.toISOString(),
     setCurrentDate,
@@ -52,7 +56,8 @@ const MonthCalendar = ({
     moveToNext: () => moveMonth(1),
     moveToPrev: () => moveMonth(-1),
     moveToPeriod: moveMonth,
+    moveToToday,
   };
 };
 
-export default MonthCalendar;
+export default useMonthCalendar;
