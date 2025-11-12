@@ -9,3 +9,4 @@ export { ModalProvider } from "./ModalProvider";
 export { default as Pagination } from "./Pagination";
 export { default as Toggle } from "./Toggle";
 export { UIThemeProvider, type Theme } from "./UIThemeProvider";
+export { default as BottomSheet } from "./BottomSheet";
