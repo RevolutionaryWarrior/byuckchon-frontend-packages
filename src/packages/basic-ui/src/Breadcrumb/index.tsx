@@ -5,6 +5,7 @@ type Props = {
     label: React.ReactNode | string;
     icon?: React.ReactNode;
     active?: boolean;
+    onClick?: () => void;
   }[];
   mode: "localNavMode" | "progressMode";
   labelStyle: string;
@@ -43,13 +44,13 @@ export default function Breadcrumb({
         const isActive = item.active ?? false;
         const isFirst = index === 0;
 
-        const itemClassName = clsx("flex items-center", {
+        const itemClassName = clsx("flex items-center cursor-pointer", {
           "pr-[12px] py-[8px] gap-[4px]": mode === "localNavMode",
           "bg-[#0058E4] text-white": mode === "localNavMode" && isActive,
         });
 
         return (
-          <div key={index} className={itemClassName}>
+          <div key={index} className={itemClassName} onClick={item.onClick}>
             {renderSeparator(isActive, isFirst)}
             {item.icon && (
               <div className="flex-shrink-0 flex items-center pl-[12px]">
