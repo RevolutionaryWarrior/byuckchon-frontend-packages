@@ -23,6 +23,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "chromatic": "npx chromatic --project-token=chpt_8e88fb3271f90db"
+    "chromatic": "npx chromatic --project-token=chpt_8e88fb3271f90db",
+    "build:watch": "vite build --watch"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
