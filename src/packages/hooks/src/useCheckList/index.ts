@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 interface UseCheckListOptions {
   items?: boolean | boolean[];
@@ -27,12 +27,13 @@ const useCheckList = ({
   items,
   initialCount = 0,
 }: UseCheckListOptions = {}): UseCheckListReturn => {
-  const getInitialItems = useCallback(() => {
+  const getInitialItems = () => {
     if (items !== undefined) {
       return Array.isArray(items) ? items : [items];
     }
+
     return Array(initialCount).fill(false);
-  }, [items, initialCount]);
+  };
 
   const [checkedItems, setCheckedItems] = useState<boolean[]>(getInitialItems);
 
@@ -40,38 +41,28 @@ const useCheckList = ({
     checkedItems.length > 0 && checkedItems.every((item) => item === true);
 
   const actions = {
-    /** 특정 인덱스의 체크 상태를 토글하는 함수 */
-    toggleItem: useCallback((index: number) => {
+    toggleItem: (index: number) => {
       setCheckedItems((prev) => {
         const newItems = [...prev];
         newItems[index] = !newItems[index];
         return newItems;
       });
-    }, []),
-
-    /** 모든 항목을 체크/언체크하는 함수 */
-    toggleAll: useCallback(
-      (checked?: boolean) => {
-        setCheckedItems((prev) => {
-          const targetValue = checked !== undefined ? checked : !isAllChecked;
-          return prev.map(() => targetValue);
-        });
-      },
-      [isAllChecked]
-    ),
-
-    /** 모든 항목을 리셋하는 함수 */
-    reset: useCallback(() => {
+    },
+    toggleAll: (checked?: boolean) => {
+      setCheckedItems((prev) => {
+        const targetValue = checked !== undefined ? checked : !isAllChecked;
+        return prev.map(() => targetValue);
+      });
+    },
+    reset: () => {
       setCheckedItems(getInitialItems());
-    }, [getInitialItems]),
+    },
   };
 
   return {
     checkedItems,
     isAllChecked,
-    toggleItem: actions.toggleItem,
-    toggleAll: actions.toggleAll,
-    reset: actions.reset,
+    ...actions,
   };
 };
 
