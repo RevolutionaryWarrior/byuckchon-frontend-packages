@@ -9,7 +9,6 @@ interface UseCheckListReturn {
   checkedItems: boolean[];
   isAllChecked: boolean;
   toggleItem: (index: number) => void;
-  setItem: (index: number, checked: boolean) => void;
   toggleAll: (checked?: boolean) => void;
   reset: () => void;
 }
@@ -50,15 +49,6 @@ const useCheckList = ({
       });
     }, []),
 
-    /** 특정 인덱스의 체크 상태를 설정하는 함수 */
-    setItem: useCallback((index: number, checked: boolean) => {
-      setCheckedItems((prev) => {
-        const newItems = [...prev];
-        newItems[index] = checked;
-        return newItems;
-      });
-    }, []),
-
     /** 모든 항목을 체크/언체크하는 함수 */
     toggleAll: useCallback(
       (checked?: boolean) => {
@@ -80,7 +70,6 @@ const useCheckList = ({
     checkedItems,
     isAllChecked,
     toggleItem: actions.toggleItem,
-    setItem: actions.setItem,
     toggleAll: actions.toggleAll,
     reset: actions.reset,
   };
