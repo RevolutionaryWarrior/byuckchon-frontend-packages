@@ -6,32 +6,47 @@ type Params = {
   callback?: () => void;
 };
 
+type ErrorResponse = {
+  type: "axios" | "client" | "unknown";
+  message: string;
+  status?: number;
+}
+
 /**
  * 에러 처리 함수
- * - 에러 메세지를 콘솔에 출력하고, 사용자 정의 에러 처리 함수를 호출합니다.
- * - axios 에러의 경우 response.data.message || status || message 를 콘솔에 출력합니다.
- * - 일반 에러의 경우 error.message || message 를 콘솔에 출력합니다.
- * - unknown 타입의 경우 (type 지정 하지 않은 error) message 를 콘솔에 출력합니다.
+ * - 사용자 정의 에러 처리 함수를 호출하고 ErrorResponse 객체를 반환합니다.
  *
  * @param {AxiosError | Error | unknown} error
  * @param {string} [message] - Optional message
  * @param {() => void} [callback] - Optional 사용자 정의 에러 처리 함수
+ * 
+ * @returns {ErrorResponse} ErrorResponse 객체
  */
 
-export const handleError = ({ error, message = "알 수 없는 에러가 발생했습니다.", callback }: Params): void => {
+export const handleError = ({ error, message = "알 수 없는 에러가 발생했습니다.", callback }: Params): ErrorResponse => {
   if (axios.isAxiosError(error)) {
-    console.error(error.response?.data?.message ?? error.status ?? message);
+    callback?.();
 
-    return callback?.();
+    return {
+      type: "axios",
+      message: error.response?.data?.message ?? message,
+      status: error.status || undefined,
+    }
   }
 
   if (error instanceof Error) {
-    console.error(error.message || message);
+    callback?.();
 
-    return callback?.();
+    return {
+      type: "client",
+      message: error.message || message,
+    }
   }
 
-  console.error(message);
+  callback?.();
 
-  return callback?.();
+  return {
+    type: "unknown",
+    message: message,
+  }
 };
