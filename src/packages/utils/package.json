@@ -23,11 +23,11 @@
     "build:watch": "vite build --watch"
   },
   "devDependencies": {
+    "typescript": "~5.8.3",
     "vite": "^7.1.2",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-libcss": "^1.1.2",
     "vite-css-modules": "^1.10.0",
-    "typescript": "~5.8.3"
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-libcss": "^1.1.2"
   },
   "repository": {
     "type": "git",
@@ -46,5 +46,8 @@
     "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
 }
