@@ -19,7 +19,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "lint": "eslint src --ext ts,tsx"
+    "lint": "eslint src --ext ts,tsx",
+    "build:watch": "vite build --watch"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
