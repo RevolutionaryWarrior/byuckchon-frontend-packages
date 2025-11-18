@@ -5,8 +5,9 @@ import ActiveButton from "../ActiveButton";
 
 type BottomSheetProps = {
   isOpen: boolean;
-  title: string;
   onClose: () => void;
+  onExit: () => void;
+  title: string;
   children: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
@@ -22,8 +23,9 @@ type BottomSheetProps = {
 
 export default function BottomSheet({
   isOpen,
-  title,
   onClose,
+  onExit,
+  title,
   onCancel,
   onConfirm,
   cancelText = "취소",
@@ -42,14 +44,28 @@ export default function BottomSheet({
       : "text-h-2 text-center";
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+
         <Drawer.Content
-          className={`px-4 py-3 fixed bottom-0 left-0 right-0 z-50 w-full bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.15)] transition-all duration-300 ease-out max-h-[45vh] ${radiusClassName}`}
+          className={`
+            px-4 py-3 fixed bottom-0 left-0 right-0 z-50 w-full bg-white
+            shadow-[0_-4px_16px_rgba(0,0,0,0.15)]
+            transition-all duration-300 ease-out max-h-[45vh]
+            ${radiusClassName}
+          `}
+          onAnimationEnd={() => {
+            if (!isOpen) onExit();
+          }}
         >
           {/* 상단 회색 띠 */}
-          <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-[#C4C4C7] cursor-pointer active:cursor-grabbing" />
+          <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-[#C4C4C7]" />
 
           {/* 헤더 */}
           <div className="relative flex items-center justify-center px-5 mt-1">
@@ -80,7 +96,6 @@ export default function BottomSheet({
               {children}
             </div>
 
-            {/* 버튼 영역 */}
             {(onCancel || onConfirm) && (
               <div className="flex gap-4 pt-3">
                 {onCancel && (
@@ -104,12 +119,11 @@ export default function BottomSheet({
               </div>
             )}
 
-            {/* 추가 텍스트 버튼 */}
             {extraText && (
               <div className="mt-3 text-center">
                 <button
                   onClick={onExtraClick}
-                  className="text-[#8F9098] text-caption underline underline-offset-2 cursor-pointer"
+                  className="text-[#8F9098] text-caption underline underline-offset-2"
                 >
                   {extraText}
                 </button>
