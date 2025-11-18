@@ -1,6 +1,6 @@
 {
-  "name": "@byuckchon-frontend/hooks",
-  "version": "0.0.3",
+  "name": "@byuckchon-frontend/core",
+  "version": "0.0.1",
   "private": false,
   "type": "module",
   "main": "dist/index.umd.js",
@@ -39,7 +39,10 @@
     "url": "git+https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages.git"
   },
   "keywords": [
-    "react"
+    "react",
+    "core",
+    "byuckchon",
+    "frontend"
   ],
   "author": "Byuckchon Frontend Team",
   "license": "MIT",
