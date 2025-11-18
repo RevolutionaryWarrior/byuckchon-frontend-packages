@@ -5,6 +5,7 @@ export type OverlayNode = React.ReactNode | OverlayRenderFn;
 
 export type OverlayContextValue = {
   open: (node: OverlayNode) => Promise<any>;
+  close: (value?: any) => void;
   requestClose: (value?: any) => void;
   finishClose: () => void;
 };

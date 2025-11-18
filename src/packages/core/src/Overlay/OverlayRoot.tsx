@@ -51,13 +51,22 @@ export default function OverlayRoot({
     });
   }, []);
 
+  const close = useCallback(
+    (value?: any) => {
+      requestClose(value);
+      finishClose();
+    },
+    [requestClose, finishClose]
+  );
+
   const value = useMemo(
     () => ({
       open,
+      close,
       requestClose,
       finishClose,
     }),
-    [open, requestClose, finishClose]
+    [open, close, requestClose, finishClose]
   );
 
   return (
