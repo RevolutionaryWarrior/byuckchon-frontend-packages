@@ -12,17 +12,9 @@ export default defineConfig({
   build: {
     cssCodeSplit: true,
     lib: {
-      entry: {
-        index: path.resolve(__dirname, "src/index.ts"),
-        styles: path.resolve(__dirname, "styles.css"),
-      },
+      entry: path.resolve(__dirname, "src/index.ts"),
       name: "index",
-      fileName: (format, entryName) => {
-        if (entryName === "styles") {
-          return `${entryName}.css`;
-        }
-        return `${entryName}.${format === "es" ? "mjs" : "umd.js"}`;
-      },
+      fileName: (format) => `index.${format === "es" ? "mjs" : "umd.js"}`,
       formats: ["es"],
     },
     rollupOptions: {

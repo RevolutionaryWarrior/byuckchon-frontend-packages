@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React from "react";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
 
@@ -11,7 +12,7 @@ type Props = {
 
 const baseButtonVariants = {
   primary: {
-    bg: "bg-[#0058E4] border-[#0054DA] border-2",
+    bg: "bg-[var(--color-primary)] border-[var(--color-primary)] border-2",
     text: "text-white text-button-active",
   },
   secondary: {
@@ -34,17 +35,21 @@ export default function ActiveButton({
   const theme = useUITheme();
 
   const variantKey = disabled ? "disabled" : variant;
-  const mergedStyle = {
-    ...baseButtonVariants[variantKey],
-    ...(theme?.button?.[variantKey] ?? {}),
-  };
+  const baseStyle = baseButtonVariants[variantKey];
+  const themeStyle = theme?.button?.[variantKey] ?? {};
+
+  const buttonClassName = clsx(
+    baseStyle.bg,
+    "w-full cursor-pointer py-4",
+    themeStyle.bg,
+    className
+  );
+
+  const textClassName = clsx(baseStyle.text, "text-center", themeStyle.text);
 
   return (
-    <button
-      {...props}
-      className={`${className} ${mergedStyle.bg} w-full cursor-pointer py-4`}
-    >
-      <p className={`${mergedStyle.text} text-center`}>{children}</p>
+    <button {...props} className={buttonClassName}>
+      <p className={textClassName}>{children}</p>
     </button>
   );
 }
