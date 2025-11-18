@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { OverlayContext, type OverlayNode } from "./OverlayContext";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type OverlayState = {
   node: OverlayNode | null;
   resolve?: (value: any) => void;
