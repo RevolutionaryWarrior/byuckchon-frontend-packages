@@ -1,64 +1,69 @@
-export function isServer() {
+function isServer() {
   return typeof window === "undefined" || "Deno" in globalThis;
 }
 
-export function isClient() {
+function isClient() {
   return !isServer();
 }
 
-export function isIOS() {
+function isIOS() {
   if (isServer()) return false;
-
-  return navigator.userAgent.match(/ipad|iphone/i) !== null;
+  return /ipad|iphone/i.test(navigator.userAgent);
 }
 
-export function isMacOS() {
+function isMacOS() {
   if (isServer()) return false;
-
-  return navigator.platform.match(/Macintosh|MacIntel|MacPPC|Mac68K/) !== null;
+  return /Macintosh|MacIntel|MacPPC|Mac68K/.test(navigator.platform);
 }
 
-export function isAndroid() {
+function isAndroid() {
   if (isServer()) return false;
-
-  return navigator.userAgent.match(/Android/i) !== null;
+  return /Android/i.test(navigator.userAgent);
 }
 
-export function isIE() {
+function isIE() {
   if (isServer()) return false;
-
-  return /MSIE|Trident/i.test(window.navigator.userAgent);
+  return /MSIE|Trident/i.test(navigator.userAgent);
 }
 
-export function getOSByUserAgent() {
+function isKakaoWebView() {
   if (isServer()) return false;
-
-  if (isIOS()) return "ios";
-
-  if (isAndroid()) return "android";
-
-  return "web";
-}
-
-export function isMobileWeb() {
-  const userAgent = getOSByUserAgent();
-
-  if (userAgent === "ios" || userAgent === "android") return true;
-
-  return false;
-}
-
-export function isKakaoWebView() {
-  if (isServer()) return false;
-
   return /KAKAOTALK/i.test(navigator.userAgent);
 }
 
-export function getPlatform() {
-  if (isServer()) return "server";
-  if (isKakaoWebView()) return "kakao";
-  const os = getOSByUserAgent();
-  if (os === "ios" || os === "android") return os;
-  if (isMacOS()) return "macos";
+function getOSByUserAgent() {
+  if (isServer()) return false;
+  if (isIOS()) return "ios";
+  if (isAndroid()) return "android";
   return "web";
 }
+
+function isMobileWeb() {
+  const os = getOSByUserAgent();
+  return os === "ios" || os === "android";
+}
+
+function getPlatform() {
+  if (isServer()) return "server";
+  if (isKakaoWebView()) return "kakao";
+
+  const os = getOSByUserAgent();
+  if (os === "ios" || os === "android") return os;
+
+  if (isMacOS()) return "macos";
+
+  return "web";
+}
+
+export const userAgent = {
+  isServer,
+  isClient,
+  isIOS,
+  isAndroid,
+  isMacOS,
+  isIE,
+  isKakaoWebView,
+  isMobileWeb,
+  getOSByUserAgent,
+  getPlatform,
+};
