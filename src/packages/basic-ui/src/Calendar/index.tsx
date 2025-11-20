@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 
-import Calendar from "react-calendar";
+import Calendar, { type CalendarProps } from "react-calendar";
 
 import PrevClick from "@icons/icon_byuckicon_chevron_left.svg?react";
 import NextClick from "@icons/icon_byuckicon_chevron_right.svg?react";
@@ -128,23 +128,29 @@ const CalendarUi = ({
     }
   }, [disabled, value, onChange]);
 
+  const option: CalendarProps = {
+    className: "custom-calendar",
+    onChange: handleChange,
+    value,
+    calendarType: "gregory",
+    locale: "ko-KR",
+    minDetail: "decade",
+    prev2Label: null,
+    next2Label: null,
+    prevLabel: <PrevClick width={24} height={24} />,
+    nextLabel: <NextClick width={24} height={24} />,
+    formatDay: (_, date) => moment(date).format("D"),
+    formatYear: (_, date) => moment(date).format("YYYY년"),
+    formatMonthYear: (_, date) => moment(date).format("YYYY년 MM월"),
+    formatMonth: (_, date) => moment(date).format("M"),
+    tileClassName: ({ date, view }) => checkWeekend({ date, view }),
+    tileDisabled: isDateDisabled,
+  };
+
   return (
     <div className={disabled ? "custom-calendar-disabled" : ""}>
       <Calendar
-        className="custom-calendar"
-        onChange={handleChange}
-        value={value}
-        calendarType="gregory"
-        locale="ko-KR"
-        minDetail="decade"
-        prev2Label={null}
-        next2Label={null}
-        prevLabel={<PrevClick width={24} height={24} />}
-        nextLabel={<NextClick width={24} height={24} />}
-        formatDay={(_, date) => moment(date).format("D")}
-        formatYear={(_, date) => moment(date).format("YYYY년")}
-        formatMonthYear={(_, date) => moment(date).format("YYYY년 MM월")}
-        formatMonth={(_, date) => moment(date).format("M")}
+        {...option}
         tileContent={({ date, view }) => {
           if (view === "decade") {
             return (
@@ -155,8 +161,6 @@ const CalendarUi = ({
           }
           return null;
         }}
-        tileClassName={({ date, view }) => checkWeekend({ date, view })}
-        tileDisabled={isDateDisabled}
       />
     </div>
   );
