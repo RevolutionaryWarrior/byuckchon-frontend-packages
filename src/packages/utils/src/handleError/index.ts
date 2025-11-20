@@ -30,7 +30,7 @@ export const handleError = ({ error, message = "알 수 없는 에러가 발생�
     return {
       type: "axios",
       message: error.response?.data?.message ?? message,
-      status: error.status || undefined,
+      status: error.response?.status || undefined,
     }
   }
 
