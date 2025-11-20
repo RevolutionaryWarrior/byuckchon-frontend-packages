@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * 함수 호출을 지연시키는 디바운스 훅입니다.
@@ -35,6 +35,14 @@ const useDebounce = <T extends (...args: any[]) => any>(
   const FIRST_DELAY = 300;
   const DELAY = delay ?? 500;
   const CURRENT_DELAY = isFirstCall ? FIRST_DELAY : DELAY;
+
+  useEffect(() => {
+    return () => {
+      if (schedule.current !== null) {
+        clearTimeout(schedule.current);
+      }
+    };
+  }, []);
 
   return useCallback(
     ((...args: Parameters<T>) => {

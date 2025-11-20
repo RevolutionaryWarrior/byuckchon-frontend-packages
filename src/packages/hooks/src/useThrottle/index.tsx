@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 /**
  * 함수 호출을 제한하는 스로틀 훅입니다.
@@ -43,15 +43,26 @@ const useThrottle = <T extends (...args: any[]) => any>(
   callback: T,
   delay?: number
 ): T => {
+  const schedule = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isWaiting = useRef(false);
+
   const DELAY = delay ? delay : 500;
+
+  useEffect(() => {
+    return () => {
+      if (schedule.current !== null) {
+        clearTimeout(schedule.current);
+      }
+    };
+  }, []);
 
   return useCallback(
     ((...args: Parameters<T>) => {
       if (!isWaiting.current) {
         callback(...args);
         isWaiting.current = true;
-        setTimeout(() => {
+
+        schedule.current = setTimeout(() => {
           isWaiting.current = false;
         }, DELAY);
       }
