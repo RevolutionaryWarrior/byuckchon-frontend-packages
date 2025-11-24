@@ -1,5 +1,6 @@
 import { ToastContainer } from "react-toastify";
-export { ShowToast } from "./ShowToast";
+// eslint-disable-next-line react-refresh/only-export-components
+export { showToast } from "./showToast";
 
 export interface ToastContainerProps {
   autoClose?: number | false;

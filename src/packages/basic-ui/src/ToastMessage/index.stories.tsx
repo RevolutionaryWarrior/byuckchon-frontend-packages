@@ -1,5 +1,5 @@
 import type { ToastContainerProps } from "react-toastify";
-import ToastMessage, { ShowToast, type ToastMessageProps } from ".";
+import ToastMessage, { showToast, type ToastMessageProps } from ".";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 interface ToastStoryArgs extends ToastMessageProps, ToastContainerProps {}
@@ -108,7 +108,7 @@ export const Default: Story = {
     const { autoClose, position, ...toastOptions } = args;
 
     function handleClick() {
-      ShowToast(toastOptions);
+      showToast(toastOptions);
     }
 
     return (
@@ -137,7 +137,7 @@ export const CenterAlign: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      ShowToast(toastOptions);
+      showToast(toastOptions);
     }
 
     return (
@@ -167,7 +167,7 @@ export const WithoutCloseButton: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      ShowToast(toastOptions);
+      showToast(toastOptions);
     }
 
     return (
@@ -212,7 +212,7 @@ export const WithIcon: Story = {
     const { autoClose, ...toastOptions } = args;
 
     function handleClick() {
-      ShowToast(toastOptions);
+      showToast(toastOptions);
     }
 
     return (

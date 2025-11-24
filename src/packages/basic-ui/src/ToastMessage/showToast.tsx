@@ -7,7 +7,7 @@ import { ToastUI } from "./ToastUI";
  * @param options - Toast 메시지 옵션
  * @returns Toast ID
  * @example
- * ShowToast({
+ * showToast({
  *   message: '저장되었습니다.',
  *   textAlign: 'left',
  *   isCloseButton: true,
@@ -16,7 +16,7 @@ import { ToastUI } from "./ToastUI";
  *   valriant: 'default' | 'error' | 'success' | 'warning',
  * });
  */
-export function ShowToast(
+export function showToast(
   options: ToastMessageProps
 ): ReturnType<typeof toast> {
   const {
@@ -28,7 +28,7 @@ export function ShowToast(
     variant,
   } = options;
 
-  // ShowToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
+  // showToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
   function ToastContent(props: ToastContentProps) {
     return (
       <ToastUI
