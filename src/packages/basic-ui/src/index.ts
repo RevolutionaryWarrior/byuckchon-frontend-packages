@@ -8,4 +8,5 @@ export { default as Dropdown } from "./Dropdown";
 export { ModalProvider } from "./ModalProvider";
 export { default as Pagination } from "./Pagination";
 export { default as Toggle } from "./Toggle";
+export { default as Table } from "./Table";
 export { UIThemeProvider, type Theme } from "./UIThemeProvider";
