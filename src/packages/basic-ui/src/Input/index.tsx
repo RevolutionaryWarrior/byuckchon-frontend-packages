@@ -33,7 +33,7 @@ const Input = ({
   return (
     <div className={className}>
       {renderLabel
-        ? renderLabel?.()
+        ? renderLabel()
         : label && (
             <label className="mb-2 block text-button-active">{label}</label>
           )}
@@ -45,7 +45,7 @@ const Input = ({
           {...props}
         />
         {renderRightIcon
-          ? renderRightIcon?.()
+          ? renderRightIcon()
           : rightIcon && (
               <div className="absolute top-1/2 right-4 -translate-y-1/2">
                 {rightIcon}
@@ -53,7 +53,7 @@ const Input = ({
             )}
       </div>
       {renderErrorMessage
-        ? renderErrorMessage?.()
+        ? renderErrorMessage()
         : hasError &&
           errorMessage && (
             <p className="ml-2 text-sm text-[#F00]">{errorMessage}</p>
