@@ -16,7 +16,8 @@ type Props = {
   className?: string;
   allowMultiple?: boolean;
   itemTextStyle?: string;
-  ContentTextStyle?: string;
+  contentTextStyle?: string;
+  dropdownIconStyle?: string;
   borderColor?: string;
   variant?: "attached" | "spaced";
   spacing?: string;
@@ -86,7 +87,8 @@ export default function Accordion({
   className = "",
   allowMultiple = true,
   itemTextStyle = "text-base font-medium text-[#222]",
-  ContentTextStyle = "p-4 text-sm text-[#222]",
+  contentTextStyle = "p-4 text-sm text-[#222]",
+  dropdownIconStyle = "w-5 h-5 transition-transform duration-200",
   borderColor = "border-[#CCCCCC]",
   variant = "attached",
   spacing = "space-y-2",
@@ -158,11 +160,11 @@ export default function Accordion({
                 {item.icon && (
                   <span className="flex-shrink-0">{item.icon}</span>
                 )}
-                <h3 className={clsx(itemTextStyle)}>{item.title}</h3>
+                <h3 className={itemTextStyle}>{item.title}</h3>
               </div>
               <IconChevronDown
                 className={clsx(
-                  "w-5 h-5 transition-transform duration-200",
+                  dropdownIconStyle,
                   isOpen && "transform rotate-180"
                 )}
               />
@@ -174,7 +176,7 @@ export default function Accordion({
                 isOpen ? `max-h-[1000px] opacity-100` : `max-h-0 opacity-0`
               )}
             >
-              <div className={clsx(ContentTextStyle, bgClasses.content)}>
+              <div className={clsx(contentTextStyle, bgClasses.content)}>
                 {item.children}
               </div>
             </div>
