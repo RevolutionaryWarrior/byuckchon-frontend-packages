@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 
 type Props = {
   initialMs: number;
+  interval?: number;
   autoStart?: boolean;
   onComplete?: () => void;
 };
 
 export default function useTimer({
   initialMs,
+  interval = 1000,
   onComplete,
   autoStart = false,
 }: Props) {
@@ -40,7 +42,7 @@ export default function useTimer({
         }
         return prevState - 1;
       });
-    }, 1000);
+    }, interval);
 
     return () => {
       if (intervalRef.current) {
@@ -48,7 +50,7 @@ export default function useTimer({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, timeSeconds, onComplete]);
+  }, [isRunning, timeSeconds, onComplete, interval]);
 
   return {
     timeSeconds,
