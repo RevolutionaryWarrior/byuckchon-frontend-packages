@@ -103,22 +103,21 @@ export default function Accordion({
 
   function handleToggle(index: number) {
     setOpenItems((prev) => {
-      const newSet = new Set(prev);
       if (allowMultiple) {
+        const newSet = new Set(prev);
         if (newSet.has(index)) {
           newSet.delete(index);
-        } else {
-          newSet.add(index);
+          return newSet;
         }
-      } else {
-        if (newSet.has(index)) {
-          newSet.clear();
-        } else {
-          newSet.clear();
-          newSet.add(index);
-        }
+        newSet.add(index);
+        return newSet;
       }
-      return newSet;
+
+      if (prev.has(index)) {
+        return new Set();
+      }
+
+      return new Set([index]);
     });
   }
 
