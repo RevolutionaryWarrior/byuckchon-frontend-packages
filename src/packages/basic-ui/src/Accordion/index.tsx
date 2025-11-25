@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import clsx from "clsx";
 import IconChevronDown from "@icons/icon_byuckicon_chevron_down.svg?react";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
@@ -102,8 +102,11 @@ export default function Accordion({
         .filter((i) => i !== -1)
     )
   );
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   function handleToggle(index: number) {
+    const wasOpen = openItems.has(index);
+
     setOpenItems((prev) => {
       if (allowMultiple) {
         const newSet = new Set(prev);
@@ -121,6 +124,19 @@ export default function Accordion({
 
       return new Set([index]);
     });
+
+    if (!wasOpen) {
+      setTimeout(() => {
+        const itemElement = itemRefs.current.get(index);
+        if (itemElement) {
+          itemElement.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline: "nearest",
+          });
+        }
+      }, 50);
+    }
   }
 
   return (
@@ -139,6 +155,13 @@ export default function Accordion({
         return (
           <div
             key={itemId}
+            ref={(el) => {
+              if (el) {
+                itemRefs.current.set(index, el);
+              } else {
+                itemRefs.current.delete(index);
+              }
+            }}
             className={clsx(
               `border-t ${borderColor} overflow-hidden`,
               isFirst && "border-t-0"
