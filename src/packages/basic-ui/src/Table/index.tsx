@@ -30,7 +30,7 @@ const baseTheme = {
   headerWrapper: "sticky top-0 border-y border-[#CCC]",
   headerCell: "border-r border-[#CCC] p-4 text-base",
   dataWrapper: "border-r border-b border-[#CCC]",
-  dataCell: "border-r border-[#CCC] p-4 text-base",
+  dataCell: "border-r border-[#CCC] p-4 text-base whitespace-normal break-words",
 };
 
 const Table = ({ header, data, checkOptions }: Props) => {
