@@ -21,14 +21,14 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
     }
   };
 
-  const onAdd = (file: File, files: File[]) => {
+  const generateResult = (file: File, files: File[]) => {
     if (multiple) {
       files.forEach((file) => onValidate(file));
-      return setResult(files);
+      setResult(files);
     }
 
     onValidate(file);
-    return setResult(file);
+    setResult(file);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -37,7 +37,7 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
 
     const [file, files] = [e.dataTransfer.files[0], Array.from(e.dataTransfer.files)];
 
-    onAdd(file, files);
+    generateResult(file, files);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +45,7 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
 
     const [file, files] = [e.target.files[0], Array.from(e.target.files)];
 
-    onAdd(file, files);
+    generateResult(file, files);
   };
 
   return {
