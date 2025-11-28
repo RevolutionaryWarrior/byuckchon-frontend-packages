@@ -29,10 +29,6 @@ const meta: Meta<typeof Accordion> = {
       description:
         "spaced 모드에서 아이템들 사이의 간격을 설정합니다. (예: space-y-2, space-y-4)",
     },
-    borderColor: {
-      control: "text",
-      description: "아코디언 아이템의 border 색상을 설정합니다.",
-    },
     className: {
       control: "text",
       description: "커스텀 클래스를 추가할 수 있습니다.",

@@ -11,4 +11,10 @@ export type AccordionTheme = {
     defaultBg?: string;
     openBg?: string;
   };
+  details?: {
+    itemTextStyle?: string;
+    contentTextStyle?: string;
+    dropdownIconStyle?: string;
+    borderColor?: string;
+  };
 };

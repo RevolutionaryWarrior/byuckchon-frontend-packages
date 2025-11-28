@@ -15,10 +15,6 @@ type Props = {
   items: AccordionItem[];
   className?: string;
   allowMultiple?: boolean;
-  itemTextStyle?: string;
-  contentTextStyle?: string;
-  dropdownIconStyle?: string;
-  borderColor?: string;
   variant?: "attached" | "spaced";
   spacing?: string;
 };
@@ -34,6 +30,12 @@ const baseTheme: Required<AccordionTheme> = {
     defaultBg: "bg-white",
     openBg: "bg-[#F1F1F1]",
   },
+  details: {
+    itemTextStyle: "text-base font-medium text-[#222]",
+    contentTextStyle: "p-4 text-sm text-[#222]",
+    dropdownIconStyle: "w-5 h-5 transition-transform duration-200",
+    borderColor: "border-[#CCCCCC]",
+  },
 };
 
 function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
@@ -47,6 +49,10 @@ function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
       ...baseTheme.content,
       ...theme?.content,
     },
+    details: {
+      ...baseTheme.details,
+      ...theme?.details,
+    },
   };
 
   const currentMode = mergedTheme.mode;
@@ -57,6 +63,7 @@ function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
         header: mergedTheme.header.defaultBg,
         headerHover: "hover:bg-[#F5F5F5]",
         content: mergedTheme.content.defaultBg,
+        details: mergedTheme.details,
       };
     case "inverted":
       return {
@@ -67,6 +74,7 @@ function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
         content: isOpen
           ? mergedTheme.content.defaultBg
           : mergedTheme.content.openBg,
+        details: mergedTheme.details,
       };
     case "highlight":
     default:
@@ -78,6 +86,7 @@ function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
         content: isOpen
           ? mergedTheme.content.openBg
           : mergedTheme.content.defaultBg,
+        details: mergedTheme.details,
       };
   }
 }
@@ -86,10 +95,6 @@ export default function Accordion({
   items,
   className = "",
   allowMultiple = true,
-  itemTextStyle = "text-base font-medium text-[#222]",
-  contentTextStyle = "p-4 text-sm text-[#222]",
-  dropdownIconStyle = "w-5 h-5 transition-transform duration-200",
-  borderColor = "border-[#CCCCCC]",
   variant = "attached",
   spacing = "space-y-2",
 }: Props) {
@@ -163,7 +168,7 @@ export default function Accordion({
               }
             }}
             className={clsx(
-              `border-t ${borderColor} overflow-hidden`,
+              `border-t ${bgClasses.details.borderColor} overflow-hidden`,
               isFirst && "border-t-0"
             )}
           >
@@ -172,7 +177,7 @@ export default function Accordion({
               onClick={() => handleToggle(index)}
               className={clsx(
                 "w-full flex items-center justify-between p-4",
-                "transition-colors duration-200",
+                "transition-colors duration-200 cursor-pointer",
                 bgClasses.header,
                 bgClasses.headerHover
               )}
@@ -183,11 +188,13 @@ export default function Accordion({
                 {item.icon && (
                   <span className="flex-shrink-0">{item.icon}</span>
                 )}
-                <h3 className={itemTextStyle}>{item.title}</h3>
+                <h3 className={bgClasses.details.itemTextStyle}>
+                  {item.title}
+                </h3>
               </div>
               <IconChevronDown
                 className={clsx(
-                  dropdownIconStyle,
+                  bgClasses.details.dropdownIconStyle,
                   isOpen && "transform rotate-180"
                 )}
               />
@@ -199,7 +206,12 @@ export default function Accordion({
                 isOpen ? `max-h-[1000px] opacity-100` : `max-h-0 opacity-0`
               )}
             >
-              <div className={clsx(contentTextStyle, bgClasses.content)}>
+              <div
+                className={clsx(
+                  bgClasses.details.contentTextStyle,
+                  bgClasses.content
+                )}
+              >
                 {item.children}
               </div>
             </div>
