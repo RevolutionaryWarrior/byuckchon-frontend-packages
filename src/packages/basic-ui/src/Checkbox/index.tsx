@@ -1,7 +1,8 @@
 import React from "react";
 import clsx from "clsx";
-
+import { twMerge } from "tailwind-merge";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
+import type { CheckboxTheme } from "./theme";
 
 type Size = "sm" | "md" | "lg";
 type Variant = "activate" | "inactivate" | "disabled";
@@ -34,30 +35,23 @@ const baseInputVariants = {
   },
 };
 
-export default function Checkbox({
-  children,
-  disabled = false,
-  defaultSize = "md",
-  className = "",
-  ...props
-}: Props) {
+export default function Checkbox({ children, disabled = false, defaultSize = "md", className = "", ...props }: Props) {
   const theme = useUITheme();
   const isChecked = !!props.checked;
 
-  const mergedInactiveStyle = {
-    ...baseInputVariants["inactivate"],
-    ...(theme?.checkbox?.["inactivate"] ?? {}),
+  const generateMergedStyle = (themeKey: keyof CheckboxTheme) => {
+    return Object.entries(baseInputVariants[themeKey]).reduce((acc, [key, value]) => {
+      acc[key as keyof (keyof Partial<CheckboxTheme[typeof themeKey]>)] = twMerge(
+        value,
+        theme?.checkbox?.[themeKey]?.[key as keyof CheckboxTheme[typeof themeKey]] ?? ""
+      );
+      return acc;
+    }, {} as Record<keyof (keyof CheckboxTheme[typeof themeKey]), string>);
   };
 
-  const mergedActiveStyle = {
-    ...baseInputVariants["activate"],
-    ...(theme?.checkbox?.["activate"] ?? {}),
-  };
-
-  const mergedDisabledStyle = {
-    ...baseInputVariants["disabled"],
-    ...(theme?.checkbox?.["disabled"] ?? {}),
-  };
+  const mergedInactiveStyle = generateMergedStyle("inactivate");
+  const mergedActiveStyle = generateMergedStyle("activate");
+  const mergedDisabledStyle = generateMergedStyle("disabled");
 
   // input 과 label 연동을 위해 (커스텀) 임의로 해시 값 아이디 생성
   const checkboxId = `checkbox-${Math.random().toString(36).slice(2, 9)}`;
@@ -72,13 +66,7 @@ export default function Checkbox({
   return (
     <div className="inline-flex items-center">
       <>
-        <input
-          type="checkbox"
-          id={checkboxId}
-          className="sr-only peer"
-          onChange={props.onChange}
-          {...props}
-        />
+        <input type="checkbox" id={checkboxId} className="sr-only peer" onChange={props.onChange} {...props} />
 
         <label
           htmlFor={checkboxId}
@@ -88,10 +76,7 @@ export default function Checkbox({
             baseSizeVariants[defaultSize].box,
 
             hasCustomChild
-              ? clsx(
-                  "bg-transparent border-0 outline-none ring-0",
-                  stateTextColor
-                )
+              ? clsx("bg-transparent border-0 outline-none ring-0", stateTextColor)
               : clsx(
                   disabled
                     ? `border-2 bg-transparent ${mergedDisabledStyle.box}`
@@ -109,11 +94,7 @@ export default function Checkbox({
             <svg
               className={clsx(
                 baseSizeVariants[defaultSize].text,
-                disabled
-                  ? mergedDisabledStyle.text
-                  : props.checked
-                  ? mergedActiveStyle.text
-                  : mergedInactiveStyle.text
+                disabled ? mergedDisabledStyle.text : props.checked ? mergedActiveStyle.text : mergedInactiveStyle.text
               )}
               fill="currentColor"
               viewBox="0 0 20 20"
