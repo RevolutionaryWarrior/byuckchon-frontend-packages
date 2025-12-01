@@ -1,8 +1,10 @@
 import type { ToastContainerProps } from "react-toastify";
-import ToastMessageContainer, { showToast, type ToastMessageProps } from ".";
+import ToastMessageContainer, { showToast, type ToastOptions } from ".";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-interface ToastStoryArgs extends ToastMessageProps, ToastContainerProps {}
+interface ToastStoryArgs extends ToastOptions, ToastContainerProps {
+  message: string;
+}
 
 const meta: Meta<ToastStoryArgs> = {
   title: "Components/ToastMessage",
@@ -105,10 +107,10 @@ export const Default: Story = {
     position: "bottom-center",
   },
   render: (args) => {
-    const { autoClose, position, ...toastOptions } = args;
+    const { autoClose, position, message, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      showToast(message, toastOptions);
     }
 
     return (
@@ -134,10 +136,10 @@ export const CenterAlign: Story = {
     autoClose: false,
   },
   render: (args) => {
-    const { autoClose, ...toastOptions } = args;
+    const { autoClose, message, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      showToast(message, toastOptions);
     }
 
     return (
@@ -164,10 +166,10 @@ export const WithoutCloseButton: Story = {
     autoClose: 3000,
   },
   render: (args) => {
-    const { autoClose, ...toastOptions } = args;
+    const { autoClose, message, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      showToast(message, toastOptions);
     }
 
     return (
@@ -209,10 +211,10 @@ export const WithIcon: Story = {
     ),
   },
   render: (args) => {
-    const { autoClose, ...toastOptions } = args;
+    const { autoClose, message, ...toastOptions } = args;
 
     function handleClick() {
-      showToast(toastOptions);
+      showToast(message, toastOptions);
     }
 
     return (

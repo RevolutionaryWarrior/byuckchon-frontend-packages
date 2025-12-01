@@ -15,8 +15,7 @@ export interface ToastMessageContainerProps {
 
 type Variant = "default" | "error" | "success" | "warning";
 
-export interface ToastMessageProps {
-  message: string;
+export interface ToastOptions {
   textAlign?: "left" | "center" | "right";
   isCloseButton?: boolean;
   Icon?: React.ReactNode;

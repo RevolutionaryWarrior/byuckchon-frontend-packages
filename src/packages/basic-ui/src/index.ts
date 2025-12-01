@@ -10,7 +10,8 @@ export { default as Pagination } from "./Pagination";
 export { default as Toggle } from "./Toggle";
 export { UIThemeProvider, type Theme } from "./UIThemeProvider";
 export {
-  default as ToastMessage,
+  default as ToastMessageContainer,
   showToast,
-  type ToastMessageProps,
+  type ToastMessageContainerProps,
+  type ToastOptions,
 } from "./ToastMessage";

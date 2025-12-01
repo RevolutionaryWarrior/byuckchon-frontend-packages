@@ -1,32 +1,32 @@
 import { toast, type ToastContentProps } from "react-toastify";
-import type { ToastMessageProps } from ".";
+import type { ToastOptions } from ".";
 import { ToastUI } from "./ToastUI";
 
 /**
  * Toast 메시지를 표시하는 함수
- * @param options - Toast 메시지 옵션
+ * @param message - Toast에 표시할 메시지
+ * @param options - Toast 옵션 (선택사항)
  * @returns Toast ID
  * @example
- * showToast({
- *   message: '저장되었습니다.',
+ * showToast('저장되었습니다.', {
  *   textAlign: 'left',
  *   isCloseButton: true,
- *   Icon: <Icon />
+ *   Icon: <Icon />,
  *   iconPosition: 'center',
- *   valriant: 'default' | 'error' | 'success' | 'warning',
+ *   variant: 'default' | 'error' | 'success' | 'warning',
  * });
  */
 export function showToast(
-  options: ToastMessageProps
+  message: string,
+  options?: ToastOptions
 ): ReturnType<typeof toast> {
   const {
-    message,
     textAlign = "left",
     isCloseButton = true,
     Icon,
     iconPosition = "center",
     variant,
-  } = options;
+  } = options ?? {};
 
   // showToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
   function ToastContent(props: ToastContentProps) {
