@@ -12,6 +12,5 @@ export { UIThemeProvider, type Theme } from "./UIThemeProvider";
 export {
   default as ToastMessageContainer,
   showToast,
-  type ToastMessageContainerProps,
   type ToastOptions,
 } from "./ToastMessage";

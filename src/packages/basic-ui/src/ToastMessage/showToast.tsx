@@ -14,6 +14,8 @@ import { ToastUI } from "./ToastUI";
  *   Icon: <Icon />,
  *   iconPosition: 'center',
  *   variant: 'default' | 'error' | 'success' | 'warning',
+ *   autoClose: 3000, // 3초 후 자동 닫기, false면 자동 닫기 안 함
+ *   position: 'bottom-center', // 토스트 표시 위치
  * });
  */
 export function showToast(
@@ -26,6 +28,8 @@ export function showToast(
     Icon,
     iconPosition = "center",
     variant,
+    autoClose = false,
+    position = "top-center",
   } = options ?? {};
 
   // showToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
@@ -49,5 +53,7 @@ export function showToast(
   return toast(ToastContent, {
     closeButton: false,
     className: defaultClassName,
+    autoClose: autoClose,
+    position: position,
   });
 }

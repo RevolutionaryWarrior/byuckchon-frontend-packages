@@ -2,7 +2,14 @@ import { ToastContainer } from "react-toastify";
 // eslint-disable-next-line react-refresh/only-export-components
 export { showToast } from "./showToast";
 
-export interface ToastMessageContainerProps {
+type Variant = "default" | "error" | "success" | "warning";
+
+export interface ToastOptions {
+  textAlign?: "left" | "center" | "right";
+  isCloseButton?: boolean;
+  Icon?: React.ReactNode;
+  iconPosition?: "start" | "center";
+  variant?: Variant;
   autoClose?: number | false;
   position?:
     | "top-left"
@@ -13,21 +20,6 @@ export interface ToastMessageContainerProps {
     | "bottom-right";
 }
 
-type Variant = "default" | "error" | "success" | "warning";
-
-export interface ToastOptions {
-  textAlign?: "left" | "center" | "right";
-  isCloseButton?: boolean;
-  Icon?: React.ReactNode;
-  iconPosition?: "start" | "center";
-  variant?: Variant;
-}
-
-export default function ToastMessageContainer({
-  autoClose = false,
-  position = "bottom-center",
-}: ToastMessageContainerProps) {
-  return (
-    <ToastContainer autoClose={autoClose} position={position} hideProgressBar />
-  );
+export default function ToastMessageContainer() {
+  return <ToastContainer hideProgressBar />;
 }

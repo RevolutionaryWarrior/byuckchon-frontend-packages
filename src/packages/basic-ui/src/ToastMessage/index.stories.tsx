@@ -1,8 +1,7 @@
-import type { ToastContainerProps } from "react-toastify";
 import ToastMessageContainer, { showToast, type ToastOptions } from ".";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-interface ToastStoryArgs extends ToastOptions, ToastContainerProps {
+interface ToastStoryArgs extends ToastOptions {
   message: string;
 }
 
@@ -64,7 +63,7 @@ const meta: Meta<ToastStoryArgs> = {
     autoClose: {
       control: "number",
       description:
-        "자동으로 닫히는 시간 (ms). false면 자동으로 닫히지 않음 (ToastContainer 컴포넌트의 props로 전달됩니다.)",
+        "자동으로 닫히는 시간 (ms). false면 자동으로 닫히지 않음 (showToast 함수의 options로 전달됩니다.)",
       table: {
         type: { summary: "number | false" },
         defaultValue: { summary: "false" },
@@ -81,13 +80,13 @@ const meta: Meta<ToastStoryArgs> = {
         "bottom-right",
       ],
       description:
-        "Toast 메시지가 표시될 위치 (ToastContainer 컴포넌트의 props로 전달됩니다.)",
+        "Toast 메시지가 표시될 위치 (showToast 함수의 options로 전달됩니다.)",
       table: {
         type: {
           summary:
             "'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'",
         },
-        defaultValue: { summary: "top-center" },
+        defaultValue: { summary: "bottom-center" },
       },
     },
   },
@@ -107,7 +106,7 @@ export const Default: Story = {
     position: "bottom-center",
   },
   render: (args) => {
-    const { autoClose, position, message, ...toastOptions } = args;
+    const { message, ...toastOptions } = args;
 
     function handleClick() {
       showToast(message, toastOptions);
@@ -121,7 +120,7 @@ export const Default: Story = {
         >
           Show Toast
         </button>
-        <ToastMessageContainer autoClose={autoClose} position={position} />
+        <ToastMessageContainer />
       </div>
     );
   },
@@ -136,7 +135,7 @@ export const CenterAlign: Story = {
     autoClose: false,
   },
   render: (args) => {
-    const { autoClose, message, ...toastOptions } = args;
+    const { message, ...toastOptions } = args;
 
     function handleClick() {
       showToast(message, toastOptions);
@@ -150,7 +149,7 @@ export const CenterAlign: Story = {
         >
           Show Toast (Center)
         </button>
-        <ToastMessageContainer autoClose={autoClose} />
+        <ToastMessageContainer />
       </div>
     );
   },
@@ -166,7 +165,7 @@ export const WithoutCloseButton: Story = {
     autoClose: 3000,
   },
   render: (args) => {
-    const { autoClose, message, ...toastOptions } = args;
+    const { message, ...toastOptions } = args;
 
     function handleClick() {
       showToast(message, toastOptions);
@@ -180,7 +179,7 @@ export const WithoutCloseButton: Story = {
         >
           Show Toast (No Close Button)
         </button>
-        <ToastMessageContainer autoClose={autoClose} />
+        <ToastMessageContainer />
       </div>
     );
   },
@@ -211,7 +210,7 @@ export const WithIcon: Story = {
     ),
   },
   render: (args) => {
-    const { autoClose, message, ...toastOptions } = args;
+    const { message, ...toastOptions } = args;
 
     function handleClick() {
       showToast(message, toastOptions);
@@ -225,7 +224,7 @@ export const WithIcon: Story = {
         >
           Show Toast (With Icon)
         </button>
-        <ToastMessageContainer autoClose={autoClose} />
+        <ToastMessageContainer />
       </div>
     );
   },
