@@ -1,41 +1,40 @@
 import clsx from "clsx";
 
-type Props = {
-  items: {
-    label: React.ReactNode | string;
-    icon?: React.ReactNode;
-    active?: boolean;
-    onClick?: () => void;
-  }[];
-  mode: "localNavMode" | "progressMode";
+type BreadcrumbItem = {
+  label: React.ReactNode | string;
+  icon?: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+};
+
+type LocalNavBreadcrumbProps = {
+  items: BreadcrumbItem[];
   labelStyle?: string;
   isSeparator?: boolean;
   separatorColor?: string;
   separatorActiveColor?: string;
 };
 
-export default function Breadcrumb({
+type ProgressBreadcrumbProps = {
+  items: BreadcrumbItem[];
+  labelStyle?: string;
+  isSeparator?: boolean;
+  separatorColor?: string;
+  separatorActiveColor?: string;
+};
+
+export function LocalNavBreadcrumb({
   items,
-  mode,
   labelStyle = "text-[#222222] font-medium text-[16px]",
   isSeparator = true,
   separatorColor = "#222222",
   separatorActiveColor = "#0058E4",
-}: Props) {
-  const getSeparator = (isActive: boolean) => {
-    const fillColor = isActive ? separatorActiveColor : separatorColor;
-    switch (mode) {
-      case "localNavMode":
-        return <RightArrowIcon fill={fillColor} />;
-      case "progressMode":
-        return <LinkIcon fill={fillColor} />;
-    }
-  };
-
+}: LocalNavBreadcrumbProps) {
   const renderSeparator = (isActive: boolean, isFirst: boolean) => {
     if (isFirst) return null;
-    if (isSeparator) return getSeparator(isActive);
-    return null;
+    if (!isSeparator) return null;
+    const fillColor = isActive ? separatorActiveColor : separatorColor;
+    return <RightArrowIcon fill={fillColor} />;
   };
 
   return (
@@ -44,10 +43,58 @@ export default function Breadcrumb({
         const isActive = item.active ?? false;
         const isFirst = index === 0;
 
-        const itemClassName = clsx("flex items-center cursor-pointer", {
-          "pr-[12px] py-[8px] gap-[4px]": mode === "localNavMode",
-          "bg-[#0058E4] text-white": mode === "localNavMode" && isActive,
-        });
+        const itemClassName = clsx(
+          "flex items-center cursor-pointer pr-[12px] py-[8px] gap-[4px]",
+          {
+            "bg-[#0058E4] text-white": isActive,
+          }
+        );
+
+        return (
+          <div
+            key={`${index}-${item.label}`}
+            className={itemClassName}
+            onClick={item.onClick}
+          >
+            {renderSeparator(isActive, isFirst)}
+            {item.icon && (
+              <div className="flex-shrink-0 flex items-center pl-[12px]">
+                {item.icon}
+              </div>
+            )}
+            {typeof item.label === "string" ? (
+              <span className={`px-[8px] ${labelStyle}`}>{item.label}</span>
+            ) : (
+              item.label
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function ProgressBreadcrumb({
+  items,
+  labelStyle = "text-[#222222] font-medium text-[16px]",
+  isSeparator = true,
+  separatorColor = "#222222",
+  separatorActiveColor = "#0058E4",
+}: ProgressBreadcrumbProps) {
+  const renderSeparator = (isActive: boolean, isFirst: boolean) => {
+    if (isFirst) return null;
+    if (!isSeparator) return null;
+    const fillColor = isActive ? separatorActiveColor : separatorColor;
+    return <LinkIcon fill={fillColor} />;
+  };
+
+  return (
+    <div className="flex items-center">
+      {items.map((item, index) => {
+        const isActive = item.active ?? false;
+        const isFirst = index === 0;
+
+        const itemClassName = "flex items-center cursor-pointer";
 
         return (
           <div
