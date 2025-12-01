@@ -50,7 +50,11 @@ export default function Breadcrumb({
         });
 
         return (
-          <div key={index} className={itemClassName} onClick={item.onClick}>
+          <div
+            key={`${index}-${item.label}`}
+            className={itemClassName}
+            onClick={item.onClick}
+          >
             {renderSeparator(isActive, isFirst)}
             {item.icon && (
               <div className="flex-shrink-0 flex items-center pl-[12px]">
