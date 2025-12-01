@@ -8,7 +8,7 @@ type Props = {
     onClick?: () => void;
   }[];
   mode: "localNavMode" | "progressMode";
-  labelStyle: string;
+  labelStyle?: string;
   isSeparator?: boolean;
   separatorColor?: string;
   separatorActiveColor?: string;
