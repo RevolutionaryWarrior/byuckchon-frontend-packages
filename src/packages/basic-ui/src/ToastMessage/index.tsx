@@ -2,7 +2,7 @@ import { ToastContainer } from "react-toastify";
 // eslint-disable-next-line react-refresh/only-export-components
 export { showToast } from "./showToast";
 
-export interface ToastContainerProps {
+export interface ToastMessageContainerProps {
   autoClose?: number | false;
   position?:
     | "top-left"
@@ -24,10 +24,10 @@ export interface ToastMessageProps {
   variant?: Variant;
 }
 
-export default function ToastMessage({
+export default function ToastMessageContainer({
   autoClose = false,
   position = "bottom-center",
-}: ToastContainerProps) {
+}: ToastMessageContainerProps) {
   return (
     <ToastContainer autoClose={autoClose} position={position} hideProgressBar />
   );

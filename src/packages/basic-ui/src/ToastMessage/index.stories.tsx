@@ -1,12 +1,12 @@
 import type { ToastContainerProps } from "react-toastify";
-import ToastMessage, { showToast, type ToastMessageProps } from ".";
+import ToastMessageContainer, { showToast, type ToastMessageProps } from ".";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 interface ToastStoryArgs extends ToastMessageProps, ToastContainerProps {}
 
 const meta: Meta<ToastStoryArgs> = {
   title: "Components/ToastMessage",
-  component: ToastMessage,
+  component: ToastMessageContainer,
   tags: ["autodocs"],
   parameters: {
     layout: "centered",
@@ -119,7 +119,7 @@ export const Default: Story = {
         >
           Show Toast
         </button>
-        <ToastMessage autoClose={autoClose} position={position} />
+        <ToastMessageContainer autoClose={autoClose} position={position} />
       </div>
     );
   },
@@ -148,7 +148,7 @@ export const CenterAlign: Story = {
         >
           Show Toast (Center)
         </button>
-        <ToastMessage autoClose={autoClose} />
+        <ToastMessageContainer autoClose={autoClose} />
       </div>
     );
   },
@@ -178,7 +178,7 @@ export const WithoutCloseButton: Story = {
         >
           Show Toast (No Close Button)
         </button>
-        <ToastMessage autoClose={autoClose} />
+        <ToastMessageContainer autoClose={autoClose} />
       </div>
     );
   },
@@ -223,7 +223,7 @@ export const WithIcon: Story = {
         >
           Show Toast (With Icon)
         </button>
-        <ToastMessage autoClose={autoClose} />
+        <ToastMessageContainer autoClose={autoClose} />
       </div>
     );
   },
