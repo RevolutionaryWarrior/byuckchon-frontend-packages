@@ -32,11 +32,10 @@ export function showToast(
     position = "top-center",
   } = options ?? {};
 
-  // showToast 함수가 일반함수라 theme 훅을 가져오면 경고가 나오는데 이를 해결하기 위해 ToastContent 함수를 생성
-  function ToastContent(props: ToastContentProps) {
+  function ToastContent({ closeToast }: ToastContentProps) {
     return (
       <ToastUI
-        {...props}
+        closeToast={closeToast}
         message={message}
         textAlign={textAlign}
         isCloseButton={isCloseButton}
@@ -47,7 +46,6 @@ export function showToast(
     );
   }
 
-  // 기본 className 설정 (react-toastify 컨테이너용)
   const defaultClassName = `!p-0 !w-[335px] !rounded-none !min-h-[44px]`;
 
   return toast(ToastContent, {

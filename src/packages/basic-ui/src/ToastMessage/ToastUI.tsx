@@ -25,7 +25,8 @@ const baseToastMessageVariants = {
   },
 };
 
-interface ToastUIProps extends ToastContentProps {
+interface ToastUIProps {
+  closeToast: ToastContentProps["closeToast"];
   message: string;
   textAlign?: "left" | "center" | "right";
   isCloseButton?: boolean;
