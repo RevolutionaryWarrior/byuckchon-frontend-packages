@@ -22,9 +22,8 @@ type Props = {
 const baseTheme: Required<AccordionTheme> = {
   mode: "highlight",
   header: {
-    defaultBg: "bg-white",
+    defaultBg: "bg-white hover:bg-[#F5F5F5]",
     openBg: "bg-[#F1F1F1]",
-    hoverBg: "hover:bg-[#F5F5F5]",
   },
   content: {
     defaultBg: "bg-white",
@@ -38,7 +37,7 @@ const baseTheme: Required<AccordionTheme> = {
   },
 };
 
-function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
+function getThemeClasses(theme?: AccordionTheme) {
   const mergedTheme = {
     mode: theme?.mode ?? baseTheme.mode,
     header: {
@@ -60,32 +59,42 @@ function getBackgroundClasses(isOpen: boolean, theme?: AccordionTheme) {
   switch (currentMode) {
     case "default":
       return {
-        header: mergedTheme.header.defaultBg,
-        headerHover: "hover:bg-[#F5F5F5]",
-        content: mergedTheme.content.defaultBg,
+        header: {
+          openBg: mergedTheme.header.defaultBg,
+          defaultBg: mergedTheme.header.defaultBg,
+          hoverBg: mergedTheme.header.hoverBg,
+        },
+        content: {
+          openBg: mergedTheme.content.defaultBg,
+          defaultBg: mergedTheme.content.defaultBg,
+        },
         details: mergedTheme.details,
       };
     case "inverted":
       return {
-        header: isOpen
-          ? mergedTheme.header.defaultBg
-          : mergedTheme.header.openBg,
-        headerHover: isOpen ? "hover:bg-[#F5F5F5]" : "hover:bg-[#E8E8E8]",
-        content: isOpen
-          ? mergedTheme.content.defaultBg
-          : mergedTheme.content.openBg,
+        header: {
+          openBg: mergedTheme.header.defaultBg,
+          defaultBg: mergedTheme.header.openBg,
+          hoverBg: mergedTheme.header.hoverBg,
+        },
+        content: {
+          openBg: mergedTheme.content.defaultBg,
+          defaultBg: mergedTheme.content.openBg,
+        },
         details: mergedTheme.details,
       };
     case "highlight":
     default:
       return {
-        header: isOpen
-          ? mergedTheme.header.openBg
-          : mergedTheme.header.defaultBg,
-        headerHover: isOpen ? "hover:bg-[#E8E8E8]" : mergedTheme.header.hoverBg,
-        content: isOpen
-          ? mergedTheme.content.openBg
-          : mergedTheme.content.defaultBg,
+        header: {
+          openBg: mergedTheme.header.openBg,
+          defaultBg: mergedTheme.header.defaultBg,
+          hoverBg: mergedTheme.header.hoverBg,
+        },
+        content: {
+          openBg: mergedTheme.content.openBg,
+          defaultBg: mergedTheme.content.defaultBg,
+        },
         details: mergedTheme.details,
       };
   }
@@ -100,6 +109,7 @@ export default function Accordion({
 }: Props) {
   const theme = useUITheme();
   const accordionTheme = theme?.accordion;
+  const themeClasses = getThemeClasses(accordionTheme);
   const [openItems, setOpenItems] = useState<Set<number>>(
     new Set(
       items
@@ -161,14 +171,13 @@ export default function Accordion({
     >
       {items.map((item, index) => {
         const isOpen = openItems.has(index);
-        const bgClasses = getBackgroundClasses(isOpen, accordionTheme);
 
         return (
           <div
             key={`accordion-${index}`}
             ref={setItemRef(index)}
             className={clsx(
-              `border-t ${bgClasses.details.borderColor} overflow-hidden`,
+              `border-t ${themeClasses.details.borderColor} overflow-hidden`,
               "first:border-t-0"
             )}
           >
@@ -178,8 +187,9 @@ export default function Accordion({
               className={clsx(
                 "w-full flex items-center justify-between p-4",
                 "transition-colors duration-200 cursor-pointer",
-                bgClasses.header,
-                bgClasses.headerHover
+                isOpen
+                  ? themeClasses.header.openBg
+                  : themeClasses.header.defaultBg
               )}
               aria-expanded={isOpen}
               aria-controls={`accordion-content-${index}`}
@@ -188,13 +198,13 @@ export default function Accordion({
                 {item.icon && (
                   <span className="flex-shrink-0">{item.icon}</span>
                 )}
-                <h3 className={bgClasses.details.itemTextStyle}>
+                <h3 className={themeClasses.details.itemTextStyle}>
                   {item.title}
                 </h3>
               </div>
               <IconChevronDown
                 className={clsx(
-                  bgClasses.details.dropdownIconStyle,
+                  themeClasses.details.dropdownIconStyle,
                   isOpen && "transform rotate-180"
                 )}
               />
@@ -208,8 +218,10 @@ export default function Accordion({
             >
               <div
                 className={clsx(
-                  bgClasses.details.contentTextStyle,
-                  bgClasses.content
+                  themeClasses.details.contentTextStyle,
+                  isOpen
+                    ? themeClasses.content.openBg
+                    : themeClasses.content.defaultBg
                 )}
               >
                 {item.children}
