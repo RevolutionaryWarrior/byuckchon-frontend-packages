@@ -102,12 +102,12 @@ const useIntersectionObserver = ({
     freezeOnceVisible,
   ]);
 
-  const result = [setRef, !!state.isIntersecting] as IntersectionReturn;
+  const result = {
+    ref: setRef,
+    isIntersecting: !!state.isIntersecting,
+  };
 
-  result.ref = result[0];
-  result.isIntersecting = result[1];
-
-  return result;
+  return result as IntersectionReturn;
 };
 
 export default useIntersectionObserver;
