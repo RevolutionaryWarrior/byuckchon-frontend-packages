@@ -46,8 +46,8 @@ function useInfiniteScroll({
   root = null,
   rootMargin = "0px",
 }: UseInfiniteScrollOptions): UseInfiniteScrollReturn {
-  const onceCheck = useRef(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const onceCheck = useRef<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLoadMore = useCallback(async () => {
     if (isLoading || !hasMore) return;
