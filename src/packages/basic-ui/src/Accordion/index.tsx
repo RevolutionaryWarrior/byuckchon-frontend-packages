@@ -109,6 +109,14 @@ export default function Accordion({
   );
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
+  function setItemRef(index: number) {
+    return (el: HTMLDivElement | null) => {
+      void (el
+        ? itemRefs.current.set(index, el)
+        : itemRefs.current.delete(index));
+    };
+  }
+
   function handleToggle(index: number) {
     const wasOpen = openItems.has(index);
 
@@ -152,24 +160,16 @@ export default function Accordion({
       )}
     >
       {items.map((item, index) => {
-        const itemId = `accordion-${index}`;
         const isOpen = openItems.has(index);
-        const isFirst = index === 0;
         const bgClasses = getBackgroundClasses(isOpen, accordionTheme);
 
         return (
           <div
-            key={itemId}
-            ref={(el) => {
-              if (el) {
-                itemRefs.current.set(index, el);
-              } else {
-                itemRefs.current.delete(index);
-              }
-            }}
+            key={`accordion-${index}`}
+            ref={setItemRef(index)}
             className={clsx(
               `border-t ${bgClasses.details.borderColor} overflow-hidden`,
-              isFirst && "border-t-0"
+              "first:border-t-0"
             )}
           >
             <button
@@ -182,7 +182,7 @@ export default function Accordion({
                 bgClasses.headerHover
               )}
               aria-expanded={isOpen}
-              aria-controls={`accordion-content-${itemId}`}
+              aria-controls={`accordion-content-${index}`}
             >
               <div className="flex items-center gap-2">
                 {item.icon && (
@@ -200,7 +200,7 @@ export default function Accordion({
               />
             </button>
             <div
-              id={`accordion-content-${itemId}`}
+              id={`accordion-content-${index}`}
               className={clsx(
                 "overflow-hidden transition-all duration-300 ease-in-out",
                 isOpen ? `max-h-[1000px] opacity-100` : `max-h-0 opacity-0`
