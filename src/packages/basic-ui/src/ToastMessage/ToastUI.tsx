@@ -1,6 +1,7 @@
 import { type ToastContentProps } from "react-toastify";
 import CloseIcon from "@icons/icon_byuckicon_close_white.svg?react";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
+import type { ToastOptions } from ".";
 
 const baseToastMessageVariants = {
   default: {
@@ -25,42 +26,31 @@ const baseToastMessageVariants = {
   },
 };
 
-interface ToastUIProps {
-  closeToast: ToastContentProps["closeToast"];
+interface ToastUIProps extends ToastContentProps {
   message: string;
-  textAlign?: "left" | "center" | "right";
-  isCloseButton?: boolean;
-  Icon?: React.ReactNode;
-  iconPosition?: "start" | "center";
-  variant?: "default" | "error" | "success" | "warning";
+  options?: ToastOptions;
 }
 
-export function ToastUI({
-  closeToast,
-  message,
-  textAlign = "left",
-  isCloseButton = true,
-  Icon,
-  iconPosition = "center",
-  variant = "default",
-}: ToastUIProps) {
+export function ToastUI({ message, closeToast, options }: ToastUIProps) {
   const theme = useUITheme();
+  const {
+    variant,
+    textAlign,
+    isCloseButton = true,
+    Icon,
+    iconPosition,
+  } = options ?? {};
 
-  const variantKey = variant;
+  const textAlignClass = textAlign ? `text-${textAlign}` : "text-left";
+  const iconPositionClass = iconPosition
+    ? `items-${iconPosition}`
+    : "items-start";
+
+  const variantKey = variant ? variant : "default";
   const mergedStyle = {
     ...baseToastMessageVariants[variantKey],
     ...(theme?.toastMessageTheme?.[variantKey] ?? {}),
   };
-
-  const textAlignClass =
-    textAlign === "center"
-      ? "text-center"
-      : textAlign === "right"
-      ? "text-right"
-      : "text-left";
-
-  const iconPositionClass =
-    iconPosition === "start" ? "items-start" : "items-center";
 
   return (
     <div

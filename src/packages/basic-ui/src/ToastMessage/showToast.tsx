@@ -22,28 +22,10 @@ export function showToast(
   message: string,
   options?: ToastOptions
 ): ReturnType<typeof toast> {
-  const {
-    textAlign = "left",
-    isCloseButton = true,
-    Icon,
-    iconPosition = "center",
-    variant,
-    autoClose = false,
-    position = "top-center",
-  } = options ?? {};
+  const { autoClose, position } = options ?? {};
 
-  function ToastContent({ closeToast }: ToastContentProps) {
-    return (
-      <ToastUI
-        closeToast={closeToast}
-        message={message}
-        textAlign={textAlign}
-        isCloseButton={isCloseButton}
-        Icon={Icon}
-        iconPosition={iconPosition}
-        variant={variant}
-      />
-    );
+  function ToastContent(props: ToastContentProps) {
+    return <ToastUI message={message} {...props} {...options} />;
   }
 
   const defaultClassName = `!p-0 !w-[335px] !rounded-none !min-h-[44px]`;
@@ -51,7 +33,7 @@ export function showToast(
   return toast(ToastContent, {
     closeButton: false,
     className: defaultClassName,
-    autoClose: autoClose,
-    position: position,
+    autoClose,
+    position,
   });
 }

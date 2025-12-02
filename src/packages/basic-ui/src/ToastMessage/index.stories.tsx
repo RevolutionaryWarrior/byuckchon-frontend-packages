@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 interface ToastStoryArgs extends ToastOptions {
   message: string;
+  options?: ToastOptions;
 }
 
 const meta: Meta<ToastStoryArgs> = {
@@ -13,6 +14,13 @@ const meta: Meta<ToastStoryArgs> = {
     layout: "centered",
   },
   argTypes: {
+    options: {
+      control: "object",
+      description: "Toast 옵션 (showToast 컴포넌트의 props로 전달됩니다.)",
+      table: {
+        type: { summary: "ToastOptions" },
+      },
+    },
     message: {
       control: "text",
       description:
@@ -98,18 +106,13 @@ type Story = StoryObj<ToastStoryArgs>;
 export const Default: Story = {
   args: {
     message:
-      "예시 텍스트를 위한 글을 쓰고 있습니다. 쉽지 않네요. 예시 텍스트를 위한 글을 쓰고 있습니다.",
-    textAlign: "left",
-    isCloseButton: true,
-    iconPosition: "center",
-    autoClose: false,
-    position: "bottom-center",
+      "예시 텍스트를 위한 글을 쓰고 있습니다. 쉽지 않네요. 예시 텍스트를 위한 글을 쓰고 있습니다",
   },
   render: (args) => {
-    const { message, ...toastOptions } = args;
+    const { message, options } = args;
 
     function handleClick() {
-      showToast(message, toastOptions);
+      showToast(message, options);
     }
 
     return (
@@ -129,16 +132,19 @@ export const Default: Story = {
 export const CenterAlign: Story = {
   args: {
     message: "중앙 정렬된 토스트 메시지입니다.",
-    textAlign: "center",
-    isCloseButton: true,
-    iconPosition: "center",
-    autoClose: false,
+    options: {
+      textAlign: "center",
+      isCloseButton: true,
+      iconPosition: "center",
+      autoClose: false,
+      position: "top-center",
+    },
   },
   render: (args) => {
-    const { message, ...toastOptions } = args;
+    const { message, options } = args;
 
     function handleClick() {
-      showToast(message, toastOptions);
+      showToast(message, options);
     }
 
     return (
@@ -159,16 +165,18 @@ export const WithoutCloseButton: Story = {
   args: {
     message:
       "닫기 버튼이 없는 토스트 메시지입니다. 3초 후 자동으로 사라집니다.",
-    textAlign: "left",
-    isCloseButton: false,
-    iconPosition: "center",
-    autoClose: 3000,
+    options: {
+      textAlign: "left",
+      isCloseButton: false,
+      iconPosition: "center",
+      autoClose: 3000,
+    },
   },
   render: (args) => {
-    const { message, ...toastOptions } = args;
+    const { message, options } = args;
 
     function handleClick() {
-      showToast(message, toastOptions);
+      showToast(message, options);
     }
 
     return (
@@ -188,32 +196,34 @@ export const WithoutCloseButton: Story = {
 export const WithIcon: Story = {
   args: {
     message: "아이콘이 포함된 토스트 메시지입니다.",
-    textAlign: "left",
-    isCloseButton: true,
-    iconPosition: "start",
-    autoClose: false,
-    Icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-5 h-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
+    options: {
+      textAlign: "left",
+      isCloseButton: true,
+      iconPosition: "start",
+      autoClose: false,
+      Icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      ),
+    },
   },
   render: (args) => {
-    const { message, ...toastOptions } = args;
+    const { message, options } = args;
 
     function handleClick() {
-      showToast(message, toastOptions);
+      showToast(message, options);
     }
 
     return (
