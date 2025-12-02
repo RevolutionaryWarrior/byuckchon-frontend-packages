@@ -215,6 +215,7 @@ export const Spaced: Story = {
       },
     ],
     variant: "spaced",
+    spacing: "space-y-2",
   },
 };
 

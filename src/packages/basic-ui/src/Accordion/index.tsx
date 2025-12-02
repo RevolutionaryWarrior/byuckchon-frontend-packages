@@ -104,8 +104,7 @@ export default function Accordion({
   items,
   className = "",
   allowMultiple = true,
-  variant = "attached",
-  spacing = "space-y-2",
+  spacing,
 }: Props) {
   const theme = useUITheme();
   const accordionTheme = theme?.accordion;
@@ -163,12 +162,7 @@ export default function Accordion({
   }
 
   return (
-    <div
-      className={clsx(
-        variant === "attached" ? "space-y-0" : spacing,
-        className
-      )}
-    >
+    <div className={clsx(spacing ? spacing : "space-y-0", className)}>
       {items.map((item, index) => {
         const isOpen = openItems.has(index);
 
