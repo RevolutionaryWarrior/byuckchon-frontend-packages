@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { OverlayContext, type OverlayNode } from "./OverlayContext";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -11,8 +12,10 @@ type OverlayState = {
 
 export default function OverlayRoot({
   children,
+  overlayBgClassName = "bg-black/40",
 }: {
   children: React.ReactNode;
+  overlayBgClassName?: string;
 }) {
   const [state, setState] = useState<OverlayState>({
     node: null,
@@ -21,7 +24,7 @@ export default function OverlayRoot({
     closeValue: null,
   });
 
-  const open = useCallback((node: OverlayNode) => {
+  function open(node: OverlayNode) {
     return new Promise((resolve) => {
       setState({
         node,
@@ -30,19 +33,20 @@ export default function OverlayRoot({
         closeValue: null,
       });
     });
-  }, []);
+  }
 
-  const requestClose = useCallback((value?: any) => {
+  function requestClose(value?: any) {
     setState((prev) => ({
       ...prev,
       isOpen: false,
       closeValue: value,
     }));
-  }, []);
+  }
 
-  const finishClose = useCallback(() => {
+  function finishClose() {
     setState((prev) => {
       prev.resolve?.(prev.closeValue);
+
       return {
         node: null,
         resolve: undefined,
@@ -50,32 +54,31 @@ export default function OverlayRoot({
         closeValue: null,
       };
     });
-  }, []);
+  }
 
-  const close = useCallback(
-    (value?: any) => {
-      requestClose(value);
-      finishClose();
-    },
-    [requestClose, finishClose]
-  );
+  function close(value?: any) {
+    requestClose(value);
+    finishClose();
+  }
 
-  const value = useMemo(
-    () => ({
-      open,
-      close,
-      requestClose,
-      finishClose,
-    }),
-    [open, close, requestClose, finishClose]
-  );
+  const value = {
+    open,
+    close,
+    requestClose,
+    finishClose,
+  };
 
   return (
     <OverlayContext.Provider value={value}>
       {children}
 
       {state.node && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
+        <div
+          className={twMerge(
+            "fixed inset-0 z-[9999] flex items-center justify-center",
+            overlayBgClassName
+          )}
+        >
           {typeof state.node === "function"
             ? state.node({ isOpen: state.isOpen })
             : state.node}
