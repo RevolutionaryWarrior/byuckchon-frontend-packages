@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import moment from "moment";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 import Calendar, { type CalendarProps } from "react-calendar";
 
@@ -91,12 +92,12 @@ const CalendarUi = ({
       return day;
     },
     checkYear: (date: Date) => {
-      const year = moment(date).format("M");
+      const year = format(date, "M", { locale: ko });
 
       return year;
     },
     checkDecade: (date: Date) => {
-      const year = moment(date).format("YYYY");
+      const year = format(date, "yyyy", { locale: ko });
 
       return year;
     },
@@ -139,10 +140,10 @@ const CalendarUi = ({
     next2Label: null,
     prevLabel: <PrevClick width={24} height={24} />,
     nextLabel: <NextClick width={24} height={24} />,
-    formatDay: (_, date) => moment(date).format("D"),
-    formatYear: (_, date) => moment(date).format("YYYY년"),
-    formatMonthYear: (_, date) => moment(date).format("YYYY년 MM월"),
-    formatMonth: (_, date) => moment(date).format("M"),
+    formatDay: (_, date) => format(date, "d", { locale: ko }),
+    formatYear: (_, date) => format(date, "yyyy년", { locale: ko }),
+    formatMonthYear: (_, date) => format(date, "yyyy년 MM월", { locale: ko }),
+    formatMonth: (_, date) => format(date, "M", { locale: ko }),
     tileClassName: ({ date, view }) => checkWeekend({ date, view }),
     tileDisabled: isDateDisabled,
   };
