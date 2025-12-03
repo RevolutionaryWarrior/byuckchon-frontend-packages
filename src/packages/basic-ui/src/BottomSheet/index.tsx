@@ -1,47 +1,28 @@
 import { Drawer } from "vaul";
-import CloseIcon from "@icons/icon_byuckicon_close.svg?react";
-import ArrowLeftIcon from "@icons/icon_byuckicon_chevron_left.svg?react";
-import ActiveButton from "../ActiveButton";
+import React, { useState } from "react";
 
 type BottomSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   onExit: () => void;
-  title: string;
   children: React.ReactNode;
-  onCancel?: () => void;
-  onConfirm?: () => void;
-  cancelText?: string;
-  confirmText?: string;
-  onBack?: () => void;
-  showClose?: boolean;
-  extraText?: string;
-  onExtraClick?: () => void;
-  titleAlign?: "center" | "left";
   radiusClassName?: string;
+  handleIcon?: React.ReactNode;
+  snapPoints?: Array<number | string>;
+  defaultSnapPoint?: number | string;
 };
 
 export default function BottomSheet({
   isOpen,
   onClose,
   onExit,
-  title,
-  onCancel,
-  onConfirm,
-  cancelText = "취소",
-  confirmText = "확인",
   children,
-  onBack,
-  showClose = true,
-  extraText,
-  onExtraClick,
-  titleAlign = "center",
   radiusClassName = "",
+  handleIcon,
+  snapPoints = [0.3, 0.9],
+  defaultSnapPoint = 0.3,
 }: BottomSheetProps) {
-  const titleClass =
-    titleAlign === "left"
-      ? "text-h-2 text-left w-full pl-5"
-      : "text-h-2 text-center";
+  const [snap, setSnap] = useState<number | string | null>(defaultSnapPoint);
 
   return (
     <Drawer.Root
@@ -49,86 +30,39 @@ export default function BottomSheet({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
+      snapPoints={snapPoints}
+      activeSnapPoint={snap}
+      setActiveSnapPoint={setSnap}
+      modal={false}
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-
         <Drawer.Content
           className={`
-            px-4 py-3 fixed bottom-0 left-0 right-0 z-50 w-full bg-white
-            shadow-[0_-4px_16px_rgba(0,0,0,0.15)]
-            transition-all duration-300 ease-out max-h-[45vh]
+            fixed bottom-0 left-0 right-0 z-50
+            bg-white border border-gray-200 rounded-t-[10px]
+            flex flex-col 
+            h-full   
             ${radiusClassName}
           `}
           onAnimationEnd={() => {
             if (!isOpen) onExit();
           }}
         >
-          {/* 상단 회색 띠 */}
-          <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-[#C4C4C7]" />
-
-          {/* 헤더 */}
-          <div className="relative flex items-center justify-center px-5 mt-1">
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-              >
-                <ArrowLeftIcon className="h-5 w-5 text-gray-700" />
-              </button>
-            )}
-
-            <Drawer.Title className={titleClass}>{title}</Drawer.Title>
-
-            {showClose && (
-              <button
-                onClick={onClose}
-                className="absolute right-0 top-1/2 -translate-y-1/2"
-              >
-                <CloseIcon className="h-5 w-5 text-gray-600" />
-              </button>
+          {/* 핸들 바 */}
+          <div
+            className="flex justify-center my-2 cursor-grab active:cursor-grabbing"
+            data-vaul-drag-handle
+          >
+            {handleIcon ?? (
+              <div className="h-1 w-9 rounded-full bg-[#C4C4C7]" />
             )}
           </div>
 
-          {/* 내용 */}
-          <div className="flex flex-col">
-            <div className="flex-1 overflow-y-auto py-3 max-h-[140px]">
-              {children}
-            </div>
-
-            {(onCancel || onConfirm) && (
-              <div className="flex gap-4 pt-3">
-                {onCancel && (
-                  <ActiveButton
-                    onClick={onCancel}
-                    variant="secondary"
-                    className="flex-1"
-                  >
-                    {cancelText}
-                  </ActiveButton>
-                )}
-                {onConfirm && (
-                  <ActiveButton
-                    onClick={onConfirm}
-                    variant="primary"
-                    className="flex-1"
-                  >
-                    {confirmText}
-                  </ActiveButton>
-                )}
-              </div>
-            )}
-
-            {extraText && (
-              <div className="mt-3 text-center">
-                <button
-                  onClick={onExtraClick}
-                  className="text-[#8F9098] text-caption underline underline-offset-2"
-                >
-                  {extraText}
-                </button>
-              </div>
-            )}
+          <div
+            className={"px-4 pb-4 flex flex-col w-full mx-auto overflow-y-auto"}
+            data-vaul-no-drag
+          >
+            {children}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
