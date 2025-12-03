@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import type { HeaderType, CheckOptionType } from "./index";
 import { Checkbox } from "../index";
 
@@ -11,20 +11,26 @@ type Props = {
 };
 
 const HeaderCell = ({ cell, checkOptions, data, CellTheme }: Props) => {
+  const { allChecked, onChange, checkedData } = checkOptions || {};
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const { allChecked, onChange } = checkOptions || {};
   const cellWidth = useMemo(() => {
     return cell.width ? { width: cell.width } : undefined;
   }, [cell.width]);
 
-  const allCheckedChange = () => {
-    if (isChecked) {
-      setIsChecked(false);
-      return onChange?.([]);
-    }
+  const isAllSelected = useCallback(() => {
+    if (!allChecked || cell.key !== "check") return false;
+    if (data.length !== checkedData?.length) return false;
 
-    setIsChecked(true);
-    return onChange?.(data || []);
+    const itemIds = new Set(checkedData?.map((item) => item.id));
+    return data.every((item) => itemIds.has(item.id));
+  }, [allChecked, cell.key, checkedData, data]);
+
+  useEffect(() => {
+    setIsChecked(isAllSelected());
+  }, [isAllSelected]);
+
+  const onAllChange = () => {
+    onChange?.(isChecked ? [] : data);
   };
 
   return (
@@ -33,7 +39,7 @@ const HeaderCell = ({ cell, checkOptions, data, CellTheme }: Props) => {
         checkOptions?.Icon ? (
           checkOptions.Icon
         ) : (
-          <Checkbox onChange={allCheckedChange} checked={isChecked} />
+          <Checkbox onChange={onAllChange} checked={isChecked} />
         )
       ) : (
         cell.label
