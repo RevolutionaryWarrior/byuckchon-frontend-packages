@@ -64,15 +64,15 @@
   .react-calendar__month-view__days
   .react-calendar__tile--now
   abbr {
-  color: #0058e4;
-  font-size: 14px;
+  color: var(--calendar-today-color, #0058e4);
+  font-size: var(--calendar-font-size, 14px);
   font-weight: 400;
 }
 
 /* 오늘 날짜 셀 스타일 */
 .custom-calendar .react-calendar__tile--now {
   border-color: transparent;
-  color: #0058e4 !important;
+  color: var(--calendar-today-color, #0058e4) !important;
   background: transparent;
 }
 
@@ -84,7 +84,7 @@
   transform: translateX(-50%);
   width: 24px;
   height: 2px;
-  background-color: #0058e4;
+  background-color: var(--calendar-today-color, #0058e4);
   z-index: 1;
 }
 
@@ -108,7 +108,7 @@
 
 .custom-calendar
   .react-calendar__month-view__days__day--neighboringMonth.react-calendar__tile--now.react-calendar__tile--active::before {
-  background-color: #0058e4;
+  background-color: var(--calendar-today-color, #0058e4);
   z-index: 2;
 }
 
@@ -127,7 +127,7 @@
   .react-calendar__month-view__days
   .cal-sun
   abbr {
-  color: #0058e4;
+  color: var(--calendar-weekend-color, #0058e4);
   border: none;
 }
 
@@ -177,12 +177,15 @@
 }
 
 .custom-calendar .react-calendar__tile--active {
-  background: #0058e4;
+  background: var(--calendar-active-color, #0058e4);
 }
 
 .react-calendar__tile--active:enabled:hover,
 .react-calendar__tile--active:enabled:focus {
-  background: #0058e4;
+  background: var(
+    --calendar-hover-color,
+    var(--calendar-active-color, #0058e4)
+  );
   font-weight: 800;
 }
 
@@ -202,14 +205,14 @@
 }
 
 .custom-calendar .react-calendar__tile:disabled abbr {
-  color: #cccccc !important;
+  color: var(--calendar-disabled-color, #cccccc) !important;
   font-weight: 700 !important;
 }
 
 .custom-calendar
   .react-calendar__month-view__days__day--neighboringMonth.react-calendar__tile:disabled
   abbr {
-  color: #cccccc !important;
+  color: var(--calendar-disabled-color, #cccccc) !important;
   font-weight: 400 !important;
 }
 
@@ -238,7 +241,7 @@
 .custom-calendar
   .react-calendar__year-view__months
   .react-calendar__tile--hasActive {
-  background: #0058e4;
+  background: var(--calendar-active-color, #0058e4);
   color: white;
   font-weight: 700;
 }
@@ -246,7 +249,7 @@
 .custom-calendar
   .react-calendar__year-view__months
   .react-calendar__tile--hasActive.react-calendar__tile--now {
-  background: #0058e4;
+  background: var(--calendar-active-color, #0058e4);
 
   color: white !important;
   font-weight: 700 !important;
@@ -262,7 +265,7 @@
 .custom-calendar
   .react-calendar__decade-view__years
   .react-calendar__tile--hasActive {
-  background: #0058e4;
+  background: var(--calendar-active-color, #0058e4);
   color: white;
   font-weight: 700;
 }
@@ -270,7 +273,7 @@
 .custom-calendar
   .react-calendar__decade-view__years
   .react-calendar__tile--hasActive.react-calendar__tile--now {
-  background: #0058e4;
+  background: var(--calendar-active-color, #0058e4);
 
   color: white !important;
   font-weight: 700 !important;
@@ -309,8 +312,8 @@
 }
 
 .custom-calendar .react-calendar__tile.react-calendar__tile--now .decade-tile {
-  font-size: 14px;
-  color: #0058e4 !important;
+  font-size: var(--calendar-font-size, 14px);
+  color: var(--calendar-today-color, #0058e4) !important;
   font-weight: 400;
   line-height: normal;
 }

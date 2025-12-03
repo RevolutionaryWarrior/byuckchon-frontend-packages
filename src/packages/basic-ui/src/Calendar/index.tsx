@@ -7,6 +7,8 @@ import Calendar, { type CalendarProps } from "react-calendar";
 import PrevClick from "@icons/icon_byuckicon_chevron_left.svg?react";
 import NextClick from "@icons/icon_byuckicon_chevron_right.svg?react";
 
+import { useUITheme } from "../UIThemeProvider/useUITheme";
+
 import "react-calendar/dist/Calendar.css";
 import "./index.css";
 
@@ -33,10 +35,10 @@ interface CalendarUiProps {
  * @param props.disabledDates - 비활성화할 날짜 배열 (기본값: [])
  * @param props.value - 선택된 날짜 값 (controlled component로 사용 시)
  * @param props.onChange - 날짜 선택 시 호출되는 콜백 함수
- * @param props.color - 텍스트 색상 (기본값: "#0a1811")
- * @param props.fontSize - 폰트 크기 (기본값: "14px")
- * @param props.width - 캘린더 너비 (기본값: "312px")
- * @param props.height - 캘린더 높이 (기본값: "100%")
+ * @param props.color - 텍스트 색상 (style prop, 최우선) (기본값: "#0a1811")
+ * @param props.fontSize - 폰트 크기 (style prop, 최우선) (기본값: "14px")
+ * @param props.width - 캘린더 너비 (style prop, 최우선) (기본값: "312px")
+ * @param props.height - 캘린더 높이 (style prop, 최우선) (기본값: "100%")
  * @returns Calendar UI 컴포넌트
  *
  * @example
@@ -52,12 +54,30 @@ interface CalendarUiProps {
  *   disabledDates={[new Date()]}
  * />
  *
- * // 스타일 커스터마이즈
+ * // 스타일 커스터마이즈 (style prop - 최우선)
  * <CalendarUi
  *   color="#0058e4"
  *   fontSize="16px"
  *   width="400px"
  * />
+ *
+ * // Theme을 통한 커스터마이즈
+ * <UIThemeProvider
+ *   theme={{
+ *     calendar: {
+ *       color: "#333333",
+ *       fontSize: "16px",
+ *       width: "400px",
+ *       activeColor: "#ff0000",
+ *       hoverColor: "#ff6666",
+ *       todayColor: "#00ff00",
+ *       weekendColor: "#0000ff",
+ *       disabledColor: "#cccccc",
+ *     },
+ *   }}
+ * >
+ *   <CalendarUi />
+ * </UIThemeProvider>
  * ```
  */
 const CalendarUi = ({
@@ -72,9 +92,21 @@ const CalendarUi = ({
   height,
 }: CalendarUiProps) => {
   const [date, setDate] = useState<Value>(null);
+  const theme = useUITheme();
 
   const value = propsValue !== undefined ? propsValue : date;
   const onChange = propsChange || setDate;
+
+  // style prop > theme > 기본값 순서로 적용
+  const calendarColor = color || theme?.calendar?.color || "#0a1811";
+  const calendarFontSize = fontSize || theme?.calendar?.fontSize || "14px";
+  const calendarWidth = width || theme?.calendar?.width || "312px";
+  const calendarHeight = height || theme?.calendar?.height || "100%";
+  const activeColor = theme?.calendar?.activeColor || "#0058e4";
+  const hoverColor = theme?.calendar?.hoverColor;
+  const todayColor = theme?.calendar?.todayColor || "#0058e4";
+  const weekendColor = theme?.calendar?.weekendColor || "#0058e4";
+  const disabledColor = theme?.calendar?.disabledColor || "#D4D6DD";
 
   // 주말 색상 체크
   const checkWeekend = ({ date, view }: { date: Date; view: string }) => {
@@ -218,10 +250,15 @@ const CalendarUi = ({
   };
 
   const calendarStyle: React.CSSProperties = {
-    ...(color && { "--calendar-color": color }),
-    ...(fontSize && { "--calendar-font-size": fontSize }),
-    ...(width && { "--calendar-width": width }),
-    ...(height && { "--calendar-height": height }),
+    "--calendar-color": calendarColor,
+    "--calendar-font-size": calendarFontSize,
+    "--calendar-width": calendarWidth,
+    "--calendar-height": calendarHeight,
+    "--calendar-active-color": activeColor,
+    ...(hoverColor && { "--calendar-hover-color": hoverColor }),
+    "--calendar-today-color": todayColor,
+    "--calendar-weekend-color": weekendColor,
+    "--calendar-disabled-color": disabledColor,
   } as React.CSSProperties;
 
   return (
