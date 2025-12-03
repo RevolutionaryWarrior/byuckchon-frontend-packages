@@ -14,7 +14,7 @@ const HeaderCell = ({ cell, checkOptions, data, CellTheme }: Props) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const { allChecked, onChange } = checkOptions || {};
   const cellWidth = useMemo(() => {
-    return cell.width ? cell.width : undefined;
+    return cell.width ? { width: cell.width } : undefined;
   }, [cell.width]);
 
   const allCheckedChange = () => {
@@ -28,7 +28,7 @@ const HeaderCell = ({ cell, checkOptions, data, CellTheme }: Props) => {
   };
 
   return (
-    <th className={CellTheme} style={{ width: cellWidth }} colSpan={cell.colSpan}>
+    <th className={CellTheme} style={cellWidth} colSpan={cell.colSpan}>
       {allChecked && cell.key === "check" ? (
         checkOptions?.Icon ? (
           checkOptions.Icon
