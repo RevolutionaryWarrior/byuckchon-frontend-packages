@@ -64,17 +64,64 @@ const CalendarUi = ({
     if (day === 6) return "cal-sat";
   };
 
+  // 날짜 비교 헬퍼 함수
+  const isSameDate = (date1: Date, date2: Date): boolean => {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  };
+
+  // 해당 월의 모든 날짜가 disabled인지 확인
+  const isMonthFullyDisabled = (date: Date): boolean => {
+    if (disabledDates.length === 0) return false;
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    // 해당 월의 마지막 날 구하기
+    const lastDay = new Date(year, month + 1, 0).getDate();
+
+    // 해당 월의 모든 날짜 확인
+    for (let day = 1; day <= lastDay; day++) {
+      const currentDate = new Date(year, month, day);
+      currentDate.setHours(0, 0, 0, 0);
+
+      // disabledDates에 포함되지 않은 날짜가 하나라도 있으면 false
+      const isDisabled = disabledDates.some((disabledDate) => {
+        const normalizedDisabledDate = new Date(disabledDate);
+        normalizedDisabledDate.setHours(0, 0, 0, 0);
+        return isSameDate(currentDate, normalizedDisabledDate);
+      });
+
+      if (!isDisabled) {
+        return false; // 접근 가능한 날짜가 있음
+      }
+    }
+
+    return true;
+  };
+
   // 날짜 비활성화 체크
-  const isDateDisabled = ({ date }: { date: Date }) => {
+  const isDateDisabled = ({ date, view }: { date: Date; view?: string }) => {
     if (disabled) return true;
     if (disabledDates.length === 0) return false;
 
+    // 월 선택 모드 (year view)에서는 해당 월의 모든 날짜가 disabled인지 확인
+    if (view === "year") {
+      return isMonthFullyDisabled(date);
+    }
+
+    // 일 선택 모드 (month view)에서는 개별 날짜만 확인
     return disabledDates.some((disabledDate) => {
-      return (
-        date.getDate() === disabledDate.getDate() &&
-        date.getMonth() === disabledDate.getMonth() &&
-        date.getFullYear() === disabledDate.getFullYear()
-      );
+      const normalizedDate = new Date(date);
+      normalizedDate.setHours(0, 0, 0, 0);
+
+      const normalizedDisabledDate = new Date(disabledDate);
+      normalizedDisabledDate.setHours(0, 0, 0, 0);
+
+      return isSameDate(normalizedDate, normalizedDisabledDate);
     });
   };
 
