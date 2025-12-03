@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { HeaderType, CheckOptionType } from "./index";
 import { Checkbox } from "../index";
 
-const HeaderCell = ({
-  cell,
-  checkOptions,
-  data,
-  CellTheme,
-}: {
+type Props = {
   cell: HeaderType;
   CellTheme: string;
   checkOptions?: CheckOptionType;
-  data?: any[];
-}) => {
+  data: any[];
+};
+
+const HeaderCell = ({ cell, checkOptions, data, CellTheme }: Props) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const { allChecked, onChange } = checkOptions || {};
+  const cellWidth = useMemo(() => {
+    return cell.width ? cell.width : undefined;
+  }, [cell.width]);
 
   const allCheckedChange = () => {
     if (isChecked) {
@@ -28,7 +28,7 @@ const HeaderCell = ({
   };
 
   return (
-    <th className={CellTheme} style={{ width: cell.width ? cell.width : undefined }} colSpan={cell.colSpan}>
+    <th className={CellTheme} style={{ width: cellWidth }} colSpan={cell.colSpan}>
       {allChecked && cell.key === "check" ? (
         checkOptions?.Icon ? (
           checkOptions.Icon

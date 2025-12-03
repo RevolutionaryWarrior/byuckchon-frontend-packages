@@ -2,17 +2,14 @@
 import type { HeaderType, CheckOptionType } from "./index";
 import { Checkbox } from "../index";
 
-const DataCell = ({
-  headerCell,
-  row,
-  checkOptions,
-  CellTheme,
-}: {
+type Props = {
   headerCell: HeaderType;
   row: any;
+  CellTheme: string;
   checkOptions?: CheckOptionType;
-  CellTheme?: string;
-}) => {
+};
+
+const DataCell = ({ headerCell, row, checkOptions, CellTheme }: Props) => {
   const { checkedData, onChange, Icon } = checkOptions || {};
 
   const handleCheckedChange = () => {
