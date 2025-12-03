@@ -27,14 +27,14 @@ export function LocalNavBreadcrumb({
   isSeparator = true,
   separatorColor = "#222222",
   separatorActiveColor = "#0058E4",
-  separatorClassName = "px-[8px]",
+  itemSpacingClassName = "px-[8px]",
 }: LocalNavBreadcrumbProps) {
   const renderSeparator = (isActive: boolean, isFirst: boolean) => {
     if (isFirst) return null;
-    if (!isSeparator) return null;
+    if (!isSeparator) return <div className={itemSpacingClassName} />;
     const fillColor = isActive ? separatorActiveColor : separatorColor;
     return (
-      <div className={separatorClassName}>
+      <div className={itemSpacingClassName}>
         <RightArrowIcon fill={fillColor} />
       </div>
     );

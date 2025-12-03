@@ -11,7 +11,7 @@ export type LocalNavBreadcrumbProps = {
   isSeparator?: boolean;
   separatorColor?: string;
   separatorActiveColor?: string;
-  separatorClassName?: string;
+  itemSpacingClassName?: string;
 };
 
 export type ProgressBreadcrumbProps = {
