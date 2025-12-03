@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type { LocalNavBreadcrumbProps } from "./types";
+import { Fragment } from "react/jsx-runtime";
 
 function RightArrowIcon({ fill }: { fill: string }) {
   return (
@@ -26,12 +27,17 @@ export function LocalNavBreadcrumb({
   isSeparator = true,
   separatorColor = "#222222",
   separatorActiveColor = "#0058E4",
+  separatorClassName = "px-[8px]",
 }: LocalNavBreadcrumbProps) {
   const renderSeparator = (isActive: boolean, isFirst: boolean) => {
     if (isFirst) return null;
     if (!isSeparator) return null;
     const fillColor = isActive ? separatorActiveColor : separatorColor;
-    return <RightArrowIcon fill={fillColor} />;
+    return (
+      <div className={separatorClassName}>
+        <RightArrowIcon fill={fillColor} />
+      </div>
+    );
   };
 
   return (
@@ -41,30 +47,28 @@ export function LocalNavBreadcrumb({
         const isFirst = index === 0;
 
         const itemClassName = clsx(
-          "flex items-center cursor-pointer pr-[12px] py-[8px] gap-[4px]",
+          "flex items-center cursor-pointer gap-[4px]",
           {
             "bg-[#0058E4] text-white": isActive,
           }
         );
 
         return (
-          <div
-            key={`${index}-${item.label}`}
-            className={itemClassName}
-            onClick={item.onClick}
-          >
+          <Fragment key={`${index}-${item.label}`}>
             {renderSeparator(isActive, isFirst)}
-            {item.icon && (
-              <div className="flex-shrink-0 flex items-center pl-[12px]">
-                {item.icon}
-              </div>
-            )}
-            {typeof item.label === "string" ? (
-              <span className={`px-[8px] ${labelStyle}`}>{item.label}</span>
-            ) : (
-              item.label
-            )}
-          </div>
+            <div className={itemClassName} onClick={item.onClick}>
+              {item.icon && (
+                <div className="flex-shrink-0 flex items-center">
+                  {item.icon}
+                </div>
+              )}
+              {typeof item.label === "string" ? (
+                <span className={`pl-[8px] ${labelStyle}`}>{item.label}</span>
+              ) : (
+                item.label
+              )}
+            </div>
+          </Fragment>
         );
       })}
     </div>
