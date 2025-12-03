@@ -6,7 +6,7 @@ type BottomSheetProps = {
   onClose: () => void;
   onExit: () => void;
   children: React.ReactNode;
-  radiusClassName?: string;
+  className?: string;
   handleIcon?: React.ReactNode;
   snapPoints?: Array<number | string>;
   defaultSnapPoint?: number | string;
@@ -17,7 +17,7 @@ export default function BottomSheet({
   onClose,
   onExit,
   children,
-  radiusClassName = "",
+  className = "",
   handleIcon,
   snapPoints = [0.3, 0.9],
   defaultSnapPoint = 0.3,
@@ -33,33 +33,37 @@ export default function BottomSheet({
       snapPoints={snapPoints}
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
-      modal={false}
+      modal
     >
       <Drawer.Portal>
         <Drawer.Content
           className={`
-            fixed bottom-0 left-0 right-0 z-50
+            fixed bottom-0 left-0 right-0 z-[10000]
             bg-white border border-gray-200 rounded-t-[10px]
             flex flex-col 
             h-full   
-            ${radiusClassName}
+            ${className}
           `}
           onAnimationEnd={() => {
             if (!isOpen) onExit();
           }}
         >
           {/* 핸들 바 */}
-          <div
-            className="flex justify-center my-2 cursor-grab active:cursor-grabbing"
-            data-vaul-drag-handle
-          >
-            {handleIcon ?? (
-              <div className="h-1 w-9 rounded-full bg-[#C4C4C7]" />
-            )}
-          </div>
+          {handleIcon === null ? null : (
+            <div
+              className="flex justify-center my-2 cursor-grab active:cursor-grabbing"
+              data-vaul-drag-handle
+            >
+              {handleIcon === undefined ? (
+                <div className="h-1 w-9 rounded-full bg-[#C4C4C7]" />
+              ) : (
+                handleIcon
+              )}
+            </div>
+          )}
 
           <div
-            className={"px-4 pb-4 flex flex-col w-full mx-auto overflow-y-auto"}
+            className="px-4 pb-4 flex flex-col w-full mx-auto overflow-y-auto"
             data-vaul-no-drag
           >
             {children}
