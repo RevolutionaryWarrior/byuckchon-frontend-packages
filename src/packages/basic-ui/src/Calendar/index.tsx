@@ -134,15 +134,6 @@ const CalendarUi = ({
 
   // 타일 액션
   const tileAction = {
-    checkMonth: (date: Date) => {
-      const day = date.getDate();
-      return day;
-    },
-    checkYear: (date: Date) => {
-      const year = format(date, "M", { locale: ko });
-
-      return year;
-    },
     checkDecade: (date: Date) => {
       const year = format(date, "yyyy", { locale: ko });
 
