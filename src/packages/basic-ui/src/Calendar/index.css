@@ -1,8 +1,9 @@
 /* 전체 캘린더 스타일 */
 .custom-calendar {
-  width: 312px;
+  width: var(--calendar-width, 312px);
+  height: var(--calendar-height, 100%);
   padding: 16px;
-  font-size: 14px;
+  font-size: var(--calendar-font-size, 14px);
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -52,8 +53,8 @@
   .react-calendar__month-view__days
   .react-calendar__month-view__days__day
   abbr {
-  color: #0a1811;
-  font-size: 14px;
+  color: var(--calendar-color, #0a1811);
+  font-size: var(--calendar-font-size, 14px);
   font-weight: 400;
 }
 

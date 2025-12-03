@@ -18,6 +18,11 @@ interface CalendarUiProps {
   disabledDates?: Date[];
   value?: Value;
   onChange?: (value: Value) => void;
+
+  color?: string;
+  fontSize?: string;
+  width?: string;
+  height?: string;
 }
 
 /**
@@ -28,6 +33,10 @@ interface CalendarUiProps {
  * @param props.disabledDates - 비활성화할 날짜 배열 (기본값: [])
  * @param props.value - 선택된 날짜 값 (controlled component로 사용 시)
  * @param props.onChange - 날짜 선택 시 호출되는 콜백 함수
+ * @param props.color - 텍스트 색상 (기본값: "#0a1811")
+ * @param props.fontSize - 폰트 크기 (기본값: "14px")
+ * @param props.width - 캘린더 너비 (기본값: "312px")
+ * @param props.height - 캘린더 높이 (기본값: "100%")
  * @returns Calendar UI 컴포넌트
  *
  * @example
@@ -42,6 +51,13 @@ interface CalendarUiProps {
  *   onChange={setSelectedDate}
  *   disabledDates={[new Date()]}
  * />
+ *
+ * // 스타일 커스터마이즈
+ * <CalendarUi
+ *   color="#0058e4"
+ *   fontSize="16px"
+ *   width="400px"
+ * />
  * ```
  */
 const CalendarUi = ({
@@ -49,6 +65,11 @@ const CalendarUi = ({
   disabledDates = [],
   value: propsValue,
   onChange: propsChange,
+
+  color,
+  fontSize,
+  width,
+  height,
 }: CalendarUiProps) => {
   const [date, setDate] = useState<Value>(null);
 
@@ -178,29 +199,37 @@ const CalendarUi = ({
     next2Label: null,
     prevLabel: <PrevClick width={24} height={24} />,
     nextLabel: <NextClick width={24} height={24} />,
+
     formatDay: (_, date) => format(date, "d", { locale: ko }),
     formatYear: (_, date) => format(date, "yyyy년", { locale: ko }),
     formatMonthYear: (_, date) => format(date, "yyyy년 MM월", { locale: ko }),
     formatMonth: (_, date) => format(date, "M", { locale: ko }),
     tileClassName: ({ date, view }) => checkWeekend({ date, view }),
     tileDisabled: isDateDisabled,
+
+    tileContent: ({ date, view }) => {
+      if (view === "decade") {
+        return (
+          <span className="decade-tile">{tileAction.checkDecade(date)}</span>
+        );
+      }
+      return null;
+    },
   };
 
+  const calendarStyle: React.CSSProperties = {
+    ...(color && { "--calendar-color": color }),
+    ...(fontSize && { "--calendar-font-size": fontSize }),
+    ...(width && { "--calendar-width": width }),
+    ...(height && { "--calendar-height": height }),
+  } as React.CSSProperties;
+
   return (
-    <div className={disabled ? "custom-calendar-disabled" : ""}>
-      <Calendar
-        {...option}
-        tileContent={({ date, view }) => {
-          if (view === "decade") {
-            return (
-              <span className="decade-tile">
-                {tileAction.checkDecade(date)}
-              </span>
-            );
-          }
-          return null;
-        }}
-      />
+    <div
+      className={disabled ? "custom-calendar-disabled" : ""}
+      style={calendarStyle}
+    >
+      <Calendar {...option} />
     </div>
   );
 };
