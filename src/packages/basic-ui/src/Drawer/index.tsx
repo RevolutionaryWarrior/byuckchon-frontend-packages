@@ -5,31 +5,30 @@ type DrawerProps = {
   children: React.ReactNode;
   onClose: () => void;
   onExit: () => void;
-  radiusClassName?: string;
+  className?: string;
   variant?: "left" | "right";
   width?: string;
   enableDragClose?: boolean;
   transitionDuration?: number;
 };
+
 export default function Drawer({
   isOpen,
   onClose,
   onExit,
   children,
-  radiusClassName = "",
+  className = "",
   variant = "left",
   width = "80vw",
   enableDragClose = true,
   transitionDuration = 0.5,
 }: DrawerProps) {
-  const [transitionEnabled, setTransitionEnabled] = useState<boolean>(false);
-
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  const [transitionEnabled, setTransitionEnabled] = useState<boolean>(false);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragDelta, setDragDelta] = useState<number>(0);
-
   const [gesture, setGesture] = useState<"none" | "horizontal" | "vertical">(
     "none"
   );
@@ -144,7 +143,7 @@ export default function Drawer({
         className={`
           pointer-events-auto fixed top-0 bottom-0 bg-white shadow-xl
           flex flex-col
-          ${radiusClassName}
+          ${className}
         `}
         style={{
           width,
