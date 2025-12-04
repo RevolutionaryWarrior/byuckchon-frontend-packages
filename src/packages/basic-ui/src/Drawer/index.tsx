@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 
 type DrawerProps = {
   isOpen: boolean;
+  children: React.ReactNode;
   onClose: () => void;
   onExit: () => void;
-  children: React.ReactNode;
   radiusClassName?: string;
   variant?: "left" | "right";
   width?: string;
   enableDragClose?: boolean;
+  transitionDuration?: number;
 };
-
 export default function Drawer({
   isOpen,
   onClose,
@@ -20,6 +20,7 @@ export default function Drawer({
   variant = "left",
   width = "80vw",
   enableDragClose = true,
+  transitionDuration = 0.5,
 }: DrawerProps) {
   const [transitionEnabled, setTransitionEnabled] = useState<boolean>(false);
 
@@ -152,7 +153,7 @@ export default function Drawer({
           transform: getTransform(),
           transition:
             transitionEnabled && gesture !== "horizontal"
-              ? "transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1)"
+              ? `transform ${transitionDuration}s cubic-bezier(0.25, 0.8, 0.25, 1)`
               : "none",
         }}
         onTransitionEnd={() => {
