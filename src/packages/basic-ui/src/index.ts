@@ -6,6 +6,7 @@ export { default as Checkbox } from "./Checkbox";
 export { default as ChoiceModal } from "./ChoiceModal";
 export { default as ConfirmModal } from "./ConfirmModal";
 export { default as Dropdown } from "./Dropdown";
+export { default as Calendar } from "./Calendar";
 export { ModalProvider } from "./ModalProvider";
 export { default as Pagination } from "./Pagination";
 export { default as Toggle } from "./Toggle";
