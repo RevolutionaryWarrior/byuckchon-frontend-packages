@@ -317,3 +317,8 @@
   font-weight: 400;
   line-height: normal;
 }
+
+.custom-calendar-header {
+  width: var(--calendar-width, 312px);
+  box-sizing: border-box;
+}
