@@ -26,11 +26,15 @@ interface CalendarUiProps {
   width?: string;
   height?: string;
 
-  /** 커스텀 헤더 렌더링 (기본 네비게이션 대체) - 날짜와 네비게이션 핸들러 제공 */
   renderHeader?: (props: {
     date: Date;
     onPrev: () => void;
     onNext: () => void;
+  }) => React.ReactNode;
+  renderTileContent?: (props: {
+    date: Date;
+    view: string;
+    isSelected: boolean;
   }) => React.ReactNode;
 }
 
@@ -47,6 +51,7 @@ interface CalendarUiProps {
  * @param props.width - 캘린더 너비 (style prop, 최우선) (기본값: "312px")
  * @param props.height - 캘린더 높이 (style prop, 최우선) (기본값: "100%")
  * @param props.renderHeader - 커스텀 헤더 렌더링 (기본 네비게이션 대체)
+ * @param props.renderTileContent - 커스텀 타일 콘텐츠 렌더링 (각 날짜 타일 내부 디자인) - 제공 시 기본 날짜 표시 제거
  * @returns Calendar UI 컴포넌트
  *
  * @example
@@ -120,6 +125,7 @@ const CalendarUi = ({
   height,
 
   renderHeader,
+  renderTileContent,
 }: CalendarUiProps) => {
   const [date, setDate] = useState<Value>(null);
   const [activeStartDate, setActiveStartDate] = useState<Date>(new Date());
@@ -267,7 +273,9 @@ const CalendarUi = ({
   };
 
   const option: CalendarProps = {
-    className: "custom-calendar",
+    className: `custom-calendar ${
+      renderTileContent ? "custom-calendar-tile-content" : ""
+    }`,
     onChange: handleChange,
     value,
     calendarType: "gregory",
@@ -288,7 +296,9 @@ const CalendarUi = ({
         }
       : undefined,
 
-    formatDay: (_, date) => format(date, "d", { locale: ko }),
+    formatDay: renderTileContent
+      ? () => ""
+      : (_, date) => format(date, "d", { locale: ko }),
     formatYear: (_, date) => format(date, "yyyy년", { locale: ko }),
     formatMonthYear: (_, date) => format(date, "yyyy년 MM월", { locale: ko }),
     formatMonth: (_, date) => format(date, "M", { locale: ko }),
@@ -301,6 +311,31 @@ const CalendarUi = ({
           <span className="decade-tile">{tileAction.checkDecade(date)}</span>
         );
       }
+
+      if (renderTileContent) {
+        const isSelected = (() => {
+          if (!value) return false;
+          if (Array.isArray(value)) {
+            const [start, end] = value;
+            if (!start || !end) return false;
+            return (
+              isSameDate(date, start) ||
+              isSameDate(date, end) ||
+              (date > start && date < end)
+            );
+          }
+
+          return isSameDate(date, value);
+        })();
+
+        const customContent = renderTileContent({ date, view, isSelected });
+        if (customContent !== null && customContent !== undefined) {
+          return customContent;
+        }
+
+        return <span style={{ display: "none" }} />;
+      }
+
       return null;
     },
   };

@@ -322,3 +322,11 @@
   width: var(--calendar-width, 312px);
   box-sizing: border-box;
 }
+
+.custom-calendar-tile-content
+  .react-calendar__month-view
+  .react-calendar__month-view__days
+  .react-calendar__month-view__days__day
+  abbr {
+  display: none;
+}
