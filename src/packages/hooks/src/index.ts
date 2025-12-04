@@ -7,3 +7,4 @@ export { default as useTimer } from "./useTimer";
 export { default as useScrollTop } from "./useScrollTop";
 export { default as useDebounce } from "./useDebounce";
 export { default as useThrottle } from "./useThrottle";
+export { default as useAutoFocus } from "./useAutoFocus";
