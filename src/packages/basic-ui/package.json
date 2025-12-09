@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/basic-ui",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": false,
   "main": "dist/index.mjs",
   "module": "dist/index.mjs",
@@ -59,8 +59,14 @@
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
   "description": "",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "date-fns": "^4.1.0",
+    "react-calendar": "^6.0.0",
+    "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
     "vite-plugin-svgr": "^4.5.0"
