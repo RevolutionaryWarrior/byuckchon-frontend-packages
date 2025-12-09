@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "main": "dist/index.umd.js",
@@ -46,5 +46,8 @@
     "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
-  "description": ""
+  "description": "",
+  "publishConfig": {
+    "access": "public"
+  }
 }

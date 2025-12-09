@@ -1,69 +1,29 @@
-# React + TypeScript + Vite
+# Byuckchon FE Modules
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Frontend-Modules
 
-Currently, two official plugins are available:
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/blob/main/LICENSE)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Byuckchon FE Modules**는 벽촌 서비스 전반에서 사용하는
+React 기반 프론트엔드 모듈을 모아놓은 모노레포 패키지 컬렉션이에요.
 
-## Expanding the ESLint configuration
+일관된 UI/UX, 개발 효율성 향상, 재사용 가능한 구조를 목표로
+아래 네 개의 패키지로 구성되어 있어요.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [**core**](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/tree/main/src/packages/core): 서비스 공통 로직, 환경 설정 등이 포함된 핵심 모듈이에요.
+- [**basic-ui**](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/tree/main/src/packages/basic-ui): 벽촌 서비스 전반에서 사용하는 React UI 컴포넌트들이에요.
+- [**utils**](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/tree/main/src/packages/utils): 숫자, 날짜, 문자열 등 실무에서 필요한 다양한 유틸리티 함수들이에요.
+- [**hooks**](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/tree/main/src/packages/hooks): React 개발에 필요한 커스텀 훅 모음이에요. scroll, debounce 등 여러 기능을 포함하고 있어요.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Byuckchon FE Modules 라이브러리 공식 문서 (준비중입니다)
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 프로젝트 상태
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- 이 모듈은 벽촌의 주요 서비스에서 실제 사용 중이에요.
+- 현재 지속적으로 개선하고 있으며, 필요에 따라 패키지를 독립적으로 분리하고 최적화하고 있어요.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 라이선스
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+MIT © Byuckchon, Inc.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+자세한 내용은 [LICENSE](https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/blob/main/LICENSE)에서 확인할 수 있어요.
