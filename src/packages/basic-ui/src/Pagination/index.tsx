@@ -1,8 +1,6 @@
 import React from "react";
 import paginationUtil from "./util";
-import { twMerge } from "tailwind-merge";
 import { useUITheme } from "../UIThemeProvider/useUITheme";
-import type { PaginationTheme } from "./theme";
 import ArrowLeftIcon from "@icons/icon_byuckicon_chevron_left.svg?react";
 import ArrowRightIcon from "@icons/icon_byuckicon_chevron_right.svg?react";
 import DoubleArrowLeftIcon from "@icons/icon_byuckicon_chevrons_left.svg?react";
@@ -58,10 +56,10 @@ const Pagination = ({
     mode: mode ?? "multi",
   });
   const theme = useUITheme();
-  const mergedTheme = Object.entries(baseTheme).reduce((acc, [key, value]) => {
-    acc[key as keyof PaginationTheme] = twMerge(value, theme?.pagination?.[key as keyof PaginationTheme]);
-    return acc;
-  }, {} as PaginationTheme);
+  const mergedTheme = {
+    ...baseTheme,
+    ...(theme?.pagination ?? {}),
+  };
 
   const IconButton = ({ children, showButton = true, ...props }: IconButtonType) => (
     <button className={`${mergedTheme.actionButton} ${showButton ? "block" : "hidden"}`} {...props}>
