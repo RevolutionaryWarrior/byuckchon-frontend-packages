@@ -63,7 +63,9 @@ export function LocalNavBreadcrumb({
                 </div>
               )}
               {typeof item.label === "string" ? (
-                <span className={`pl-[8px] ${labelStyle}`}>{item.label}</span>
+                <span className={`${item.icon && "pl-[8px]"} ${labelStyle}`}>
+                  {item.label}
+                </span>
               ) : (
                 item.label
               )}
