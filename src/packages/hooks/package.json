@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/hooks",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "main": "dist/index.umd.js",
@@ -19,7 +19,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "lint": "eslint src --ext ts,tsx"
+    "lint": "eslint src --ext ts,tsx",
+    "build:watch": "vite build --watch"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
@@ -46,5 +47,8 @@
     "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
-  "description": ""
+  "description": "",
+  "publishConfig": {
+    "access": "public"
+  }
 }
