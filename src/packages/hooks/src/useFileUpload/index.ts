@@ -13,7 +13,7 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
   const onValidate = (file: File) => {
     const extension = file.name.split(".").pop()?.toLowerCase() as string;
 
-    if (!accept.some((accept) => accept.includes(extension))) {
+    if (!accept.some((accept) => accept.toLowerCase() === extension)) {
       throw new Error("파일 확장자가 올바르지 않습니다.");
     }
     if (file.size > maxSizeMb * 1024 * 1024) {
