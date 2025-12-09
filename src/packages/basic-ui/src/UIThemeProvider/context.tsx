@@ -8,6 +8,9 @@ import type { ConfirmModalTheme } from "../ConfirmModal/theme";
 import type { PaginationTheme } from "../Pagination/theme";
 import type { ToggleTheme } from "../Toggle/theme";
 import type { TableTheme } from "../Table/theme";
+import type { CalendarTheme } from "../Calendar/theme";
+import type { AccordionTheme } from "../Accordion/theme";
+import type { ToastMessageTheme } from "../ToastMessage/theme";
 
 export type Theme = {
   button?: ButtonTheme;
@@ -19,6 +22,9 @@ export type Theme = {
   choiceModal?: ChoiceModalTheme;
   alertModal?: AlertModalTheme;
   table?: TableTheme;
+  calendar?: CalendarTheme;
+  accordion?: AccordionTheme;
+  toastMessageTheme?: ToastMessageTheme;
 };
 
 export const UIThemeContext = createContext<Theme | undefined>(undefined);
