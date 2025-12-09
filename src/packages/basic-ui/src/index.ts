@@ -16,6 +16,7 @@ export {
   type ToastOptions,
 } from "./ToastMessage";
 export { default as Toggle } from "./Toggle";
+export { default as Table } from "./Table";
 export { default as Tooltip } from "./Tooltip";
 export { UIThemeProvider, type Theme } from "./UIThemeProvider";
 export { default as BottomSheet } from "./BottomSheet";
