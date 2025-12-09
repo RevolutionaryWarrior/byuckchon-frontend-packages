@@ -1,6 +1,7 @@
 export { default as useCheckList } from "./useCheckList";
 export { default as useDebounce } from "./useDebounce";
 export { default as useDetectClose } from "./useDetectClose";
+export { default as useInstallPWA } from "./useInstallPWA";
 export { default as useInfiniteScroll } from "./useInfiniteScroll";
 export { default as useMonthCalendar } from "./useMonthCalendar";
 export { default as usePagination } from "./usePagination";
