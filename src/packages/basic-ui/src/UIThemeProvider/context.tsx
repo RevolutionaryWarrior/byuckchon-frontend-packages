@@ -7,6 +7,7 @@ import type { ChoiceModalTheme } from "../ChoiceModal/theme";
 import type { ConfirmModalTheme } from "../ConfirmModal/theme";
 import type { PaginationTheme } from "../Pagination/theme";
 import type { ToggleTheme } from "../Toggle/theme";
+import type { AccordionTheme } from "../Accordion/theme";
 import type { ToastMessageTheme } from "../ToastMessage/theme";
 
 export type Theme = {
@@ -18,6 +19,7 @@ export type Theme = {
   confirmModal?: ConfirmModalTheme;
   choiceModal?: ChoiceModalTheme;
   alertModal?: AlertModalTheme;
+  accordion?: AccordionTheme;
   toastMessageTheme?: ToastMessageTheme;
 };
 

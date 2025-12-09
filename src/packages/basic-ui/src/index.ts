@@ -1,4 +1,5 @@
 export { default as ActiveButton } from "./ActiveButton";
+export { default as Accordion } from "./Accordion";
 export { default as Tooltip } from "./Tooltip";
 export { default as AlertModal } from "./AlertModal";
 export { default as Checkbox } from "./Checkbox";
