@@ -11,4 +11,5 @@ export { default as usePullToRefresh } from "./usePullToRefresh";
 export { default as useScrollTop } from "./useScrollTop";
 export { default as useScrollToSelectedItem } from "./useScrollToSelectedItem";
 export { default as useThrottle } from "./useThrottle";
+export { default as useAutoFocus } from "./useAutoFocus";
 export { default as useTimer } from "./useTimer";
