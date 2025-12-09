@@ -1,3 +1,27 @@
+/**
+ * useImpressionRef
+ *
+ * 요소가 일정 비율 이상 화면에 노출되고 일정 시간 유지되면
+ * `onImpressionStart` / `onImpressionEnd` 콜백을 발생시키는 Hook.
+ *
+ * - IntersectionObserver 기반 노출 감지
+ * - 문서 가시성 변화(탭 전환/백그라운드) 대응
+ * - debounce 로 노출 확정 처리
+ *
+ * @template Element 감지 대상 DOM 타입 (기본: HTMLElement)
+ *
+ * @param {Object} options 설정 객체
+ * @param {() => void} [options.onImpressionStart] 노출 확정 시 호출
+ * @param {() => void} [options.onImpressionEnd] 노출 종료 시 호출
+ * @param {HTMLElement | null} [options.root] 관찰 기준 영역
+ * @param {string} [options.rootMargin="0px"]
+ * @param {number} [options.areaThreshold=0.5] 노출 비율 threshold (0~1)
+ * @param {number} [options.timeThreshold=300] 유지 시간 threshold(ms)
+ *
+ * @returns {{ ref: React.RefObject<Element> }} 감지 대상 ref
+ */
+
+
 import { useCallback, useEffect, useRef } from "react";
 import useVisibilityEvent from "../useVisibilityEvent";
 
