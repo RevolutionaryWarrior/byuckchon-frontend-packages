@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-export default function useAutoFocus(trigger: boolean) {
-  const ref = useRef<HTMLInputElement | null>(null);
+export default function useAutoFocus<T extends HTMLElement>(trigger: boolean) {
+  const ref = useRef<T | null>(null);
 
   useEffect(() => {
     if (trigger && ref.current) {
