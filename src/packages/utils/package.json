@@ -47,6 +47,8 @@
   },
   "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
   "description": "",
+  "dependencies": {
+    "axios": "^1.13.2"},
   "publishConfig": {
     "access": "public"
   }
