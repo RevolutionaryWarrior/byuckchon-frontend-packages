@@ -4,17 +4,17 @@ import dompurify, { type Config } from "dompurify";
  * HTML sanitization 설정 옵션
  *
  * @interface SanitizeHtmlConfig
- * @property {string[]} [allowElements] - 허용할 HTML 태그 목록. 비어있으면 기본 DOMPurify 허용 태그 사용
  * @property {string[]} [addElements] - 기본 허용 태그에 추가할 HTML 태그 목록. allowElements가 있으면 무시됨
- * @property {string[]} [dropElements] - 제거할 HTML 태그 목록
+ * @property {string[]} [allowElements] - 허용할 HTML 태그 목록. 비어있으면 기본 DOMPurify 허용 태그 사용
  * @property {Record<string, string[]>} [allowAttributes] - 태그별 허용할 속성 목록.
+ * @property {string[]} [dropElements] - 제거할 HTML 태그 목록
  * @property {Record<string, string[]>} [dropAttributes] - 태그별 제거할 속성 목록
  */
 export interface SanitizeHtmlConfig {
-  allowElements?: string[];
   addElements?: string[];
-  dropElements?: string[];
+  allowElements?: string[];
   allowAttributes?: Record<string, string[]>;
+  dropElements?: string[];
   dropAttributes?: Record<string, string[]>;
 }
 
@@ -24,10 +24,10 @@ interface SanitizeHtmlProps {
 }
 
 const DefaultConfig: SanitizeHtmlConfig = {
-  allowElements: [],
   addElements: [],
-  dropElements: [],
+  allowElements: [],
   allowAttributes: {},
+  dropElements: [],
   dropAttributes: {},
 };
 
@@ -49,6 +49,15 @@ const DefaultConfig: SanitizeHtmlConfig = {
  * const sanitized = SanitizeHtml({ content: '<h1>제목</h1><script>alert("XSS")</script>' });
  * // 결과: '<h1>제목</h1>'
  *
+ * // 기본 허용 태그에 몇 개만 추가 (addElements)
+ * const sanitized = SanitizeHtml({
+ *   content: '<h1>제목</h1><p>내용</p><custom-tag>커스텀</custom-tag>',
+ *   config: {
+ *     addElements: ['custom-tag', 'my-component']
+ *   }
+ * });
+ * // 결과: 기본 허용 태그(h1, p 등) + custom-tag, my-component가 허용됨
+ *
  * // 특정 태그만 허용 (allowElements)
  * const sanitized = SanitizeHtml({
  *   content: '<h1>제목</h1><p>내용</p><div>div</div>',
@@ -66,15 +75,6 @@ const DefaultConfig: SanitizeHtmlConfig = {
  *   }
  * });
  * // 결과: '<a href="https://example.com">링크</a>'
- *
- * * // 기본 허용 태그에 몇 개만 추가 (addElements)
- * const sanitized = SanitizeHtml({
- *   content: '<h1>제목</h1><p>내용</p><custom-tag>커스텀</custom-tag>',
- *   config: {
- *     addElements: ['custom-tag', 'my-component']
- *   }
- * });
- * // 결과: 기본 허용 태그(h1, p 등) + custom-tag, my-component가 허용됨
  *
  * // 특정 태그 제거 (dropElements)
  * const sanitized = SanitizeHtml({
@@ -103,21 +103,20 @@ export const SanitizeHtml = ({ content, config }: SanitizeHtmlProps) => {
     ALLOW_UNKNOWN_PROTOCOLS: false,
   };
 
-  // allowElements가 있으면 해당 태그만 사용, 없으면 기본 태그 사용
-  if (sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0) {
-    // allowElements가 지정되면 해당 태그만 허용
-    dompurifyConfig.ALLOWED_TAGS = sanitizeConfig.allowElements;
-  } else if (
-    sanitizeConfig.addElements &&
-    sanitizeConfig.addElements.length > 0
-  ) {
-    // addElements가 있으면 기본 태그에 추가
+  // addElements가 있으면 기본 태그에 추가
+  if (sanitizeConfig.addElements && sanitizeConfig.addElements.length > 0) {
     // DOMPurify의 ADD_TAGS를 사용하여 기본 허용 태그를 유지하면서 추가 태그만 허용
     dompurifyConfig.ADD_TAGS = sanitizeConfig.addElements;
   }
 
+  // allowElements가 있으면 해당 태그만 사용, 없으면 기본 태그 사용
+  if (sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0) {
+    // allowElements가 지정되면 해당 태그만 허용
+    dompurifyConfig.ALLOWED_TAGS = sanitizeConfig.allowElements;
+  }
+
   // allowAttributes가 있으면 ALLOWED_ATTR로 변환
-  // 주의: allowAttributes를 설정하면 기본 허용 속성이 무시되므로 필요한 모든 속성을 명시해야 함
+  // allowAttributes를 설정하면 기본 허용 속성이 무시되므로 필요한 모든 속성을 명시해야 함
   if (sanitizeConfig.allowAttributes) {
     const allowedAttrs = Object.values(sanitizeConfig.allowAttributes).flat();
 
