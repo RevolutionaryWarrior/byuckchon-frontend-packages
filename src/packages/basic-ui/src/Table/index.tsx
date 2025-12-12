@@ -23,6 +23,7 @@ type Props = {
   header: HeaderType[];
   data: any[];
   checkOptions?: CheckOptionType;
+  onRowClick?: (row: any) => void;
 };
 
 const baseTheme = {
@@ -33,7 +34,7 @@ const baseTheme = {
   dataCell: "border-r border-[#CCC] p-4 text-base whitespace-normal break-words",
 };
 
-const Table = ({ header, data, checkOptions }: Props) => {
+const Table = ({ header, data, checkOptions, onRowClick }: Props) => {
   const theme = useUITheme();
   const mergedTheme = Object.entries(baseTheme).reduce((acc, [key, value]) => {
     acc[key as keyof TableTheme] = twMerge(value as string, theme?.table?.[key as keyof TableTheme] as string);
@@ -57,7 +58,7 @@ const Table = ({ header, data, checkOptions }: Props) => {
       </thead>
       <tbody>
         {data.map((row) => (
-          <tr key={row.id} className={mergedTheme.dataWrapper}>
+          <tr key={row.id} className={mergedTheme.dataWrapper} onClick={() => onRowClick?.(row)}>
             {header.map((cell) => (
               <DataCell
                 key={cell.key}
