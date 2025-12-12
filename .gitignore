@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env
 index.html
+.npmrc
 
 # Editor directories and files
 .vscode/*
