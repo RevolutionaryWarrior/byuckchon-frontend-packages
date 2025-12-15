@@ -51,7 +51,6 @@ export default function Dropdown({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [shouldOpenUpward, setShouldOpenUpward] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
-  const optionsListRef = useRef<HTMLDivElement | null>(null);
   const triggerProps: TriggerProps = useMemo(
     () => ({
       isOpen,
@@ -139,7 +138,6 @@ export default function Dropdown({
 
       {options.length > 0 && isOpen && (
         <div
-          ref={optionsListRef}
           className={twMerge(
             "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
             shouldOpenUpward ? "bottom-full" : "top-full",
