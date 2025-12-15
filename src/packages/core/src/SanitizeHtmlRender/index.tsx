@@ -34,6 +34,11 @@ const DefaultConfig: SanitizeHtmlConfig = {
   dropAttributes: {},
 };
 
+const getAttrs = (attrMap: Record<string, string[]> | undefined): string[] => {
+  if (!attrMap) return [];
+  return Array.from(new Set(Object.values(attrMap).flat()));
+};
+
 /**
  * DOMPurify를 사용하여 HTML을 안전하게 sanitize하고 렌더링하는 React 컴포넌트
  *
@@ -48,64 +53,65 @@ const DefaultConfig: SanitizeHtmlConfig = {
  *
  * @returns {JSX.Element} sanitize된 HTML을 렌더링하는 React 컴포넌트
  */
+
 export const SanitizeHtmlRender = ({
   content,
   config,
   tagName: Component = "div",
   className,
 }: SanitizeHtmlProps) => {
-  const sanitizeConfig = config || DefaultConfig;
+  const sanitizeConfig = { ...DefaultConfig, ...config };
 
-  // DOMPurify Config 형식으로 변환
+  // 1. ALLOWED_ATTR 계산
+  const allowedAttrs = getAttrs(sanitizeConfig.allowAttributes);
+  const allowedAttrsConfig =
+    allowedAttrs.length > 0
+      ? {
+          ALLOWED_ATTR: [...new Set([...allowedAttrs, "class", "id", "style"])],
+        }
+      : {};
+
+  // 2. FORBID_ATTR 계산
+  const forbiddenAttrs = getAttrs(sanitizeConfig.dropAttributes);
+  const forbiddenAttrsConfig =
+    forbiddenAttrs.length > 0 ? { FORBID_ATTR: forbiddenAttrs } : {};
+
+  // 3. ADD_TAGS 계산
+  const addTagsConfig =
+    sanitizeConfig.addElements &&
+    sanitizeConfig.addElements.length > 0 &&
+    !(sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0)
+      ? { ADD_TAGS: sanitizeConfig.addElements }
+      : {};
+
+  // 4. ALLOWED_TAGS 계산
+  const allowedTagsConfig =
+    sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0
+      ? { ALLOWED_TAGS: sanitizeConfig.allowElements }
+      : {};
+
+  // 5. FORBID_TAGS 계산
+  const forbidTagsConfig =
+    sanitizeConfig.dropElements && sanitizeConfig.dropElements.length > 0
+      ? { FORBID_TAGS: sanitizeConfig.dropElements }
+      : {};
+
   const dompurifyConfig: Config = {
     ALLOW_UNKNOWN_PROTOCOLS: false,
+
+    ...addTagsConfig,
+    ...allowedTagsConfig,
+    ...forbiddenAttrsConfig,
+    ...allowedAttrsConfig,
+    ...forbidTagsConfig,
   };
-
-  // addElements가 있으면 기본 태그에 추가
-  if (sanitizeConfig.addElements && sanitizeConfig.addElements.length > 0) {
-    // DOMPurify의 ADD_TAGS를 사용하여 기본 허용 태그를 유지하면서 추가 태그만 허용
-    dompurifyConfig.ADD_TAGS = sanitizeConfig.addElements;
-  }
-
-  // allowElements가 있으면 해당 태그만 사용, 없으면 기본 태그 사용
-  if (sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0) {
-    // allowElements가 지정되면 해당 태그만 허용
-    dompurifyConfig.ALLOWED_TAGS = sanitizeConfig.allowElements;
-  }
-
-  // allowAttributes가 있으면 ALLOWED_ATTR로 변환
-  // allowAttributes를 설정하면 기본 허용 속성이 무시되므로 필요한 모든 속성을 명시해야 함
-  if (sanitizeConfig.allowAttributes) {
-    const allowedAttrs = Object.values(sanitizeConfig.allowAttributes).flat();
-
-    if (allowedAttrs.length > 0) {
-      // 기본 허용 속성도 포함 (class, id 등)
-      dompurifyConfig.ALLOWED_ATTR = [
-        ...new Set([...allowedAttrs, "class", "id", "style"]),
-      ];
-    }
-  }
-
-  // dropElements가 있으면 FORBID_TAGS로 변환
-  if (sanitizeConfig.dropElements && sanitizeConfig.dropElements.length > 0) {
-    dompurifyConfig.FORBID_TAGS = sanitizeConfig.dropElements;
-  }
-
-  // dropAttributes가 있으면 FORBID_ATTR로 변환
-  if (sanitizeConfig.dropAttributes) {
-    const forbiddenAttrs = Object.values(sanitizeConfig.dropAttributes).flat();
-
-    if (forbiddenAttrs.length > 0) {
-      dompurifyConfig.FORBID_ATTR = forbiddenAttrs;
-    }
-  }
-
-  const sanitizedContent = dompurify.sanitize(content, dompurifyConfig);
 
   return (
     <Component
       className={className}
-      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      dangerouslySetInnerHTML={{
+        __html: dompurify.sanitize(content, dompurifyConfig),
+      }}
     />
   );
 };
