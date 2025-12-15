@@ -73,21 +73,21 @@ export default function Dropdown({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!ref.current) return;
+  const handleToggle = () => {
+    if (!isOpen && ref.current) {
+      const triggerRect = ref.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const spaceBelow = windowHeight - triggerRect.bottom;
+      const spaceAbove = triggerRect.top;
+      const dropdownHeight = Math.min(260, options.length * 52);
+      const shouldOpenUpward =
+        spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
 
-    const triggerRect = ref.current.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const spaceBelow = windowHeight - triggerRect.bottom;
-    const spaceAbove = triggerRect.top;
-    const dropdownHeight = Math.min(260, options.length * 52);
-
-    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-      setShouldOpenUpward(true);
-    } else {
-      setShouldOpenUpward(false);
+      setShouldOpenUpward(shouldOpenUpward);
     }
-  }, [isOpen, options.length]);
+
+    setIsOpen((prev) => !prev);
+  };
 
   const selectOption = (option: DropdownOptionType) => {
     if (option.disabled) return;
@@ -115,7 +115,7 @@ export default function Dropdown({
             disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
             triggerClassName
           )}
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={handleToggle}
           disabled={disabled}
         >
           <span className="w-full text-left">
