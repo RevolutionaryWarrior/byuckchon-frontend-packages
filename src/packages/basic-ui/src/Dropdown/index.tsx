@@ -49,7 +49,9 @@ export default function Dropdown({
   renderOption,
 }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [shouldOpenUpward, setShouldOpenUpward] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
+  const optionsListRef = useRef<HTMLDivElement | null>(null);
   const triggerProps: TriggerProps = useMemo(
     () => ({
       isOpen,
@@ -71,6 +73,22 @@ export default function Dropdown({
 
     return () => document.removeEventListener("mousedown", handleClick);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const triggerRect = ref.current.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const spaceBelow = windowHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+    const dropdownHeight = Math.min(260, options.length * 52);
+
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      setShouldOpenUpward(true);
+    } else {
+      setShouldOpenUpward(false);
+    }
+  }, [isOpen, options.length]);
 
   const selectOption = (option: DropdownOptionType) => {
     if (option.disabled) return;
@@ -94,7 +112,7 @@ export default function Dropdown({
           aria-label={selectedOption?.label || placeholder}
           className={twMerge(
             "cursor-pointer w-full text-left border border-[#CCCCCC] flex items-center justify-between h-[52px] text-base px-3",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+            "focus:outline-none transition-colors duration-200",
             disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
             triggerClassName
           )}
@@ -121,8 +139,10 @@ export default function Dropdown({
 
       {options.length > 0 && isOpen && (
         <div
+          ref={optionsListRef}
           className={twMerge(
             "absolute z-50 w-full border border-[#CCCCCC] shadow-lg max-h-[260px] overflow-y-auto text-base",
+            shouldOpenUpward ? "bottom-full" : "top-full",
             optionWrapperClassName
           )}
           role="listbox"

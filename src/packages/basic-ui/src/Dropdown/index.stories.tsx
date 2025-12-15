@@ -70,6 +70,9 @@ export const Default: Story = {
       { label: "사과", value: "apple" },
       { label: "바나나", value: "banana" },
       { label: "포도", value: "grape" },
+      { label: "사과", value: "apple" },
+      { label: "바나나", value: "banana" },
+      { label: "포도", value: "grape" },
     ];
 
     return (
