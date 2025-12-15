@@ -73,7 +73,7 @@ export default function Dropdown({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [isOpen]);
 
-  const handleToggle = () => {
+  const handleToggleWithPosition = () => {
     if (!isOpen && ref.current) {
       const triggerRect = ref.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
@@ -115,7 +115,7 @@ export default function Dropdown({
             disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
             triggerClassName
           )}
-          onClick={handleToggle}
+          onClick={handleToggleWithPosition}
           disabled={disabled}
         >
           <span className="w-full text-left">
