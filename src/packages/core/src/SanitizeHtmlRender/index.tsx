@@ -47,66 +47,6 @@ const DefaultConfig: SanitizeHtmlConfig = {
  * @param {string} [props.className] - 적용할 CSS 클래스명
  *
  * @returns {JSX.Element} sanitize된 HTML을 렌더링하는 React 컴포넌트
- *
- * @example
- * ```tsx
- * // 기본 사용 (div 태그)
- * <SanitizeHtmlRender content='<h1>제목</h1><script>alert("XSS")</script>' />
- * // 결과: <div><h1>제목</h1></div>
- *
- *  * // 기본 허용 태그에 몇 개만 추가 (addElements)
- * <SanitizeHtmlRender
- *   content='<h1>제목</h1><p>내용</p><custom-tag>커스텀</custom-tag>'
- *   config={{
- *     addElements: ['custom-tag', 'my-component']
- *   }}
- * />
- * // 결과: 기본 허용 태그(h1, p 등) + custom-tag, my-component가 허용됨
- *
- * // 특정 태그로 렌더링 (tagName)
- * <SanitizeHtmlRender
- *   content='<h1>제목</h1>'
- *   tagName="section"
- *   className="p-4 bg-gray-50"
- * />
- * // 결과: <section class="p-4 bg-gray-50"><h1>제목</h1></section>
- *
- * // 특정 태그만 허용 (allowElements)
- * <SanitizeHtmlRender
- *   content='<h1>제목</h1><p>내용</p><div>div</div>'
- *   config={{
- *     allowElements: ['h1', 'p']
- *   }}
- * />
- * // 결과: <div><h1>제목</h1><p>내용</p></div>
- *
- * // 특정 속성만 허용 (allowAttributes)
- * <SanitizeHtmlRender
- *   content='<a href="https://example.com" onclick="alert()">링크</a>'
- *   config={{
- *     allowAttributes: { a: ['href'] }
- *   }}
- * />
- * // 결과: <div><a href="https://example.com">링크</a></div>
- *
- * // 특정 태그 제거 (dropElements)
- * <SanitizeHtmlRender
- *   content='<h1>제목</h1><p>내용</p><script>alert("XSS")</script><div>div</div>'
- *   config={{
- *     dropElements: ['script', 'div']
- *   }}
- * />
- * // 결과: <div><h1>제목</h1><p>내용</p></div>
- *
- * // 특정 속성 제거 (dropAttributes)
- * <SanitizeHtmlRender
- *   content='<a href="https://example.com" onclick="alert()" target="_blank">링크</a>'
- *   config={{
- *     dropAttributes: { a: ['onclick', 'target'] }
- *   }}
- * />
- * // 결과: <div><a href="https://example.com">링크</a></div>
- * ```
  */
 export const SanitizeHtmlRender = ({
   content,

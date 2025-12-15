@@ -42,58 +42,6 @@ const DefaultConfig: SanitizeHtmlConfig = {
  * @param {SanitizeHtmlConfig} [props.config] - HTML sanitization 설정 옵션
  *
  * @returns {string} sanitize된 HTML 문자열
- *
- * @example
- * ```tsx
- * // 기본 사용
- * const sanitized = SanitizeHtml({ content: '<h1>제목</h1><script>alert("XSS")</script>' });
- * // 결과: '<h1>제목</h1>'
- *
- * // 기본 허용 태그에 몇 개만 추가 (addElements)
- * const sanitized = SanitizeHtml({
- *   content: '<h1>제목</h1><p>내용</p><custom-tag>커스텀</custom-tag>',
- *   config: {
- *     addElements: ['custom-tag', 'my-component']
- *   }
- * });
- * // 결과: 기본 허용 태그(h1, p 등) + custom-tag, my-component가 허용됨
- *
- * // 특정 태그만 허용 (allowElements)
- * const sanitized = SanitizeHtml({
- *   content: '<h1>제목</h1><p>내용</p><div>div</div>',
- *   config: {
- *     allowElements: ['h1', 'p']
- *   }
- * });
- * // 결과: '<h1>제목</h1><p>내용</p>'
- *
- * // 특정 속성만 허용 (allowAttributes)
- * const sanitized = SanitizeHtml({
- *   content: '<a href="https://example.com" onclick="alert()">링크</a>',
- *   config: {
- *     allowAttributes: { a: ['href'] }
- *   }
- * });
- * // 결과: '<a href="https://example.com">링크</a>'
- *
- * // 특정 태그 제거 (dropElements)
- * const sanitized = SanitizeHtml({
- *   content: '<h1>제목</h1><p>내용</p><script>alert("XSS")</script><div>div</div>',
- *   config: {
- *     dropElements: ['script', 'div']
- *   }
- * });
- * // 결과: '<h1>제목</h1><p>내용</p>'
- *
- * // 특정 속성 제거 (dropAttributes)
- * const sanitized = SanitizeHtml({
- *   content: '<a href="https://example.com" onclick="alert()" target="_blank">링크</a>',
- *   config: {
- *     dropAttributes: { a: ['onclick', 'target'] }
- *   }
- * });
- * // 결과: '<a href="https://example.com">링크</a>'
- * ```
  */
 export const SanitizeHtml = ({ content, config }: SanitizeHtmlProps) => {
   const sanitizeConfig = config || DefaultConfig;
