@@ -11,6 +11,7 @@ import {
   formatISO,
   parse,
 } from "date-fns";
+import type { FormatTimeOptions } from "./type";
 
 /** utc -> kst 시간 변환 함수 */
 export const utcToKst = (utcDate: Date): Date => {
@@ -111,4 +112,72 @@ export const relativeTime = (
   return isAgo
     ? `${TIME_UNIT_LABELS.seconds} ${TIME_UNIT_LABELS.direction}`
     : `${TIME_UNIT_LABELS.seconds} ${TIME_UNIT_LABELS.direction}`;
+};
+
+export const formatToCustomKoreanTime = (
+  isoString: Date | string,
+  options: FormatTimeOptions = {}
+): string => {
+  const {
+    use12Hour = true,
+    showPeriod = true,
+    showSeconds = false,
+    includeDate = false,
+    includeWeekday = false,
+    timeSeparator = ":",
+    dateFormat = "yyyy-MM-dd",
+    dateTimeSeparator = " ",
+    padHours = true,
+    periodLabels = { am: "오전", pm: "오후" },
+    weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"],
+  } = options;
+
+  const date = typeof isoString === "string" ? new Date(isoString) : isoString;
+
+  if (isNaN(date.getTime())) {
+    throw new Error("올바른 날짜 형식이 아닙니다.");
+  }
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+
+  let timeString = "";
+
+  if (use12Hour) {
+    const period = hours < 12 ? periodLabels.am : periodLabels.pm;
+    const displayHours = hours % 12 || 12;
+    const hoursStr = padHours
+      ? displayHours.toString().padStart(2, "0")
+      : displayHours.toString();
+
+    timeString = showPeriod ? `${period} ${hoursStr}` : hoursStr;
+  } else {
+    const hoursStr = padHours
+      ? hours.toString().padStart(2, "0")
+      : hours.toString();
+    timeString = hoursStr;
+  }
+
+  const minutesStr = minutes.toString().padStart(2, "0");
+  timeString += `${timeSeparator}${minutesStr}`;
+
+  if (showSeconds) {
+    const secondsStr = seconds.toString().padStart(2, "0");
+    timeString += `${timeSeparator}${secondsStr}`;
+  }
+
+  if (includeDate) {
+    const dateStr = formatDate(date, dateFormat);
+    let result = dateStr;
+
+    if (includeWeekday) {
+      const weekday = weekdayLabels[date.getDay()];
+      result += ` (${weekday})`;
+    }
+
+    return `${result}${dateTimeSeparator}${timeString}`;
+  }
+
+  return timeString;
 };
