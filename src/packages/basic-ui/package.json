@@ -33,6 +33,7 @@
     "@storybook/addon-docs": "^9.1.10",
     "@storybook/addon-links": "^9.1.10",
     "@storybook/react-vite": "^9.1.10",
+    "@types/react-slick": "^0.23.13",
     "@vitejs/plugin-react": "^4.3.1",
     "chromatic": "^13.3.0",
     "eslint-plugin-storybook": "^9.1.10",
@@ -66,9 +67,12 @@
     "@tailwindcss/vite": "^4.1.13",
     "date-fns": "^4.1.0",
     "react-calendar": "^6.0.0",
+    "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",
+    "slick-carousel": "^1.8.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
+    "uuid": "^13.0.0",
     "vaul": "^1.1.2",
     "vite-plugin-svgr": "^4.5.0"
   }
