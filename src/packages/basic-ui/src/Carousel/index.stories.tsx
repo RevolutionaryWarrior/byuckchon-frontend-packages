@@ -16,12 +16,33 @@ const meta: Meta<typeof Carousel> = {
     settings: {
       control: "object",
       description:
-        "react-slick의 Settings 옵션 (arrows는 제외, 항상 커스텀 NavButton 사용)",
+        "react-slick의 Settings 옵션 (arrows와 dots는 제외, 항상 커스텀 NavButton과 dots 사용)",
     },
     arrowsPosition: {
       control: "object",
       description:
         "화살표 위치를 커스터마이징할 수 있는 옵션 (prev, next 각각 top, bottom, left, right, transform 설정 가능)",
+    },
+    LeftArrow: {
+      control: false,
+      description: "커스텀 왼쪽 화살표 컴포넌트",
+    },
+    RightArrow: {
+      control: false,
+      description: "커스텀 오른쪽 화살표 컴포넌트",
+    },
+    dotsPosition: {
+      control: "select",
+      options: [
+        "bottom-center",
+        "bottom-left",
+        "bottom-right",
+        "top-center",
+        "top-left",
+        "top-right",
+      ],
+      description:
+        "dots의 위치를 설정합니다. 설정하지 않으면 dots가 표시되지 않습니다.",
     },
     containerClassName: {
       control: "text",
@@ -125,130 +146,6 @@ export const Default: Story = {
   },
 };
 
-export const MultipleSlides: Story = {
-  args: {
-    children: sampleSlides,
-    settings: {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 3,
-      slidesToScroll: 1,
-      responsive: [
-        {
-          breakpoint: 1024,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 1,
-          },
-        },
-        {
-          breakpoint: 768,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-          },
-        },
-      ],
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "한 번에 여러 슬라이드를 표시하는 예시입니다. 반응형 설정도 포함되어 있습니다.",
-      },
-    },
-  },
-};
-
-export const Autoplay: Story = {
-  args: {
-    children: sampleSlides,
-    settings: {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 3000,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "자동 재생 기능이 활성화된 캐러셀입니다. 3초마다 자동으로 슬라이드가 변경됩니다.",
-      },
-    },
-  },
-};
-
-export const NoInfinite: Story = {
-  args: {
-    children: sampleSlides,
-    settings: {
-      dots: true,
-      infinite: false,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "무한 루프가 비활성화된 캐러셀입니다. 첫 번째와 마지막 슬라이드에서 더 이상 이동할 수 없습니다.",
-      },
-    },
-  },
-};
-
-export const NoDots: Story = {
-  args: {
-    children: sampleSlides,
-    settings: {
-      dots: false,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "dots를 비활성화한 예시입니다. 화살표는 항상 커스텀 NavButton으로 표시됩니다.",
-      },
-    },
-  },
-};
-
-export const Fade: Story = {
-  args: {
-    children: sampleSlides,
-    settings: {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      fade: true,
-      cssEase: "linear",
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "페이드 전환 효과가 적용된 캐러셀입니다.",
-      },
-    },
-  },
-};
-
 export const WithContent: Story = {
   render: () => {
     const contentSlides = [
@@ -299,7 +196,7 @@ export const WithContent: Story = {
       </div>,
     ];
 
-    return <Carousel children={contentSlides} />;
+    return <Carousel children={contentSlides} dotsPosition="bottom-center" />;
   },
   parameters: {
     docs: {
@@ -317,7 +214,6 @@ export const ArrowPositionTop: Story = {
       prev: { top: "0px", left: "0px" },
       next: { top: "0px", right: "0px" },
     },
-    containerClassName: "px-[60px]",
   },
   parameters: {
     docs: {
@@ -335,7 +231,6 @@ export const ArrowPositionBottom: Story = {
       prev: { bottom: "0px", left: "0px" },
       next: { bottom: "0px", right: "0px" },
     },
-    containerClassName: "px-[60px]",
   },
   parameters: {
     docs: {
@@ -353,7 +248,6 @@ export const ArrowPositionCenter: Story = {
       prev: { top: "50%", left: "0px", transform: "translateY(-50%)" },
       next: { top: "50%", right: "0px", transform: "translateY(-50%)" },
     },
-    containerClassName: "px-[60px]",
   },
   parameters: {
     docs: {
@@ -364,30 +258,14 @@ export const ArrowPositionCenter: Story = {
   },
 };
 
-export const ArrowPositionInside: Story = {
-  args: {
-    children: sampleSlides,
-    arrowsPosition: {
-      prev: { left: "20px", top: "50%", transform: "translateY(-50%)" },
-      next: { right: "20px", top: "50%", transform: "translateY(-50%)" },
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "화살표를 캐러셀 내부로 이동한 예시입니다.",
-      },
-    },
-  },
-};
-
 export const ArrowPositionCustom: Story = {
   args: {
     children: sampleSlides,
     arrowsPosition: {
-      prev: { bottom: "-50px", right: "50px" },
-      next: { bottom: "-50px", right: "0px" },
+      prev: { bottom: "0px", right: "50px" },
+      next: { bottom: "0px", right: "0px" },
     },
+    containerClassName: "pb-[50px]",
   },
   parameters: {
     docs: {
@@ -402,14 +280,139 @@ export const ArrowPositionCustom: Story = {
 export const WithContainerClassName: Story = {
   args: {
     children: sampleSlides,
-    containerClassName:
-      "max-w-4xl mx-auto border-2 border-gray-300 rounded-lg p-8",
+    arrowsPosition: {
+      prev: { left: "0px", top: "50%", transform: "translateY(-50%)" },
+      next: { right: "0px", top: "50%", transform: "translateY(-50%)" },
+    },
+    dotsPosition: "bottom-center",
+    containerClassName: "p-[50px]",
   },
   parameters: {
     docs: {
       description: {
         story:
           "containerClassName을 사용하여 컨테이너에 추가 스타일을 적용한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionBottomCenter: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "bottom-center",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 하단 중앙에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionBottomLeft: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "bottom-left",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 하단 왼쪽에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionBottomRight: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "bottom-right",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 하단 오른쪽에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionTopCenter: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "top-center",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 상단 중앙에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionTopLeft: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "top-left",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 상단 왼쪽에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const DotsPositionTopRight: Story = {
+  args: {
+    children: sampleSlides,
+    dotsPosition: "top-right",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "dots를 상단 오른쪽에 배치한 예시입니다.",
+      },
+    },
+  },
+};
+
+export const CustomArrows: Story = {
+  render: () => {
+    const customLeftArrow = (
+      <div className="size-[50px] flex items-center justify-center bg-blue-500 rounded-full text-white font-bold text-xl">
+        ←
+      </div>
+    );
+
+    const customRightArrow = (
+      <div className="size-[50px] flex items-center justify-center bg-blue-500 rounded-full text-white font-bold text-xl">
+        →
+      </div>
+    );
+
+    return (
+      <Carousel
+        children={sampleSlides}
+        arrowsPosition={{
+          prev: { left: "20px", top: "50%", transform: "translateY(-50%)" },
+          next: { right: "20px", top: "50%", transform: "translateY(-50%)" },
+        }}
+        LeftArrow={customLeftArrow}
+        RightArrow={customRightArrow}
+        dotsPosition="bottom-center"
+      />
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "커스텀 화살표를 사용한 예시입니다. LeftArrow와 RightArrow prop으로 원하는 화살표 컴포넌트를 전달할 수 있습니다.",
       },
     },
   },

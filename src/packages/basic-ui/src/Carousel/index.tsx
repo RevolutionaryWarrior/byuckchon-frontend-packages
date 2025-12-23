@@ -1,6 +1,6 @@
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Slider, { type Settings } from "react-slick";
 import ChevronLeftIcon from "@icons/icon_byuckicon_chevron_left.svg?react";
 import ChevronRightIcon from "@icons/icon_byuckicon_chevron_right.svg?react";
@@ -15,15 +15,24 @@ interface ArrowPosition {
   transform?: string;
 }
 
-export interface CarouselProps {
+type DotsPosition =
+  | "bottom-center"
+  | "bottom-left"
+  | "bottom-right"
+  | "top-center"
+  | "top-left"
+  | "top-right";
+
+interface CarouselProps {
   children: React.ReactNode[];
-  settings?: Omit<Partial<Settings>, "arrows">;
+  settings?: Omit<Partial<Settings>, "arrows" | "dots">;
   arrowsPosition?: {
     prev: ArrowPosition;
     next: ArrowPosition;
   };
   LeftArrow?: React.ReactNode;
   RightArrow?: React.ReactNode;
+  dotsPosition?: DotsPosition;
   containerClassName?: string;
 }
 
@@ -36,18 +45,15 @@ const defaultSettings: Settings = {
 };
 
 const NavButton = ({
-  onClick,
   children,
   arrowPosition,
   ...props
 }: {
-  onClick: () => void;
   children: React.ReactNode;
   arrowPosition: ArrowPosition;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
-      onClick={onClick}
       style={{
         position: "absolute",
         cursor: "pointer",
@@ -67,26 +73,58 @@ export default function Carousel({
   arrowsPosition,
   LeftArrow,
   RightArrow,
+  dotsPosition,
   containerClassName,
 }: CarouselProps) {
   const sliderRef = useRef<Slider>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const mergedContainerClassName = twMerge(
     "relative w-full",
     containerClassName
   );
 
+  const mergedDotsPosition = twMerge(
+    "absolute flex gap-2 w-content justify-center",
+    dotsPosition === "bottom-center" && "bottom-2 left-1/2 -translate-x-1/2",
+    dotsPosition === "bottom-left" && "bottom-2 left-2",
+    dotsPosition === "bottom-right" && "bottom-2 right-2",
+    dotsPosition === "top-center" && "top-2 left-1/2 -translate-x-1/2",
+    dotsPosition === "top-left" && "top-2 left-2",
+    dotsPosition === "top-right" && "top-2 right-2"
+  );
+
   const mergedSettings: Settings = {
     ...defaultSettings,
     ...settings,
     arrows: false,
+    dots: false,
+    afterChange: (index) => {
+      setCurrentIndex(index);
+    },
   };
+
+  const nexNavHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    sliderRef.current?.slickNext();
+  };
+
+  const prevNavHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    sliderRef.current?.slickPrev();
+  };
+
+  const dotsNavHandler =
+    (index: number) => (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      sliderRef.current?.slickGoTo(index);
+    };
 
   return (
     <div className={mergedContainerClassName}>
       {arrowsPosition?.prev && (
         <NavButton
-          onClick={() => sliderRef.current?.slickPrev()}
+          onClick={prevNavHandler}
           arrowPosition={arrowsPosition?.prev}
           aria-label="이전 슬라이드"
           type="button"
@@ -105,7 +143,7 @@ export default function Carousel({
       </Slider>
       {arrowsPosition?.next && (
         <NavButton
-          onClick={() => sliderRef.current?.slickNext()}
+          onClick={nexNavHandler}
           arrowPosition={arrowsPosition?.next}
           aria-label="다음 슬라이드"
           type="button"
@@ -116,6 +154,25 @@ export default function Carousel({
             </div>
           )}
         </NavButton>
+      )}
+      {dotsPosition && (
+        <ul className={mergedDotsPosition}>
+          {Array.from({ length: children.length }).map((_, index) => (
+            <li key={uuidv4()}>
+              <button
+                type="button"
+                className="p-[5px] cursor-pointer"
+                onClick={dotsNavHandler(index)}
+              >
+                <div
+                  className={`w-[5px] h-[5px] rounded-full ${
+                    currentIndex === index ? "bg-[#000000BF]" : "bg-[#00000040]"
+                  }`}
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
