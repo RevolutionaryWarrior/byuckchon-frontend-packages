@@ -11,7 +11,7 @@
     "build": "tsc -b && pnpm -r run build",
     "dev": "pnpm --filter example-app dev",
     "lint": "pnpm -r run lint",
-    "release": "changeset publish",
+    "release": "pnpm build && changeset publish",
     "version-packages": "changeset version"
   },
   "dependencies": {
