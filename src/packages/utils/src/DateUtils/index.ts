@@ -204,3 +204,13 @@ export function isSameDay(date1: string | Date, date2: string | Date): boolean {
     d1.getDate() === d2.getDate()
   );
 }
+
+export const isSameMinute = (date1: string, date2: string) => {
+  const d1 = typeof date1 === "string" ? new Date(date1) : date1;
+  const d2 = typeof date2 === "string" ? new Date(date2) : date2;
+
+  const time1 = d1.setSeconds(0, 0);
+  const time2 = d2.setSeconds(0, 0);
+
+  return time1 === time2;
+};
