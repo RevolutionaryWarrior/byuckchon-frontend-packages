@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Byuckchon Frontend Packages Monorepo",
   "workspaces": [
-    "packages/*"
+    "src/packages/*"
   ],
   "scripts": {
     "build": "tsc -b && pnpm -r run build",
