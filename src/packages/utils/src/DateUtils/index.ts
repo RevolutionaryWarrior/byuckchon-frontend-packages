@@ -13,11 +13,31 @@ import {
 } from "date-fns";
 import type { FormatTimeOptions } from "./type";
 
+/** 날짜 형식 검증 및 변환 함수 */
+const validateAndConvertDate = (date: Date | string): Date => {
+  const dateObject = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(dateObject.getTime())) {
+    throw new Error("올바른 날짜 형식이 아닙니다.");
+  }
+
+  return dateObject;
+};
+
 /** utc -> kst 시간 변환 함수 */
-export const utcToKst = (utcDate: Date): Date => {
+export const utcToKst = (utcDate: Date | string): Date => {
+  const dateObject = validateAndConvertDate(utcDate);
   const timezoneOffset = 9 * 60 * 60 * 1000;
 
-  return new Date(utcDate.getTime() + timezoneOffset);
+  return new Date(dateObject.getTime() + timezoneOffset);
+};
+
+/** kst -> utc 시간 변환 함수 */
+export const kstToUtc = (kstDate: Date | string): Date => {
+  const dateObject = validateAndConvertDate(kstDate);
+  const timezoneOffset = 9 * 60 * 60 * 1000;
+
+  return new Date(dateObject.getTime() - timezoneOffset);
 };
 
 /** 날짜 형식 변환 함수 ( ex: yyyy-MM-dd ) */
@@ -25,11 +45,7 @@ export const formatDate = (
   date: Date | string,
   pattern: string = "yyyy-MM-dd"
 ): string => {
-  const dateObject = typeof date === "string" ? new Date(date) : date;
-
-  if (isNaN(dateObject.getTime())) {
-    throw new Error("올바른 날짜 형식이 아닙니다.");
-  }
+  const dateObject = validateAndConvertDate(date);
 
   return format(dateObject, pattern);
 };
@@ -132,11 +148,7 @@ export const formatToCustomKoreanTime = (
     weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"],
   } = options;
 
-  const date = typeof isoString === "string" ? new Date(isoString) : isoString;
-
-  if (isNaN(date.getTime())) {
-    throw new Error("올바른 날짜 형식이 아닙니다.");
-  }
+  const date = validateAndConvertDate(isoString);
 
   const hours = date.getHours();
   const minutes = date.getMinutes();
@@ -181,3 +193,14 @@ export const formatToCustomKoreanTime = (
 
   return timeString;
 };
+
+export function isSameDay(date1: string | Date, date2: string | Date): boolean {
+  const d1 = typeof date1 === "string" ? new Date(date1) : date1;
+  const d2 = typeof date2 === "string" ? new Date(date2) : date2;
+
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
