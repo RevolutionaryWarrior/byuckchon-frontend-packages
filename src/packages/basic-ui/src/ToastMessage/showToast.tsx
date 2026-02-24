@@ -25,7 +25,7 @@ export function showToast(
   const { autoClose, position } = options ?? {};
 
   function ToastContent(props: ToastContentProps) {
-    return <ToastUI message={message} {...props} {...options} />;
+    return <ToastUI message={message} {...props} options={options} />;
   }
 
   const defaultClassName = `!p-0 !w-[335px] !rounded-none !min-h-[44px]`;
