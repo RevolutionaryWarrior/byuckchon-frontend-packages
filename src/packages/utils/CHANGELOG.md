@@ -1,5 +1,11 @@
 # @byuckchon-frontend/utils
 
+## 1.4.0
+
+### Minor Changes
+
+- 67d8258: add: editor 관련 util
+
 ## 1.3.0
 
 ### Minor Changes
