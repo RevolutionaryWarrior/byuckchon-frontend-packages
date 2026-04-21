@@ -15,3 +15,4 @@ export { default as useScrollToSelectedItem } from "./useScrollToSelectedItem";
 export { default as useThrottle } from "./useThrottle";
 export { default as useTimer } from "./useTimer";
 export { default as useVisibilityEvent } from "./useVisibilityEvent";
+export { default as usePasswordVisibility } from "./usePasswordVisibility";
