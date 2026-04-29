@@ -1,5 +1,11 @@
 # @byuckchon-frontend/hooks
 
+## 1.3.1
+
+### Patch Changes
+
+- a113b78: edit workflow + test PR open
+
 ## 1.3.0
 
 ### Minor Changes
