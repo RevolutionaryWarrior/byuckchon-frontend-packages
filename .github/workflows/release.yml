@@ -63,7 +63,6 @@ jobs:
         working-directory: ingensrota
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
-          UPDATED_MARKER: ${{ runner.temp }}/byuckchon-frontend-packages-updated
         run: |
           set -euo pipefail
 
@@ -77,11 +76,6 @@ jobs:
               .filter((pkg) => pkg.name.startsWith("@byuckchon-frontend/"))
               .map((pkg) => [pkg.name, pkg.version])
           );
-
-          if (packageVersions.size === 0) {
-            console.log("No @byuckchon-frontend packages were published.");
-            process.exit(0);
-          }
 
           const dependencyFields = [
             "dependencies",
@@ -124,8 +118,6 @@ jobs:
 
           walk(process.cwd());
 
-          const changedFiles = [];
-
           for (const filePath of packageJsonFiles) {
             const packageJson = JSON.parse(fs.readFileSync(filePath, "utf8"));
             let changed = false;
@@ -147,23 +139,11 @@ jobs:
 
             if (changed) {
               fs.writeFileSync(filePath, `${JSON.stringify(packageJson, null, 2)}\n`);
-              changedFiles.push(path.relative(process.cwd(), filePath));
             }
           }
-
-          if (changedFiles.length === 0) {
-            console.log("No matching @byuckchon-frontend dependencies were found.");
-            process.exit(0);
-          }
-
-          fs.writeFileSync(process.env.UPDATED_MARKER, "true");
-          console.log(`Updated ${changedFiles.join(", ")}`);
           NODE
 
-          if [ ! -f "$UPDATED_MARKER" ]; then
-            exit 0
-          fi
-
+          # 조건 검증 없이 무조건 패키지 매니저 인스톨 실행
           if [ -f pnpm-lock.yaml ]; then
             pnpm install --lockfile-only
           elif [ -f yarn.lock ]; then
@@ -194,11 +174,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No dependency updates to open a pull request for."
-            exit 0
-          fi
-
           APP_USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
 
           git config user.name "${APP_SLUG}[bot]"
@@ -207,7 +182,8 @@ jobs:
           git fetch origin "$BRANCH_NAME":"refs/remotes/origin/$BRANCH_NAME" || true
           git checkout -B "$BRANCH_NAME"
           git add -A
-          git commit -m "chore: update byuckchon-frontend-packages"
+          
+          git commit --allow-empty -m "chore: update byuckchon-frontend-packages"
           git push --force-with-lease origin "$BRANCH_NAME"
 
           if gh pr view "$BRANCH_NAME" --repo RevolutionaryWarrior/Ingensrota >/dev/null 2>&1; then

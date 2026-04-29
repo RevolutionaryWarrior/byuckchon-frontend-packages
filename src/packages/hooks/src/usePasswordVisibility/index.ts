@@ -17,9 +17,7 @@ export default function usePasswordVisibility(...fields: string[]) {
       prev.includes(field) ? prev.filter((v) => v !== field) : [...prev, field],
     );
   };
- 
-  // PR open Test
-  
+   
   return {
     isVisible,
     isHidden,
