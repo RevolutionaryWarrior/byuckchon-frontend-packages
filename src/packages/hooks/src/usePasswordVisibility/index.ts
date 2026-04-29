@@ -18,6 +18,8 @@ export default function usePasswordVisibility(...fields: string[]) {
     );
   };
 
+  console.log("PR open Test");
+
   return {
     isVisible,
     isHidden,
