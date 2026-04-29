@@ -30,9 +30,196 @@ jobs:
       - run: pnpm install
 
       - name: Create Release Pull Request or Publish
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Ingensrota app token
+        id: ingensrota-token
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.INGENSROTA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.INGENSROTA_APP_PRIVATE_KEY }}
+          owner: RevolutionaryWarrior
+          repositories: Ingensrota
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Checkout Ingensrota
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: RevolutionaryWarrior/Ingensrota
+          token: ${{ steps.ingensrota-token.outputs.token }}
+          path: ingensrota
+
+      - name: Update byuckchon frontend packages
+        if: steps.changesets.outputs.published == 'true'
+        working-directory: ingensrota
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          UPDATED_MARKER: ${{ runner.temp }}/byuckchon-frontend-packages-updated
+        run: |
+          set -euo pipefail
+
+          node <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
+          const packageVersions = new Map(
+            publishedPackages
+              .filter((pkg) => pkg.name.startsWith("@byuckchon-frontend/"))
+              .map((pkg) => [pkg.name, pkg.version])
+          );
+
+          if (packageVersions.size === 0) {
+            console.log("No @byuckchon-frontend packages were published.");
+            process.exit(0);
+          }
+
+          const dependencyFields = [
+            "dependencies",
+            "devDependencies",
+            "peerDependencies",
+            "optionalDependencies",
+          ];
+          const ignoredDirectories = new Set([
+            ".git",
+            "node_modules",
+            "dist",
+            "build",
+            ".next",
+          ]);
+          const packageJsonFiles = [];
+
+          function walk(directory) {
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+              const entryPath = path.join(directory, entry.name);
+
+              if (entry.isDirectory()) {
+                if (!ignoredDirectories.has(entry.name)) {
+                  walk(entryPath);
+                }
+                continue;
+              }
+
+              if (entry.name === "package.json") {
+                packageJsonFiles.push(entryPath);
+              }
+            }
+          }
+
+          function nextRange(currentRange, version) {
+            if (currentRange.startsWith("^")) return `^${version}`;
+            if (currentRange.startsWith("~")) return `~${version}`;
+            if (currentRange.startsWith(">=")) return `>=${version}`;
+            return version;
+          }
+
+          walk(process.cwd());
+
+          const changedFiles = [];
+
+          for (const filePath of packageJsonFiles) {
+            const packageJson = JSON.parse(fs.readFileSync(filePath, "utf8"));
+            let changed = false;
+
+            for (const field of dependencyFields) {
+              const dependencies = packageJson[field];
+
+              if (!dependencies) {
+                continue;
+              }
+
+              for (const [packageName, version] of packageVersions) {
+                if (dependencies[packageName]) {
+                  dependencies[packageName] = nextRange(dependencies[packageName], version);
+                  changed = true;
+                }
+              }
+            }
+
+            if (changed) {
+              fs.writeFileSync(filePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+              changedFiles.push(path.relative(process.cwd(), filePath));
+            }
+          }
+
+          if (changedFiles.length === 0) {
+            console.log("No matching @byuckchon-frontend dependencies were found.");
+            process.exit(0);
+          }
+
+          fs.writeFileSync(process.env.UPDATED_MARKER, "true");
+          console.log(`Updated ${changedFiles.join(", ")}`);
+          NODE
+
+          if [ ! -f "$UPDATED_MARKER" ]; then
+            exit 0
+          fi
+
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --lockfile-only
+          elif [ -f yarn.lock ]; then
+            YARN_VERSION="$(yarn --version)"
+
+            if [[ "$YARN_VERSION" == 1.* ]]; then
+              yarn install --ignore-scripts
+            else
+              yarn install --mode=update-lockfile
+            fi
+          else
+            npm install --package-lock-only
+          fi
+
+      - name: Create Ingensrota Pull Request
+        if: steps.changesets.outputs.published == 'true'
+        working-directory: ingensrota
+        env:
+          GH_TOKEN: ${{ steps.ingensrota-token.outputs.token }}
+          APP_SLUG: ${{ steps.ingensrota-token.outputs.app-slug }}
+          BRANCH_NAME: feature/update-byuckchon-frontend-packages
+          PR_TITLE: "[feature] byuckchon-frontend-packages 업데이트"
+          PR_BODY: |
+            byuckchon-frontend-packages 릴리즈를 Ingensrota에 반영합니다.
+
+            Published packages:
+            ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No dependency updates to open a pull request for."
+            exit 0
+          fi
+
+          APP_USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+
+          git fetch origin "$BRANCH_NAME":"refs/remotes/origin/$BRANCH_NAME" || true
+          git checkout -B "$BRANCH_NAME"
+          git add -A
+          git commit -m "chore: update byuckchon-frontend-packages"
+          git push --force-with-lease origin "$BRANCH_NAME"
+
+          if gh pr view "$BRANCH_NAME" --repo RevolutionaryWarrior/Ingensrota >/dev/null 2>&1; then
+            gh pr edit "$BRANCH_NAME" \
+              --repo RevolutionaryWarrior/Ingensrota \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+          else
+            gh pr create \
+              --repo RevolutionaryWarrior/Ingensrota \
+              --base main \
+              --head "$BRANCH_NAME" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+          fi
