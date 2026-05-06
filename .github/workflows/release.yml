@@ -180,7 +180,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.ingensrota-token.outputs.token }}
           APP_SLUG: ${{ steps.ingensrota-token.outputs.app-slug }}
-          BRANCH_NAME: feature/update-byuckchon-frontend-packages
+          BRANCH_PREFIX: feature/update-byuckchon-frontend-packages
           PR_TITLE: "[feature] byuckchon-frontend-packages 업데이트"
           PR_BODY: |
             byuckchon-frontend-packages 릴리즈를 Ingensrota에 반영합니다.
@@ -189,6 +189,45 @@ jobs:
             ${{ steps.changesets.outputs.publishedPackages }}
         run: |
           set -euo pipefail
+
+          BASE_REF="${{ github.event.before }}"
+          HEAD_REF="${{ github.sha }}"
+
+          if [[ -z "$BASE_REF" || "$BASE_REF" =~ ^0+$ ]]; then
+            BASE_REF="${HEAD_REF}^"
+          fi
+
+          CHANGED_FOLDERS="$(
+            git -C .. diff --name-only "$BASE_REF" "$HEAD_REF" -- src/packages \
+              | awk -F/ '
+                  $1 == "src" && $2 == "packages" && $4 == "src" && $5 != "" {
+                    if ($5 == "index.ts" || $5 == "index.tsx") print $3;
+                    else print $5;
+                  }
+                  $1 == "src" && $2 == "packages" && $4 != "src" {
+                    print $3;
+                  }
+                ' \
+              | sort -u
+          )"
+          CHANGED_FOLDER_COUNT="$(printf "%s\n" "$CHANGED_FOLDERS" | sed "/^$/d" | wc -l | tr -d " ")"
+
+          if [[ "$CHANGED_FOLDER_COUNT" -eq 1 ]]; then
+            BRANCH_SUFFIX="$CHANGED_FOLDERS"
+          elif [[ "$CHANGED_FOLDER_COUNT" -gt 1 ]]; then
+            BRANCH_SUFFIX="multiple"
+          else
+            BRANCH_SUFFIX="release"
+          fi
+
+          BRANCH_SUFFIX="$(printf "%s" "$BRANCH_SUFFIX" \
+            | sed -E "s/[^A-Za-z0-9._-]+/-/g; s/^-+|-+$//g")"
+
+          if [[ -z "$BRANCH_SUFFIX" ]]; then
+            BRANCH_SUFFIX="release"
+          fi
+
+          BRANCH_NAME="${BRANCH_PREFIX}/${BRANCH_SUFFIX}"
 
           APP_USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
 
