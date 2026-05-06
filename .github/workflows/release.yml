@@ -158,6 +158,22 @@ jobs:
             npm install --package-lock-only
           fi
 
+      - name: Generate Ingensrota library docs
+        if: steps.changesets.outputs.published == 'true'
+        working-directory: ingensrota
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LIBRARY_DOCS_AI_MODEL: ${{ vars.LIBRARY_DOCS_AI_MODEL }}
+        run: |
+          set -euo pipefail
+
+          node ../scripts/generate-library-docs.cjs \
+            --target . \
+            --library-path src/consts/Portfolio/Library \
+            --changed-only \
+            --base "${{ github.event.before }}" \
+            --head "${{ github.sha }}"
+
       - name: Create Ingensrota Pull Request
         if: steps.changesets.outputs.published == 'true'
         working-directory: ingensrota
