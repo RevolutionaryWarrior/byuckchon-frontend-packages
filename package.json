@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc -b && pnpm -r run build",
     "dev": "pnpm --filter example-app dev",
+    "generate:library-docs": "node scripts/generate-library-docs.cjs",
     "lint": "pnpm -r run lint",
     "release": "pnpm build && changeset publish",
     "version-packages": "changeset version"
