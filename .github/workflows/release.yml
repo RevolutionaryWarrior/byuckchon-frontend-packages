@@ -58,6 +58,50 @@ jobs:
           token: ${{ steps.ingensrota-token.outputs.token }}
           path: ingensrota
 
+      - name: Resolve library docs diff base
+        id: library-docs-base
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+
+          node <<'NODE' > /tmp/current-byuckchon-release-tags.txt
+          const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
+
+          for (const pkg of publishedPackages) {
+            if (pkg.name.startsWith("@byuckchon-frontend/")) {
+              console.log(`${pkg.name}@${pkg.version}`);
+            }
+          }
+          NODE
+
+          git tag --list "@byuckchon-frontend/*" --sort=-creatordate > /tmp/byuckchon-release-tags.txt
+
+          PREVIOUS_TAG="$(
+            grep -Fvx -f /tmp/current-byuckchon-release-tags.txt /tmp/byuckchon-release-tags.txt \
+              | head -n 1 \
+              || true
+          )"
+
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            BASE_REF="$(git rev-list -n 1 "$PREVIOUS_TAG")"
+            echo "Docs diff base tag: ${PREVIOUS_TAG}"
+          else
+            BASE_REF="${{ github.event.before }}"
+
+            if [[ -z "$BASE_REF" || "$BASE_REF" =~ ^0+$ ]]; then
+              BASE_REF="${{ github.sha }}^"
+            fi
+
+            echo "No previous release tag found. Falling back to ${BASE_REF}."
+          fi
+
+          echo "Resolved library docs diff base: ${BASE_REF}"
+          echo "base-ref=${BASE_REF}" >> "$GITHUB_OUTPUT"
+
       - name: Update byuckchon frontend packages
         if: steps.changesets.outputs.published == 'true'
         working-directory: ingensrota
@@ -164,6 +208,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LIBRARY_DOCS_AI_MODEL: ${{ vars.LIBRARY_DOCS_AI_MODEL }}
+          LIBRARY_DOCS_BASE_REF: ${{ steps.library-docs-base.outputs.base-ref }}
         run: |
           set -euo pipefail
 
@@ -172,7 +217,7 @@ jobs:
             --library-path src/consts/Portfolio/Library \
             --changed-only \
             --no-prune \
-            --base "${{ github.event.before }}" \
+            --base "$LIBRARY_DOCS_BASE_REF" \
             --head "${{ github.sha }}"
 
       - name: Create Ingensrota Pull Request
@@ -190,28 +235,39 @@ jobs:
         run: |
           set -euo pipefail
 
-          BASE_REF="${{ github.event.before }}"
+          BASE_REF="${{ steps.library-docs-base.outputs.base-ref }}"
           HEAD_REF="${{ github.sha }}"
 
           if [[ -z "$BASE_REF" || "$BASE_REF" =~ ^0+$ ]]; then
             BASE_REF="${HEAD_REF}^"
           fi
 
-          CHANGED_PACKAGES="$(
+          CHANGED_TOPICS="$(
             git -C .. diff --name-only "$BASE_REF" "$HEAD_REF" -- src/packages \
               | awk -F/ '
-                  $1 == "src" && $2 == "packages" && $3 != "" {
+                  $1 == "src" && $2 == "packages" && $3 != "" && $4 == "src" && $5 != "" {
+                    if ($5 == "index.ts" || $5 == "index.tsx") print $3;
+                    else print $3 "-" $5;
+                  }
+                  $1 == "src" && $2 == "packages" && $3 != "" && $4 != "src" {
                     print $3;
                   }
                 ' \
               | sort -u
           )"
-          CHANGED_PACKAGE_COUNT="$(printf "%s\n" "$CHANGED_PACKAGES" | sed "/^$/d" | wc -l | tr -d " ")"
+          CHANGED_TOPIC_COUNT="$(printf "%s\n" "$CHANGED_TOPICS" | sed "/^$/d" | wc -l | tr -d " ")"
 
-          if [[ "$CHANGED_PACKAGE_COUNT" -eq 1 ]]; then
-            BRANCH_TOPIC="$CHANGED_PACKAGES"
-          elif [[ "$CHANGED_PACKAGE_COUNT" -gt 1 ]]; then
-            BRANCH_TOPIC="multiple"
+          if [[ "$CHANGED_TOPIC_COUNT" -eq 1 ]]; then
+            BRANCH_TOPIC="$CHANGED_TOPICS"
+          elif [[ "$CHANGED_TOPIC_COUNT" -gt 1 ]]; then
+            FIRST_PACKAGE="$(printf "%s\n" "$CHANGED_TOPICS" | sed "/^$/d" | sed -E "s/-.*$//" | sort -u | head -n 1)"
+            PACKAGE_COUNT="$(printf "%s\n" "$CHANGED_TOPICS" | sed "/^$/d" | sed -E "s/-.*$//" | sort -u | wc -l | tr -d " ")"
+
+            if [[ "$PACKAGE_COUNT" -eq 1 && -n "$FIRST_PACKAGE" ]]; then
+              BRANCH_TOPIC="${FIRST_PACKAGE}-multiple"
+            else
+              BRANCH_TOPIC="multiple"
+            fi
           else
             BRANCH_TOPIC="release"
           fi
