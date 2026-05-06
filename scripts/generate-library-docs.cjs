@@ -92,7 +92,7 @@ function parseArgs(argv) {
     dryRun: false,
     headRef: process.env.LIBRARY_DOCS_HEAD_REF || "",
     libraryPath: process.env.INGENSROTA_LIBRARY_PATH || DEFAULT_LIBRARY_PATH,
-    prune: !parseBoolean(process.env.LIBRARY_DOCS_NO_PRUNE),
+    prune: parseBoolean(process.env.LIBRARY_DOCS_PRUNE),
     skipAi: parseBoolean(process.env.LIBRARY_DOCS_SKIP_AI),
     targetRepo: process.env.INGENSROTA_REPO_PATH || "",
   };
@@ -139,6 +139,11 @@ function parseArgs(argv) {
 
     if (arg === "--no-prune") {
       args.prune = false;
+      continue;
+    }
+
+    if (arg === "--prune") {
+      args.prune = true;
       continue;
     }
 
