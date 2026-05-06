@@ -1,5 +1,11 @@
 # @byuckchon-frontend/hooks
 
+## 1.3.6
+
+### Patch Changes
+
+- 866e458: chore: md 파일 업데이트 테스트
+
 ## 1.3.5
 
 ### Patch Changes
