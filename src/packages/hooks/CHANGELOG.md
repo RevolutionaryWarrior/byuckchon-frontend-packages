@@ -1,5 +1,11 @@
 # @byuckchon-frontend/hooks
 
+## 1.3.5
+
+### Patch Changes
+
+- 7822847: chore: md 파일 자동화 테스트
+
 ## 1.3.4
 
 ### Patch Changes
