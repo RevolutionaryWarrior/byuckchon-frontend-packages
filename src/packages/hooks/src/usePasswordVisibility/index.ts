@@ -18,7 +18,7 @@ export default function usePasswordVisibility(...fields: string[]) {
     );
   };
 
-  // test check PR open workflows
+  // test check PR open workflows + md generate test
 
   return {
     isVisible,

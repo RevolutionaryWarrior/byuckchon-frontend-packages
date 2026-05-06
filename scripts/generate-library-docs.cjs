@@ -7,7 +7,6 @@ const ts = require("typescript");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const DEFAULT_LIBRARY_PATH = "src/consts/Portfolio/Library";
-const GENERATOR_PATH = "scripts/generate-library-docs.cjs";
 const AUTO_GENERATED_MARKER =
   "<!-- AUTO-GENERATED: byuckchon-frontend-packages/scripts/generate-library-docs.cjs -->";
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
@@ -530,7 +529,7 @@ function getGitChanges(args) {
     diffArgs.push("HEAD");
   }
 
-  diffArgs.push("--", GENERATOR_PATH, ...PACKAGES.map((pkg) => pkg.sourceDir));
+  diffArgs.push("--", ...PACKAGES.map((pkg) => pkg.sourceDir));
 
   const output = execFileSync("git", diffArgs, {
     cwd: REPO_ROOT,
@@ -553,12 +552,6 @@ function getGitChanges(args) {
 
 function classifyPackageSourcePath(filePath) {
   const normalized = normalizePath(filePath);
-
-  if (normalized === GENERATOR_PATH) {
-    return {
-      kind: "generator",
-    };
-  }
 
   for (const pkg of PACKAGES) {
     const sourceDir = normalizePath(pkg.sourceDir);
@@ -613,13 +606,6 @@ function getAffectedPlan(args, packageStates) {
       const classified = classifyPackageSourcePath(changedPath);
 
       if (!classified) {
-        continue;
-      }
-
-      if (classified.kind === "generator") {
-        for (const pkg of PACKAGES) {
-          rootIndexPackages.add(pkg);
-        }
         continue;
       }
 
