@@ -1,5 +1,11 @@
 # @byuckchon-frontend/hooks
 
+## 1.3.9
+
+### Patch Changes
+
+- daba327: chore: md 파일 생성 테스트
+
 ## 1.3.8
 
 ### Patch Changes
