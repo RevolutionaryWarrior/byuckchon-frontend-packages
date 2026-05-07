@@ -1,5 +1,11 @@
 # @byuckchon-frontend/utils
 
+## 1.4.2
+
+### Patch Changes
+
+- fbfac70: chore: md 파일 테스트
+
 ## 1.4.0
 
 ### Minor Changes
