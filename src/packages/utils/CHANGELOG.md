@@ -1,5 +1,11 @@
 # @byuckchon-frontend/utils
 
+## 1.4.3
+
+### Patch Changes
+
+- 2b7724d: chore: md 파일 테스트
+
 ## 1.4.2
 
 ### Patch Changes
