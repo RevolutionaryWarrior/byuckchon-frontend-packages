@@ -10,7 +10,7 @@ const DEFAULT_LIBRARY_PATH = "src/consts/Portfolio/Library";
 const AUTO_GENERATED_MARKER =
   "<!-- AUTO-GENERATED: byuckchon-frontend-packages/scripts/generate-library-docs.cjs -->";
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
-const DEFAULT_AI_MODEL = "gpt-4o-mini";
+const DEFAULT_AI_MODEL = "gpt-5.5";
 
 const PACKAGES = [
   {
@@ -69,7 +69,7 @@ const SEMANTIC_SCHEMA = {
     },
     usageExplanation: {
       type: "string",
-      description: "AST가 만든 usage skeleton을 어떻게 읽고 적용할지 설명하는 짧은 한국어 문장입니다.",
+      description: "renderer가 만든 사용 예시 코드의 흐름을 설명하는 짧은 한국어 문장입니다.",
     },
     notes: {
       type: "string",
@@ -689,6 +689,18 @@ function getSignatureText(name, signature, location) {
   return `${name}: ${signatureText}`;
 }
 
+function getSignatureTypeParameterText(signature) {
+  const declarations = signature.typeParameters
+    ?.map((typeParameter) => getDeclaration(typeParameter.symbol))
+    .filter(Boolean);
+
+  if (!declarations?.length) {
+    return "";
+  }
+
+  return `<${declarations.map((declaration) => declaration.getText()).join(", ")}>`;
+}
+
 function isOptionalDeclaration(declaration) {
   return Boolean(declaration?.questionToken || declaration?.initializer || declaration?.dotDotDotToken);
 }
@@ -811,6 +823,7 @@ function getParameterRows(signature, location) {
       name,
       properties: getPropertyRows(parameterType, declaration || location, defaults),
       required: !isOptionalDeclaration(declaration),
+      rest: Boolean(declaration?.dotDotDotToken),
       type,
     };
   });
@@ -935,6 +948,7 @@ function describeFunctionExport(publicName, symbol, declaration, sourceFile) {
     parameters: getParameterRows(signature, declaration),
     returnInfo,
     signature: getSignatureText(publicName, signature, declaration),
+    typeParameters: getSignatureTypeParameterText(signature),
   };
 }
 
@@ -1098,7 +1112,7 @@ function renderParameters(parameters, title = "Parameters") {
 }
 
 function renderReturn(returnInfo) {
-  const lines = ["### Return", "", code(returnInfo.type), ""];
+  const lines = ["### Return", "", "```ts", formatTypeBlock(returnInfo.type), "```", ""];
 
   if (returnInfo.properties.length) {
     lines.push(renderTable(["Name", "Type"], returnInfo.properties.map((row) => [code(row.name), code(row.type)])));
@@ -1123,6 +1137,85 @@ function renderObjectProperties(rows) {
   return renderTable(["Name", "Type"], rows.map((row) => [code(row.name), code(row.type)]));
 }
 
+function splitTopLevelMembers(value) {
+  const members = [];
+  let depth = 0;
+  let quote = "";
+  let current = "";
+
+  for (const char of value) {
+    if (quote) {
+      current += char;
+      if (char === quote) quote = "";
+      continue;
+    }
+
+    if (char === "'" || char === '"' || char === "`") {
+      quote = char;
+      current += char;
+      continue;
+    }
+
+    if (char === "<" || char === "(" || char === "[" || char === "{") {
+      depth += 1;
+    } else if (char === ">" || char === ")" || char === "]" || char === "}") {
+      depth = Math.max(0, depth - 1);
+    }
+
+    if (char === ";" && depth === 0) {
+      if (current.trim()) {
+        members.push(current.trim());
+      }
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (current.trim()) {
+    members.push(current.trim());
+  }
+
+  return members;
+}
+
+function formatTypeBlock(typeText) {
+  const normalized = String(typeText || "-").trim();
+
+  if (!normalized.startsWith("{") || !normalized.endsWith("}")) {
+    return normalized;
+  }
+
+  const body = normalized.slice(1, -1).trim();
+  const members = splitTopLevelMembers(body);
+
+  if (!members.length) {
+    return "{}";
+  }
+
+  return ["{", ...members.map((member) => `  ${member.endsWith(";") ? member : `${member};`}`), "}"].join("\n");
+}
+
+function renderSignatureCode(doc) {
+  if (!doc.returnInfo) {
+    return formatTypeBlock(doc.signature || doc.type);
+  }
+
+  const params = (doc.parameters || []).map((parameter) => {
+    const prefix = parameter.rest ? "..." : "";
+    const optional = !parameter.rest && !parameter.required ? "?" : "";
+    return `  ${prefix}${parameter.name}${optional}: ${parameter.type}`;
+  });
+  const name = `${doc.name}${doc.typeParameters || ""}`;
+
+  if (!params.length) {
+    return `${name}(): ${formatTypeBlock(doc.returnInfo.type)}`;
+  }
+
+  return [`${name}(`, `${params.join(",\n")}`, `): ${formatTypeBlock(doc.returnInfo.type)}`].join("\n");
+}
+
 function getPlaceholderValue(type, name = "") {
   if (/\[\]|Array</.test(type)) return "[]";
   if (/=>|Function/.test(type) || /^on[A-Z]/.test(name) || /callback/i.test(name)) return "() => {}";
@@ -1138,6 +1231,14 @@ function getPlaceholderValue(type, name = "") {
 function getCallArgs(parameters) {
   return (parameters || [])
     .map((parameter) => {
+      if (parameter.rest) {
+        if (/string\[\]/.test(parameter.type)) {
+          return '"fieldA", "fieldB"';
+        }
+        if (/number\[\]/.test(parameter.type)) return "0, 1";
+        return getPlaceholderValue(parameter.type.replace(/\[\]$/, ""), parameter.name);
+      }
+
       if (parameter.properties.length) {
         const requiredProperties = parameter.properties.filter((property) => property.required);
 
@@ -1153,6 +1254,284 @@ function getCallArgs(parameters) {
       return getPlaceholderValue(parameter.type, parameter.name);
     })
     .join(", ");
+}
+
+function getPrimaryExportDoc(exportDocs) {
+  return exportDocs.find((doc) => doc.kind !== "type") || exportDocs[0] || null;
+}
+
+function getBindingNames(doc) {
+  const properties = doc.returnInfo?.properties || [];
+
+  if (!shouldDestructureReturn(doc)) {
+    return "";
+  }
+
+  return properties.map((property) => property.name).join(", ");
+}
+
+function isFunctionType(type) {
+  return /=>|\bFunction\b/.test(String(type || ""));
+}
+
+function isBooleanType(type) {
+  return /\bboolean\b/.test(String(type || ""));
+}
+
+function isRefType(type) {
+  return /\b(MutableRefObject|RefObject|Ref)\b/.test(String(type || ""));
+}
+
+function isDirectRefType(type) {
+  const value = String(type || "").trim();
+  return !value.startsWith("{") && isRefType(value);
+}
+
+function isRefLikeProperty(property) {
+  return /ref$/i.test(property.name) || isRefType(property.type);
+}
+
+function shouldDestructureReturn(doc) {
+  const returnInfo = doc?.returnInfo;
+  const properties = returnInfo?.properties || [];
+
+  if (!properties.length || isDirectRefType(returnInfo.type)) {
+    return false;
+  }
+
+  return returnInfo.type.trim().startsWith("{") || properties.length > 1 || /\b(Return|Result|State)\b/.test(returnInfo.type);
+}
+
+function getHookResultVariableName(doc) {
+  if (isDirectRefType(doc.returnInfo?.type)) {
+    return "ref";
+  }
+
+  return "result";
+}
+
+function renderDeclarationSnippet(doc) {
+  if (!doc || doc.kind === "type") {
+    return "";
+  }
+
+  if (doc.kind === "component") {
+    return renderComponentUsage(doc);
+  }
+
+  if (doc.kind === "object") {
+    const callableMember = doc.callableMembers?.[0];
+
+    if (callableMember) {
+      return `const result = ${doc.accessPrefix}.${callableMember.name}(${getCallArgs(callableMember.parameters)});`;
+    }
+
+    return `const value = ${doc.accessPrefix};`;
+  }
+
+  const bindingNames = getBindingNames(doc);
+  const callExpression = `${doc.accessPrefix}(${getCallArgs(doc.parameters)})`;
+
+  if (doc.kind === "hook" && bindingNames) {
+    return `const { ${bindingNames} } = ${callExpression};`;
+  }
+
+  if (doc.kind === "hook") {
+    return `const ${getHookResultVariableName(doc)} = ${callExpression};`;
+  }
+
+  return `const result = ${callExpression};`;
+}
+
+function getCodeLanguage(doc) {
+  if (!doc || doc.kind === "component" || doc.kind === "hook") {
+    return "tsx";
+  }
+
+  return "ts";
+}
+
+function getFunctionCallArgsFromType(type, contextArg = "") {
+  const value = String(type || "").trim();
+  const parameterText = value.startsWith("(")
+    ? value.match(/^\((.*)\)\s*=>/)?.[1] || ""
+    : value.match(/^([^=()]+?)\s*=>/)?.[1] || "";
+
+  if (!parameterText.trim()) {
+    return "";
+  }
+
+  return parameterText
+    .split(",")
+    .map((parameter) => {
+      const [name = "", typeText = ""] = parameter.split(":").map((part) => part.trim());
+      if (contextArg && /string/.test(typeText)) return contextArg;
+      return getPlaceholderValue(typeText || name, name);
+    })
+    .join(", ");
+}
+
+function getUsageContextArg(parameters) {
+  const restStringParameter = (parameters || []).find((parameter) => parameter.rest && /string\[\]/.test(parameter.type));
+  if (restStringParameter) {
+    return '"fieldA"';
+  }
+
+  const stringParameter = (parameters || []).find((parameter) => /string/.test(parameter.type));
+  if (stringParameter) {
+    return getPlaceholderValue(stringParameter.type, stringParameter.name);
+  }
+
+  return "";
+}
+
+function renderCallableInvocation(property, contextArg = "") {
+  return `${property.name}(${getFunctionCallArgsFromType(property.type, contextArg)})`;
+}
+
+function getBooleanLabelPair(propertyName) {
+  if (/hidden/i.test(propertyName)) return ["hidden", "shown"];
+  if (/visible/i.test(propertyName)) return ["visible", "hidden"];
+  if (/open/i.test(propertyName)) return ["open", "closed"];
+  if (/selected/i.test(propertyName)) return ["selected", "unselected"];
+  if (/active/i.test(propertyName)) return ["active", "inactive"];
+  return ["true", "false"];
+}
+
+function renderHookExampleBody(exportDoc) {
+  const properties = exportDoc.returnInfo?.properties || [];
+  const contextArg = getUsageContextArg(exportDoc.parameters);
+  const callableProperties = properties.filter((property) => isFunctionType(property.type));
+  const booleanCallable = callableProperties.find((property) => isBooleanType(property.type));
+  const actionCallable = callableProperties.find((property) => !isBooleanType(property.type)) || callableProperties[0];
+  const refProperty = properties.find(isRefLikeProperty);
+  const displayProperty = properties.find((property) => !isFunctionType(property.type) && !isRefLikeProperty(property));
+  const resultVariable = getHookResultVariableName(exportDoc);
+
+  if (!shouldDestructureReturn(exportDoc)) {
+    if (isDirectRefType(exportDoc.returnInfo?.type)) {
+      return ["  return <input ref={ref} />;"];
+    }
+
+    if (isFunctionType(exportDoc.returnInfo?.type)) {
+      return [
+        "  return (",
+        `    <button type="button" onClick={${resultVariable}}>`,
+        "      Run",
+        "    </button>",
+        "  );",
+      ];
+    }
+
+    return [`  return <pre>{JSON.stringify(${resultVariable}, null, 2)}</pre>;`];
+  }
+
+  if (refProperty) {
+    return [`  return <div ref={${refProperty.name}}>Example content</div>;`];
+  }
+
+  if (booleanCallable && actionCallable) {
+    const actionCall = renderCallableInvocation(actionCallable, contextArg);
+    const statusLines = callableProperties
+      .filter((property) => isBooleanType(property.type))
+      .slice(0, 2)
+      .map((property) => {
+        const [truthyLabel, falsyLabel] = getBooleanLabelPair(property.name);
+        return `      <span>{${renderCallableInvocation(property, contextArg)} ? "${truthyLabel}" : "${falsyLabel}"}</span>`;
+      });
+
+    return [
+      "  return (",
+      '    <div className="flex items-center gap-2">',
+      ...statusLines,
+      `      <button type="button" onClick={() => ${actionCall}}>`,
+      "        Toggle",
+      "      </button>",
+      "    </div>",
+      "  );",
+    ];
+  }
+
+  if (actionCallable) {
+    return [
+      "  return (",
+      `    <button type="button" onClick={() => ${renderCallableInvocation(actionCallable, contextArg)}}>`,
+      "      Run",
+      "    </button>",
+      "  );",
+    ];
+  }
+
+  if (displayProperty) {
+    return [`  return <div>{String(${displayProperty.name})}</div>;`];
+  }
+
+  return ['  return <div data-state="ready" />;'];
+}
+
+function renderHookUsageCode(importStatement, exportDoc) {
+  return [
+    importStatement,
+    "",
+    "export default function Example() {",
+    `  ${renderDeclarationSnippet(exportDoc)}`,
+    "",
+    ...renderHookExampleBody(exportDoc),
+    "}",
+  ].join("\n");
+}
+
+function createFallbackUsageCode(doc, primaryExport) {
+  const importStatement = renderImport(doc.pkg, doc.moduleInfo, doc.publicRecord, doc.exportDocs);
+
+  if (!primaryExport || primaryExport.kind === "type") {
+    return "";
+  }
+
+  if (primaryExport.kind === "hook") {
+    return renderHookUsageCode(importStatement, primaryExport);
+  }
+
+  if (primaryExport.kind === "component") {
+    return [
+      importStatement,
+      "",
+      "export default function Example() {",
+      "  return (",
+      `    ${renderComponentUsage(primaryExport)}`,
+      "  );",
+      "}",
+    ].join("\n");
+  }
+
+  return [importStatement, "", renderDeclarationSnippet(primaryExport)].join("\n");
+}
+
+function createFallbackUsageExplanation(primaryExport) {
+  if (!primaryExport || primaryExport.kind === "type") {
+    return "이 모듈은 별도 호출 예시 없이 type definition section을 기준으로 사용 형태를 확인할 수 있습니다.";
+  }
+
+  if (primaryExport.kind === "hook") {
+    const properties = primaryExport.returnInfo?.properties || [];
+    if (properties.some(isRefLikeProperty) || isDirectRefType(primaryExport.returnInfo?.type)) {
+      return `${primaryExport.name} hook이 반환한 ref를 JSX element에 연결하는 기본 흐름입니다.`;
+    }
+    if (properties.some((property) => isFunctionType(property.type))) {
+      return `${primaryExport.name} hook이 반환한 상태와 실행 함수를 컴포넌트 이벤트에서 사용하는 기본 흐름입니다.`;
+    }
+    return `${primaryExport.name} hook의 반환 값을 React component 내부에서 사용하는 기본 흐름입니다.`;
+  }
+
+  if (primaryExport.kind === "component") {
+    return `${primaryExport.name} component를 JSX에서 렌더링하는 기본 흐름입니다.`;
+  }
+
+  if (primaryExport.kind === "object") {
+    return `${primaryExport.name} object의 public member를 호출하는 기본 흐름입니다.`;
+  }
+
+  return `${primaryExport.name} function을 호출하고 반환 값을 사용하는 기본 흐름입니다.`;
 }
 
 function renderComponentUsage(doc) {
@@ -1238,7 +1617,7 @@ function renderRuntimeExportSection(doc) {
     "### Signature",
     "",
     "```ts",
-    doc.signature || doc.type,
+    renderSignatureCode(doc),
     "```",
     "",
   ];
@@ -1275,13 +1654,6 @@ function renderRuntimeExportSection(doc) {
     lines.push(renderReturn(doc.returnInfo));
   }
 
-  const usage = renderUsage(doc);
-  if (usage) {
-    lines.push("### Usage");
-    lines.push("");
-    lines.push(usage);
-  }
-
   return lines.filter(Boolean).join("\n");
 }
 
@@ -1293,7 +1665,52 @@ function renderModuleStructure(moduleInfo) {
   return renderTable(["File"], moduleInfo.files.map((filePath) => [code(filePath)]));
 }
 
+function renderUsageExampleSection(doc, semantic) {
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+  const usageCode = createFallbackUsageCode(doc, primaryExport);
+
+  if (!usageCode) {
+    return "";
+  }
+
+  return [
+    "## 사용예시",
+    "",
+    semantic.usageExplanation,
+    "",
+    `\`\`\`${getCodeLanguage(primaryExport)}`,
+    usageCode,
+    "```",
+    "",
+  ].join("\n");
+}
+
+function renderDeclarationSection(exportDocs) {
+  const primaryExport = getPrimaryExportDoc(exportDocs);
+  const declaration = renderDeclarationSnippet(primaryExport);
+
+  if (!declaration) {
+    return "";
+  }
+
+  return [
+    "## 선언",
+    "",
+    `\`\`\`${getCodeLanguage(primaryExport)}`,
+    declaration,
+    "```",
+    "",
+  ].join("\n");
+}
+
 function renderMarkdown(pkg, moduleInfo, publicRecord, exportDocs, semantic) {
+  const doc = {
+    exportDocs,
+    moduleInfo,
+    pkg,
+    publicRecord,
+  };
+
   return [
     AUTO_GENERATED_MARKER,
     "",
@@ -1303,10 +1720,8 @@ function renderMarkdown(pkg, moduleInfo, publicRecord, exportDocs, semantic) {
     "",
     semantic.description,
     "",
-    "## Usage Explanation",
-    "",
-    semantic.usageExplanation,
-    "",
+    renderUsageExampleSection(doc, semantic),
+    renderDeclarationSection(exportDocs),
     "## Import",
     "",
     "```ts",
@@ -1340,11 +1755,15 @@ function compactRows(rows) {
     name: row.name,
     properties: compactRows(row.properties || []),
     required: Boolean(row.required),
+    rest: Boolean(row.rest),
     type: row.type,
   }));
 }
 
 function getSemanticMetadata(doc) {
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+  const usageExampleCode = createFallbackUsageCode(doc, primaryExport);
+
   return {
     exports: doc.exportDocs.map((exportDoc) => ({
       callableMembers: (exportDoc.callableMembers || []).map((member) => ({
@@ -1362,10 +1781,14 @@ function getSemanticMetadata(doc) {
       publicAccess: exportDoc.accessPrefix,
       returnType: exportDoc.returnInfo?.type || "",
       signature: exportDoc.signature || exportDoc.type || "",
+      typeParameters: exportDoc.typeParameters || "",
     })),
     files: doc.moduleInfo.files,
     moduleName: doc.moduleInfo.moduleName,
     packageName: doc.pkg.packageName,
+    importStatement: renderImport(doc.pkg, doc.moduleInfo, doc.publicRecord, doc.exportDocs),
+    declaration: renderDeclarationSnippet(primaryExport),
+    usageExampleCode,
     targetFolder: doc.pkg.targetFolder,
   };
 }
@@ -1374,11 +1797,12 @@ function createFallbackSemantic(doc) {
   const kinds = [...new Set(doc.exportDocs.map((exportDoc) => exportDoc.kind))];
   const kindText = kinds.length === 1 ? `${kinds[0]}입니다` : `${kinds.join(", ")} export를 제공합니다`;
   const exportNames = doc.exportDocs.map((exportDoc) => exportDoc.name).join(", ");
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
 
   return {
     description: `${doc.moduleInfo.moduleName} 모듈은 ${exportNames} public API를 제공하는 ${kindText}.`,
     notes: "특별한 주의 사항은 없습니다.",
-    usageExplanation: "아래 예시는 AST metadata를 기준으로 생성된 기본 사용 형태입니다.",
+    usageExplanation: createFallbackUsageExplanation(primaryExport),
   };
 }
 
@@ -1434,7 +1858,9 @@ async function generateAiSemantic(args, doc) {
             "Markdown 전체를 작성하지 않습니다.",
             "반드시 JSON schema에 맞는 JSON만 반환합니다.",
             "TypeScript AST metadata만 근거로 설명합니다.",
-            "import, signature, parameter, return type의 정확한 값은 반복하지 않습니다.",
+            "usage example code는 renderer가 metadata.usageExampleCode로 생성합니다.",
+            "AI는 usage example code를 새로 작성하거나 수정하지 않습니다.",
+            "signature, parameter, return type의 정확한 값은 설명 문장에 반복하지 않습니다.",
             "한국어로 짧고 안정적인 문장을 씁니다.",
             "추측, 과장, 마케팅 표현을 사용하지 않습니다.",
             'kind 표현은 hook은 "hook입니다", component는 "component입니다", function은 "function입니다", object는 "object입니다", type은 "type입니다" 스타일을 유지합니다.',
@@ -1447,7 +1873,8 @@ async function generateAiSemantic(args, doc) {
               instruction: {
                 description: "모듈이 언제 필요한지 1-2문장으로 설명합니다.",
                 notes: '주의 사항이 명확하지 않으면 "특별한 주의 사항은 없습니다."라고 씁니다.',
-                usageExplanation: "AST가 별도로 생성한 usage skeleton을 읽는 방법을 1-2문장으로 설명합니다.",
+                usageExplanation:
+                  "metadata.usageExampleCode가 어떤 실제 사용 흐름을 보여주는지 1문장으로 설명합니다. 코드가 비어 있으면 type definition만 확인하면 된다고 설명합니다.",
               },
               metadata,
             },
@@ -1456,9 +1883,8 @@ async function generateAiSemantic(args, doc) {
           ),
         },
       ],
-      max_output_tokens: 600,
+      max_output_tokens: 2200,
       model: args.aiModel,
-      temperature: 0.2,
       text: {
         format: {
           description: "Semantic fields for a generated TypeScript API markdown document.",
