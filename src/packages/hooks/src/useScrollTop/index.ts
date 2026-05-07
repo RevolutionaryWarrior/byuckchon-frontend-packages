@@ -44,5 +44,4 @@ export default function useScrollTop({
   };
 
   return { showScrollTop, scrollRef, scrollToTop };
-  // test check PR open workflows + md generate test
 }

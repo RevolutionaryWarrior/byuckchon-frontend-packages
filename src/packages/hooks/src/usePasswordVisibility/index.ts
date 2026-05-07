@@ -18,8 +18,6 @@ export default function usePasswordVisibility(...fields: string[]) {
     );
   };
 
-  //
-  
   return {
     isVisible,
     isHidden,

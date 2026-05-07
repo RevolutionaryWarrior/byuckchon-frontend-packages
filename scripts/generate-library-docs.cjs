@@ -61,11 +61,20 @@ const SKIPPED_OBJECT_PROPERTIES = new Set([
 const SEMANTIC_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["description", "usageExplanation", "notes"],
+  required: ["purpose", "useCases", "summary", "usageExplanation", "notes", "exportDescriptions"],
   properties: {
-    description: {
+    purpose: {
       type: "string",
-      description: "모듈의 역할을 설명하는 짧은 한국어 문장입니다.",
+      description: "문서 타입에 맞춰 모듈의 목적을 설명하는 짧은 한국어 문장입니다.",
+    },
+    useCases: {
+      type: "array",
+      description: "이 모듈을 사용하면 좋은 상황 목록입니다.",
+      items: { type: "string" },
+    },
+    summary: {
+      type: "string",
+      description: "모듈을 한 문장으로 요약한 한국어 문장입니다.",
     },
     usageExplanation: {
       type: "string",
@@ -74,6 +83,29 @@ const SEMANTIC_SCHEMA = {
     notes: {
       type: "string",
       description: "주의 사항 또는 사용 시 확인할 점입니다. 없으면 정해진 기본 문장을 사용합니다.",
+    },
+    exportDescriptions: {
+      type: "array",
+      description: "각 public export의 역할 설명입니다.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "role", "usage"],
+        properties: {
+          name: {
+            type: "string",
+            description: "metadata.exports에 존재하는 public export 이름입니다.",
+          },
+          role: {
+            type: "string",
+            description: "해당 export의 역할을 설명하는 짧은 한국어 문장입니다.",
+          },
+          usage: {
+            type: "string",
+            description: "해당 export를 언제 사용하는지 설명하는 짧은 한국어 문장입니다.",
+          },
+        },
+      },
     },
   },
 };
@@ -1703,6 +1735,301 @@ function renderDeclarationSection(exportDocs) {
   ].join("\n");
 }
 
+function getDocumentKind(doc) {
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+
+  if (doc.pkg.targetFolder === "Hooks" || primaryExport?.kind === "hook") {
+    return "hook";
+  }
+
+  if (doc.pkg.targetFolder === "Utils") {
+    return "util";
+  }
+
+  return "core";
+}
+
+function getSemanticExport(semantic, exportName) {
+  return (semantic.exportDescriptions || []).find((item) => item.name === exportName) || null;
+}
+
+function getRuntimeExports(exportDocs) {
+  return exportDocs.filter((doc) => doc.kind !== "type");
+}
+
+function renderUseCases(useCases) {
+  const items = (useCases || []).filter(Boolean);
+
+  if (!items.length) {
+    return "- 일반적인 재사용 로직이 필요할 때 사용합니다.";
+  }
+
+  return items.map((item) => `- ${item}`).join("\n");
+}
+
+function getFlattenedParameterRows(parameters) {
+  if (!parameters?.length) {
+    return [];
+  }
+
+  if (parameters.length === 1 && parameters[0].properties?.length) {
+    return parameters[0].properties;
+  }
+
+  return parameters;
+}
+
+function renderKoreanParameterRows(parameters) {
+  const rows = getFlattenedParameterRows(parameters);
+
+  if (!rows.length) {
+    return "전달 인자가 없습니다.";
+  }
+
+  return renderTable(
+    ["인자", "타입", "필수 여부", "기본값"],
+    rows.map((row) => [
+      code(row.name),
+      code(row.type),
+      row.required ? "필수" : "선택",
+      row.defaultValue ? code(row.defaultValue) : "-",
+    ]),
+  ).trim();
+}
+
+function renderKoreanReturnRows(returnInfo) {
+  if (!returnInfo) {
+    return "반환값이 없습니다.";
+  }
+
+  if (returnInfo.properties?.length) {
+    return renderTable(
+      ["반환값", "타입", "설명"],
+      returnInfo.properties.map((row) => [code(row.name), code(row.type), row.documentation || "-"]),
+    ).trim();
+  }
+
+  if (!returnInfo.type || returnInfo.type === "void") {
+    return "반환값이 없습니다.";
+  }
+
+  return renderTable(["반환값", "타입", "설명"], [["result", code(returnInfo.type), "실행 결과"]]).trim();
+}
+
+function renderUsageCodeBlock(doc, exportDoc) {
+  if (!exportDoc || exportDoc.kind === "type") {
+    return "";
+  }
+
+  const importStatement = renderImport(doc.pkg, doc.moduleInfo, doc.publicRecord, doc.exportDocs);
+
+  if (exportDoc.kind === "hook") {
+    return renderHookUsageCode(importStatement, exportDoc);
+  }
+
+  if (exportDoc.kind === "component") {
+    return [
+      importStatement,
+      "",
+      "export default function Example() {",
+      "  return (",
+      `    ${renderComponentUsage(exportDoc)}`,
+      "  );",
+      "}",
+    ].join("\n");
+  }
+
+  return [importStatement, "", renderDeclarationSnippet(exportDoc)].filter(Boolean).join("\n");
+}
+
+function renderUsageSection(title, doc, semantic, exportDoc = getPrimaryExportDoc(doc.exportDocs)) {
+  const usageCode = renderUsageCodeBlock(doc, exportDoc);
+
+  if (!usageCode) {
+    return [title, "", "타입 정의를 기준으로 사용 형태를 확인할 수 있습니다.", ""].join("\n");
+  }
+
+  return [
+    title,
+    "",
+    semantic.usageExplanation,
+    "",
+    `\`\`\`${getCodeLanguage(exportDoc)}`,
+    usageCode,
+    "```",
+    "",
+  ].join("\n");
+}
+
+function renderAppendix(doc) {
+  return [
+    "## 참고 정보",
+    "",
+    "### Import",
+    "",
+    "```ts",
+    renderImport(doc.pkg, doc.moduleInfo, doc.publicRecord, doc.exportDocs),
+    "```",
+    "",
+    "### Source",
+    "",
+    code(doc.moduleInfo.sourcePath),
+    "",
+    "### Module Structure",
+    "",
+    renderModuleStructure(doc.moduleInfo),
+    "### Exports",
+    "",
+    renderTable(
+      ["Name", "Kind", "Public Access"],
+      doc.exportDocs.map((exportDoc) => [code(exportDoc.name), code(exportDoc.kind), code(exportDoc.accessPrefix)]),
+    ),
+  ].join("\n");
+}
+
+function renderHookMarkdown(doc, semantic) {
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+
+  return [
+    AUTO_GENERATED_MARKER,
+    "",
+    `# ${doc.moduleInfo.moduleName}`,
+    "",
+    "## 1. 훅의 목적",
+    "",
+    semantic.purpose,
+    "",
+    "## 2. 사용 상황",
+    "",
+    renderUseCases(semantic.useCases),
+    "",
+    renderUsageSection("## 3. 사용 예시", doc, semantic, primaryExport),
+    "## 4. 전달 인자",
+    "",
+    renderKoreanParameterRows(primaryExport?.parameters || []),
+    "",
+    "## 5. 반환값",
+    "",
+    renderKoreanReturnRows(primaryExport?.returnInfo),
+    "",
+    "## 6. 한 줄 요약",
+    "",
+    semantic.summary,
+    "",
+    renderAppendix(doc),
+  ].join("\n");
+}
+
+function renderUtilFunctionSection(doc, semantic, exportDoc) {
+  const exportSemantic = getSemanticExport(semantic, exportDoc.name);
+
+  return [
+    `### ${exportDoc.name}`,
+    "",
+    "#### 역할",
+    "",
+    exportSemantic?.role || `${exportDoc.name} 유틸 함수입니다.`,
+    "",
+    "#### 사용 예시",
+    "",
+    `\`\`\`${getCodeLanguage(exportDoc)}`,
+    renderUsageCodeBlock(doc, exportDoc),
+    "```",
+    "",
+    "#### 전달 인자",
+    "",
+    renderKoreanParameterRows(exportDoc.parameters || []),
+    "",
+    "#### 반환값",
+    "",
+    renderKoreanReturnRows(exportDoc.returnInfo),
+    "",
+  ].join("\n");
+}
+
+function renderUtilMarkdown(doc, semantic) {
+  const runtimeExports = getRuntimeExports(doc.exportDocs);
+
+  return [
+    AUTO_GENERATED_MARKER,
+    "",
+    `# ${doc.moduleInfo.moduleName}`,
+    "",
+    "## 1. 유틸의 목적",
+    "",
+    semantic.purpose,
+    "",
+    "## 2. 사용 상황",
+    "",
+    renderUseCases(semantic.useCases),
+    "",
+    "## 3. 함수별 설명",
+    "",
+    ...(runtimeExports.length ? runtimeExports.map((exportDoc) => renderUtilFunctionSection(doc, semantic, exportDoc)) : ["런타임 함수 export가 없습니다.", ""]),
+    renderUsageSection("## 4. 전체 사용 예시", doc, semantic),
+    "## 5. 한 줄 요약",
+    "",
+    semantic.summary,
+    "",
+    renderAppendix(doc),
+  ].join("\n");
+}
+
+function renderCoreCodeExplanation(doc, semantic) {
+  return getRuntimeExports(doc.exportDocs)
+    .map((exportDoc) => {
+      const exportSemantic = getSemanticExport(semantic, exportDoc.name);
+      return [
+        `### ${exportDoc.name}`,
+        "",
+        exportSemantic?.role || `${exportDoc.name} ${exportDoc.kind}입니다.`,
+        "",
+        "```ts",
+        renderSignatureCode(exportDoc),
+        "```",
+        "",
+      ].join("\n");
+    })
+    .join("\n");
+}
+
+function renderCoreMarkdown(doc, semantic) {
+  const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+
+  return [
+    AUTO_GENERATED_MARKER,
+    "",
+    `# ${doc.moduleInfo.moduleName}`,
+    "",
+    "## 1. 코드의 목적",
+    "",
+    semantic.purpose,
+    "",
+    "## 2. 사용 상황",
+    "",
+    renderUseCases(semantic.useCases),
+    "",
+    "## 3. 코드 설명",
+    "",
+    renderCoreCodeExplanation(doc, semantic) || "런타임 export가 없습니다.",
+    "",
+    renderUsageSection("## 4. 사용 예시", doc, semantic, primaryExport),
+    "## 5. 전달 인자",
+    "",
+    renderKoreanParameterRows(primaryExport?.parameters || []),
+    "",
+    "## 6. 반환값",
+    "",
+    renderKoreanReturnRows(primaryExport?.returnInfo),
+    "",
+    "## 7. 한 줄 요약",
+    "",
+    semantic.summary,
+    "",
+    renderAppendix(doc),
+  ].join("\n");
+}
+
 function renderMarkdown(pkg, moduleInfo, publicRecord, exportDocs, semantic) {
   const doc = {
     exportDocs,
@@ -1711,42 +2038,17 @@ function renderMarkdown(pkg, moduleInfo, publicRecord, exportDocs, semantic) {
     publicRecord,
   };
 
-  return [
-    AUTO_GENERATED_MARKER,
-    "",
-    `# ${moduleInfo.moduleName}`,
-    "",
-    "## Description",
-    "",
-    semantic.description,
-    "",
-    renderUsageExampleSection(doc, semantic),
-    renderDeclarationSection(exportDocs),
-    "## Import",
-    "",
-    "```ts",
-    renderImport(pkg, moduleInfo, publicRecord, exportDocs),
-    "```",
-    "",
-    "## Source",
-    "",
-    code(moduleInfo.sourcePath),
-    "",
-    "## Module Structure",
-    "",
-    renderModuleStructure(moduleInfo),
-    "## Exports",
-    "",
-    renderTable(
-      ["Name", "Kind", "Public Access"],
-      exportDocs.map((doc) => [code(doc.name), code(doc.kind), code(doc.accessPrefix)]),
-    ),
-    ...exportDocs.map(renderExportSection),
-    "## Notes",
-    "",
-    semantic.notes,
-    "",
-  ].join("\n");
+  const documentKind = getDocumentKind(doc);
+
+  if (documentKind === "hook") {
+    return renderHookMarkdown(doc, semantic);
+  }
+
+  if (documentKind === "util") {
+    return renderUtilMarkdown(doc, semantic);
+  }
+
+  return renderCoreMarkdown(doc, semantic);
 }
 
 function compactRows(rows) {
@@ -1763,8 +2065,10 @@ function compactRows(rows) {
 function getSemanticMetadata(doc) {
   const primaryExport = getPrimaryExportDoc(doc.exportDocs);
   const usageExampleCode = createFallbackUsageCode(doc, primaryExport);
+  const documentKind = getDocumentKind(doc);
 
   return {
+    documentKind,
     exports: doc.exportDocs.map((exportDoc) => ({
       callableMembers: (exportDoc.callableMembers || []).map((member) => ({
         documentation: member.documentation || "",
@@ -1793,24 +2097,86 @@ function getSemanticMetadata(doc) {
   };
 }
 
-function createFallbackSemantic(doc) {
-  const kinds = [...new Set(doc.exportDocs.map((exportDoc) => exportDoc.kind))];
-  const kindText = kinds.length === 1 ? `${kinds[0]}입니다` : `${kinds.join(", ")} export를 제공합니다`;
+function getFallbackUseCases(documentKind, primaryExport) {
+  if (documentKind === "hook") {
+    return ["React 컴포넌트 안에서 반복되는 상태나 이벤트 로직을 재사용해야 할 때 사용합니다."];
+  }
+
+  if (documentKind === "util") {
+    return ["여러 곳에서 동일한 데이터 처리 로직을 재사용해야 할 때 사용합니다."];
+  }
+
+  if (primaryExport?.kind === "component") {
+    return ["공통 UI 또는 보호용 컴포넌트를 여러 화면에서 재사용해야 할 때 사용합니다."];
+  }
+
+  return ["공통 core 로직을 여러 패키지나 화면에서 재사용해야 할 때 사용합니다."];
+}
+
+function getFallbackPurpose(doc, documentKind, primaryExport) {
   const exportNames = doc.exportDocs.map((exportDoc) => exportDoc.name).join(", ");
+
+  if (documentKind === "hook") {
+    return `${doc.moduleInfo.moduleName} 훅은 ${exportNames} public API를 통해 React 로직을 재사용하기 위한 hook입니다.`;
+  }
+
+  if (documentKind === "util") {
+    return `${doc.moduleInfo.moduleName} 유틸은 ${exportNames} public API를 통해 공통 처리 로직을 제공하는 유틸 함수 모음입니다.`;
+  }
+
+  if (primaryExport?.kind === "component") {
+    return `${doc.moduleInfo.moduleName} 코드는 ${exportNames} public API를 통해 공통 컴포넌트를 제공하는 core 모듈입니다.`;
+  }
+
+  return `${doc.moduleInfo.moduleName} 코드는 ${exportNames} public API를 제공하는 core 모듈입니다.`;
+}
+
+function createFallbackExportDescriptions(doc) {
+  return doc.exportDocs.map((exportDoc) => ({
+    name: exportDoc.name,
+    role:
+      exportDoc.documentation ||
+      `${exportDoc.name} ${exportDoc.kind === "function" ? "function" : exportDoc.kind}입니다.`,
+    usage: `${exportDoc.name}의 public API가 필요한 곳에서 사용합니다.`,
+  }));
+}
+
+function createFallbackSemantic(doc) {
   const primaryExport = getPrimaryExportDoc(doc.exportDocs);
+  const documentKind = getDocumentKind(doc);
+  const purpose = getFallbackPurpose(doc, documentKind, primaryExport);
 
   return {
-    description: `${doc.moduleInfo.moduleName} 모듈은 ${exportNames} public API를 제공하는 ${kindText}.`,
+    exportDescriptions: createFallbackExportDescriptions(doc),
     notes: "특별한 주의 사항은 없습니다.",
+    purpose,
+    summary: purpose,
     usageExplanation: createFallbackUsageExplanation(primaryExport),
+    useCases: getFallbackUseCases(documentKind, primaryExport),
   };
 }
 
 function normalizeSemantic(value, fallback) {
+  const fallbackExportMap = new Map((fallback.exportDescriptions || []).map((item) => [item.name, item]));
+  const exportDescriptions = Array.isArray(value?.exportDescriptions)
+    ? value.exportDescriptions
+        .filter((item) => item?.name)
+        .map((item) => ({
+          name: String(item.name).trim(),
+          role: String(item.role || fallbackExportMap.get(item.name)?.role || "역할 설명이 없습니다.").trim(),
+          usage: String(item.usage || fallbackExportMap.get(item.name)?.usage || "사용 상황 설명이 없습니다.").trim(),
+        }))
+    : fallback.exportDescriptions;
+
   return {
-    description: String(value?.description || fallback.description).trim(),
+    exportDescriptions,
     notes: String(value?.notes || fallback.notes).trim(),
+    purpose: String(value?.purpose || fallback.purpose).trim(),
+    summary: String(value?.summary || fallback.summary).trim(),
     usageExplanation: String(value?.usageExplanation || fallback.usageExplanation).trim(),
+    useCases: Array.isArray(value?.useCases) && value.useCases.length
+      ? value.useCases.map((item) => String(item).trim()).filter(Boolean)
+      : fallback.useCases,
   };
 }
 
@@ -1858,11 +2224,15 @@ async function generateAiSemantic(args, doc) {
             "Markdown 전체를 작성하지 않습니다.",
             "반드시 JSON schema에 맞는 JSON만 반환합니다.",
             "TypeScript AST metadata만 근거로 설명합니다.",
+            "metadata.documentKind 값에 따라 hook, util, core 문서 톤을 구분합니다.",
+            "hook 문서는 훅의 목적, 사용 상황, 사용 예시, 전달 인자, 반환값, 한 줄 요약에 들어갈 짧은 설명만 만듭니다.",
+            "util 문서는 유틸의 목적, 사용 상황, 함수별 역할, 전체 사용 예시, 한 줄 요약에 들어갈 짧은 설명만 만듭니다.",
+            "core 문서는 코드의 목적, 사용 상황, 코드 설명, 사용 예시, 전달 인자, 반환값, 한 줄 요약에 들어갈 짧은 설명만 만듭니다.",
             "usage example code는 renderer가 metadata.usageExampleCode로 생성합니다.",
             "AI는 usage example code를 새로 작성하거나 수정하지 않습니다.",
             "signature, parameter, return type의 정확한 값은 설명 문장에 반복하지 않습니다.",
+            "개선 제안, 내부 동작의 과한 설명, 추측, 과장, 마케팅 표현을 사용하지 않습니다.",
             "한국어로 짧고 안정적인 문장을 씁니다.",
-            "추측, 과장, 마케팅 표현을 사용하지 않습니다.",
             'kind 표현은 hook은 "hook입니다", component는 "component입니다", function은 "function입니다", object는 "object입니다", type은 "type입니다" 스타일을 유지합니다.',
           ].join("\n"),
         },
@@ -1871,10 +2241,14 @@ async function generateAiSemantic(args, doc) {
           content: JSON.stringify(
             {
               instruction: {
-                description: "모듈이 언제 필요한지 1-2문장으로 설명합니다.",
-                notes: '주의 사항이 명확하지 않으면 "특별한 주의 사항은 없습니다."라고 씁니다.',
+                purpose: "metadata.documentKind에 맞춰 모듈의 목적을 1-2문장으로 설명합니다.",
+                useCases: "실제 사용 상황을 2-4개 작성합니다.",
+                summary: "문서 마지막에 들어갈 한 줄 요약을 1문장으로 작성합니다.",
                 usageExplanation:
                   "metadata.usageExampleCode가 어떤 실제 사용 흐름을 보여주는지 1문장으로 설명합니다. 코드가 비어 있으면 type definition만 확인하면 된다고 설명합니다.",
+                exportDescriptions:
+                  "metadata.exports의 각 name에 대해 역할과 사용 상황을 짧게 작성합니다. metadata에 없는 name은 만들지 않습니다.",
+                notes: '주의 사항이 명확하지 않으면 "특별한 주의 사항은 없습니다."라고 씁니다.',
               },
               metadata,
             },
@@ -1883,7 +2257,7 @@ async function generateAiSemantic(args, doc) {
           ),
         },
       ],
-      max_output_tokens: 2200,
+      max_output_tokens: 4000,
       model: args.aiModel,
       text: {
         format: {
