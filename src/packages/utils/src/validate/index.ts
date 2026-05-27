@@ -117,39 +117,42 @@ function validateJuminAfter2020(jumin: string): boolean {
 }
 
 /**
- * 사업자등록번호를 검증합니다.
+ * 대한민국 사업자등록번호를 유효성을 검증합니다. (국세청 공식 알고리즘)
  * @param number - 검증할 사업자등록번호 문자열 (하이픈 포함 가능)
  * @returns 유효한 사업자등록번호이면 true, 아니면 false
- * @example
- * validateCorporateRegiNumber('123-45-67890') // 유효성 검사 후 결과 반환
- * validateCorporateRegiNumber('1234567890') // 유효성 검사 후 결과 반환
  */
 function validateCorporateRegiNumber(number: string): boolean {
-  const numberMap = number
-    .replace(/-/gi, "")
-    .split("")
-    .map((d) => parseInt(d, 10));
+  // 하이픈 제거 및 숫자 배열 변환
+  const cleanNumber = number.replace(/[^0-9]/g, "");
 
-  if (numberMap.length === 10) {
-    // 모든 자리가 0인 경우는 유효하지 않음
-    if (numberMap.every((digit) => digit === 0)) {
-      return false;
-    }
-
-    const keyArr = [1, 3, 7, 1, 3, 7, 1, 3, 5];
-    let chk = 0;
-
-    // 1~9번째 자리까지 계산
-    for (let i = 0; i < 9; i++) {
-      chk += keyArr[i] * numberMap[i];
-    }
-
-    // 10번째 자리 검증
-    const checkDigit = (10 - (chk % 10)) % 10;
-    return numberMap[9] === checkDigit;
+  if (cleanNumber.length !== 10) {
+    return false;
   }
 
-  return false;
+  // 모든 자리가 0인 경우는 제외
+  if (/^0+$/.test(cleanNumber)) {
+    return false;
+  }
+
+  const numberMap = cleanNumber.split("").map((d) => parseInt(d, 10));
+  const keyArr = [1, 3, 7, 1, 3, 7, 1, 3, 5];
+  let chk = 0;
+
+  // 1~8번째 자리까지 가중치 곱하여 합산
+  for (let i = 0; i < 8; i++) {
+    chk += keyArr[i] * numberMap[i];
+  }
+
+  // 9번째 자리는 (값 * 5) 결과를 10으로 나눈 몫과 나머지를 더해줌 (핵심!)
+  const ninthProduct = keyArr[8] * numberMap[8];
+  chk += Math.floor(ninthProduct / 10) + (ninthProduct % 10);
+
+  // 최종 check digit 계산
+  const remainder = chk % 10;
+  const checkDigit = remainder === 0 ? 0 : 10 - remainder;
+
+  // 10번째 자리와 일치하는지 비교
+  return numberMap[9] === checkDigit;
 }
 
 /**
