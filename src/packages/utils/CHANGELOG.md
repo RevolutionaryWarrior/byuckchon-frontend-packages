@@ -1,5 +1,11 @@
 # @byuckchon-frontend/utils
 
+## 1.5.0
+
+### Minor Changes
+
+- 448491c: add dateUtils Function
+
 ## 1.4.4
 
 ### Patch Changes
