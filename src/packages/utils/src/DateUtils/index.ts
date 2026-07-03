@@ -60,6 +60,37 @@ export const parseDate = (date: string, pattern?: string): Date => {
   return parse(date, pattern ?? "yyyy-MM-dd", new Date());
 };
 
+/** 특정 시점부터 현재까지 경과한 시간을 분 단위 문자열로 반환하는 함수 */
+export const formatMinutesPassedSince = (date: Date | string): string => {
+  const dateObject = validateAndConvertDate(date);
+  const elapsedMinutes = Math.max(
+    0,
+    Math.floor((Date.now() - dateObject.getTime()) / (60 * 1000))
+  );
+
+  if (elapsedMinutes < 60) {
+    return `${elapsedMinutes.toString().padStart(2, "0")}분`;
+  }
+
+  const hours = Math.floor(elapsedMinutes / 60);
+  const minutes = elapsedMinutes % 60;
+
+  return `${hours}시간${minutes}분`;
+};
+
+/** 초 단위 시간을 분:초 형식으로 반환하는 함수 */
+export const formatSecondsToMinutesSeconds = (seconds: number): string => {
+  if (!Number.isFinite(seconds)) {
+    throw new Error("초는 유한한 숫자여야 합니다.");
+  }
+
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
 /** 이전 날짜 반환 함수 */
 export const beforeDate = (firstDate: Date, secondDate: Date): Date => {
   return dfIsBefore(firstDate, secondDate) ? firstDate : secondDate;
