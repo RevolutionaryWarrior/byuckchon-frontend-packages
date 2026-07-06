@@ -1,5 +1,11 @@
 # @byuckchon-frontend/hooks
 
+## 1.3.12
+
+### Patch Changes
+
+- 03e2f3b: useFileUpload의 multiUpload 동작 오류 수정
+
 ## 1.3.11
 
 ### Patch Changes
