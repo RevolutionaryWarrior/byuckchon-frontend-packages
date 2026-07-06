@@ -11,7 +11,7 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
   const [result, setResult] = useState<File | File[] | null>(null);
 
   const onValidate = (file: File) => {
-    const extension = file.name.split(".").pop()?.toLowerCase() as string;
+    const extension = `.${file.name.split(".").pop()?.toLowerCase()}`;
 
     if (!accept.some((accept) => accept.toLowerCase() === extension)) {
       throw new Error("파일 확장자가 올바르지 않습니다.");
@@ -21,31 +21,24 @@ const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".j
     }
   };
 
-  const generateResult = (file: File, files: File[]) => {
-    if (multiple) {
-      files.forEach((file) => onValidate(file));
-      setResult(files);
-    }
+  const generateResult = (files: File[]) => {
+    if (files.length === 0) return;
 
-    onValidate(file);
-    setResult(file);
+    files.forEach((file) => onValidate(file));
+    setResult(multiple ? files : files[0]);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const [file, files] = [e.dataTransfer.files[0], Array.from(e.dataTransfer.files)];
-
-    generateResult(file, files);
+    generateResult(Array.from(e.dataTransfer.files));
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
-    const [file, files] = [e.target.files[0], Array.from(e.target.files)];
-
-    generateResult(file, files);
+    generateResult(Array.from(e.target.files));
   };
 
   return {
