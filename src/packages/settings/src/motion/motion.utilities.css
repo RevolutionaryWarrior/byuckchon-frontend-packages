@@ -1,0 +1,215 @@
+/**
+ * motion.utilities.css
+ * -----------------------------------------------------------------------
+ * 실제 @utility 정의 본체입니다. 프로젝트마다 값이 달라져도
+ * 이 파일은 절대 수정하지 않습니다. (수정 대상은 항상 tokens 쪽)
+ *
+ * 각 클래스가 어떤 basic-ui 컴포넌트에 쓰이는지는 MOTION_GUIDE.md 참고.
+ * -----------------------------------------------------------------------
+ */
+
+/* ============================================================
+   Common — Button, Table row, Calendar cell 등 다수 컴포넌트 공유
+============================================================ */
+@utility motion-hover-scale {
+  transition-property: transform;
+  transition-duration: var(--motion-hover-scale-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &:hover {
+    transform: scale(1.03);
+  }
+}
+
+@utility motion-press {
+  transition-property: transform;
+  transition-duration: var(--motion-press-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ============================================================
+   Accordion / Dropdown / Table 정렬 화살표
+============================================================ */
+@utility motion-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition-property: grid-template-rows;
+  transition-duration: var(--motion-collapse-duration);
+  transition-timing-function: ease-out;
+
+  &[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+
+  & > div {
+    overflow: hidden;
+  }
+}
+
+@utility motion-rotate {
+  transition-property: transform;
+  transition-duration: var(--motion-rotate-duration);
+  transition-timing-function: ease-out;
+
+  &[data-open='true'] {
+    transform: rotate(180deg);
+  }
+}
+
+/* ============================================================
+   Toggle
+============================================================ */
+@utility motion-toggle-knob {
+  transition-property: transform;
+  transition-duration: var(--motion-toggle-duration);
+  transition-timing-function: var(--motion-ease-out);
+}
+
+/* ============================================================
+   Checkbox
+============================================================ */
+@utility motion-check-pop {
+  transform: scale(0);
+  transition-property: transform;
+  transition-duration: var(--motion-check-pop-duration);
+  transition-timing-function: var(--motion-ease-spring);
+
+  input:checked + label &,
+  .cb-checked & {
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   Input
+============================================================ */
+@utility motion-label-float {
+  transition-property: transform, color;
+  transition-duration: var(--motion-label-float-duration);
+  transition-timing-function: var(--motion-ease-out);
+  transform-origin: left top;
+}
+
+/* ============================================================
+   Dropdown menu / Modal content
+============================================================ */
+@utility motion-scale-in {
+  opacity: 0;
+  transform: scale(0.95);
+  transition-property: opacity, transform;
+  transition-duration: var(--motion-scale-in-duration);
+  transition-timing-function: var(--motion-ease-out);
+  pointer-events: none;
+
+  &[data-open='true'] {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+}
+
+/* ============================================================
+   Modal / BottomSheet / Drawer 배경 딤
+============================================================ */
+@utility motion-backdrop {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: var(--motion-backdrop-duration);
+  transition-timing-function: var(--motion-ease-out);
+  pointer-events: none;
+
+  &[data-open='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ============================================================
+   BottomSheet 본체
+============================================================ */
+@utility motion-sheet {
+  transform: translateY(100%);
+  transition-property: transform;
+  transition-duration: var(--motion-sheet-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &[data-open='true'] {
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Drawer 본체 (우측 진입 기준. 좌측은 -100%로 시작하도록 별도 클래스화 가능)
+============================================================ */
+@utility motion-slide-x-right {
+  transform: translateX(100%);
+  transition-property: transform;
+  transition-duration: var(--motion-slide-x-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &[data-open='true'] {
+    transform: translateX(0);
+  }
+}
+
+@utility motion-slide-x-left {
+  transform: translateX(-100%);
+  transition-property: transform;
+  transition-duration: var(--motion-slide-x-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &[data-open='true'] {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   ToastMessage
+============================================================ */
+@utility motion-toast {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition-property: opacity, transform;
+  transition-duration: var(--motion-toast-duration);
+  transition-timing-function: var(--motion-ease-out);
+
+  &[data-open='true'] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   Tooltip
+============================================================ */
+@utility motion-tooltip {
+  opacity: 0;
+  transform: translateY(4px);
+  transition-property: opacity, transform;
+  transition-duration: var(--motion-tooltip-duration);
+  transition-timing-function: var(--motion-ease-out);
+  pointer-events: none;
+
+  .group:hover & {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* ============================================================
+   Pagination / Tab indicator
+============================================================ */
+@utility motion-tab-indicator {
+  position: absolute;
+
+  &[data-ready='true'] {
+    transition-property: left, width;
+    transition-duration: var(--motion-tab-indicator-duration);
+    transition-timing-function: ease-out;
+  }
+}

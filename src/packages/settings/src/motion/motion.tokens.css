@@ -1,0 +1,63 @@
+/**
+ * motion.tokens.css
+ * -----------------------------------------------------------------------
+ * 프론트엔드가 정한 모션 default 값입니다.
+ * 디자이너는 이 파일을 수정하지 않습니다.
+ *
+ * 프로젝트별로 값을 바꾸고 싶다면, 이 파일을 건드리지 말고
+ * 프로젝트의 tokens.css(Tokens Studio → Style Dictionary 산출물)에서
+ * 원하는 변수 이름만 다시 선언하세요. (뒤에 로드되는 값이 우선 적용됩니다)
+ *
+ * 예) apps/marketd-web/src/styles/tokens.css
+ *   :root {
+ *     --motion-toggle-duration: 300ms;   ← 이 한 줄만 있어도 Toggle만 300ms로 바뀝니다.
+ *   }
+ *
+ * 변수명 = @utility 클래스 하나에 1:1 대응이 원칙입니다.
+ * (자세한 대응 관계는 MOTION_GUIDE.md 참고)
+ * -----------------------------------------------------------------------
+ */
+
+:root {
+  /* 공용 easing — 대부분의 모션이 공유. 필요 시 이것도 개별 override 가능 */
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Common — hover, press (여러 컴포넌트가 공통으로 재사용) */
+  --motion-hover-scale-duration: 120ms;
+  --motion-press-duration: 80ms;
+
+  /* Accordion — 높이 펼침/접힘 + 화살표 회전 (Dropdown, Table 정렬 화살표와 공유) */
+  --motion-collapse-duration: 200ms;
+  --motion-rotate-duration: 200ms;
+
+  /* Toggle */
+  --motion-toggle-duration: 200ms;
+
+  /* Checkbox */
+  --motion-check-pop-duration: 150ms;
+
+  /* Input */
+  --motion-label-float-duration: 120ms;
+
+  /* Dropdown, Modal content 등 — fade + scale 진입 */
+  --motion-scale-in-duration: 200ms;
+
+  /* Modal / BottomSheet / Drawer 공통 배경 딤 처리 */
+  --motion-backdrop-duration: 200ms;
+
+  /* BottomSheet 본체 슬라이드 */
+  --motion-sheet-duration: 320ms;
+
+  /* Drawer 본체 슬라이드 */
+  --motion-slide-x-duration: 320ms;
+
+  /* ToastMessage */
+  --motion-toast-duration: 200ms;
+
+  /* Tooltip */
+  --motion-tooltip-duration: 120ms;
+
+  /* Pagination / Tab indicator */
+  --motion-tab-indicator-duration: 200ms;
+}
