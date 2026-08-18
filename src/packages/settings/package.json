@@ -1,0 +1,39 @@
+{
+  "name": "@byuckchon-frontend/settings",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, 추후 eslint/font/color 등)",
+  "files": [
+    "src",
+    "MOTION_GUIDE.md"
+  ],
+  "exports": {
+    "./motion": "./src/motion/index.css",
+    "./motion/tokens": "./src/motion/motion.tokens.css",
+    "./motion/utilities": "./src/motion/motion.utilities.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages.git"
+  },
+  "keywords": [
+    "settings",
+    "motion",
+    "tokens",
+    "tailwindcss",
+    "frontend"
+  ],
+  "author": "Byuckchon Frontend Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages/issues"
+  },
+  "homepage": "https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=4.0.0"
+  }
+}

@@ -1,0 +1,16 @@
+/**
+ * @byuckchon-frontend/settings — motion entry
+ * -----------------------------------------------------------------------
+ * 사용법 (프로젝트 App.css):
+ *
+ *   @import "tailwindcss";
+ *   @import "@byuckchon-frontend/settings/motion";
+ *   @import "./tokens.css";  ← 프로젝트별 override (없으면 생략)
+ *
+ * tokens(변수 default) → utilities(@utility 정의) 순서로 로드됩니다.
+ * 프로젝트 tokens.css는 반드시 이 import 뒤에 두어야 override가 적용됩니다.
+ * -----------------------------------------------------------------------
+ */
+
+@import './motion.tokens.css';
+@import './motion.utilities.css';
