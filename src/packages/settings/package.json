@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/settings",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, 추후 eslint/font/color 등)",
