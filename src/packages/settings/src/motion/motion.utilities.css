@@ -41,7 +41,7 @@
   transition-duration: var(--motion-collapse-duration);
   transition-timing-function: ease-out;
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     grid-template-rows: 1fr;
   }
 
@@ -55,7 +55,7 @@
   transition-duration: var(--motion-rotate-duration);
   transition-timing-function: ease-out;
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     transform: rotate(180deg);
   }
 }
@@ -92,6 +92,11 @@
   transition-duration: var(--motion-label-float-duration);
   transition-timing-function: var(--motion-ease-out);
   transform-origin: left top;
+  transform: translateY(0) scale(1);
+
+  &[data-focus="true"] {
+    transform: translateY(-10px) scale(0.8);
+  }
 }
 
 /* ============================================================
@@ -105,7 +110,7 @@
   transition-timing-function: var(--motion-ease-out);
   pointer-events: none;
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
@@ -122,7 +127,7 @@
   transition-timing-function: var(--motion-ease-out);
   pointer-events: none;
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     opacity: 1;
     pointer-events: auto;
   }
@@ -137,7 +142,7 @@
   transition-duration: var(--motion-sheet-duration);
   transition-timing-function: var(--motion-ease-out);
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     transform: translateY(0);
   }
 }
@@ -151,7 +156,7 @@
   transition-duration: var(--motion-slide-x-duration);
   transition-timing-function: var(--motion-ease-out);
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     transform: translateX(0);
   }
 }
@@ -162,7 +167,7 @@
   transition-duration: var(--motion-slide-x-duration);
   transition-timing-function: var(--motion-ease-out);
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     transform: translateX(0);
   }
 }
@@ -177,7 +182,7 @@
   transition-duration: var(--motion-toast-duration);
   transition-timing-function: var(--motion-ease-out);
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
@@ -207,7 +212,7 @@
 @utility motion-tab-indicator {
   position: absolute;
 
-  &[data-ready='true'] {
+  &[data-ready="true"] {
     transition-property: left, width;
     transition-duration: var(--motion-tab-indicator-duration);
     transition-timing-function: ease-out;
