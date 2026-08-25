@@ -73,10 +73,32 @@ basic-ui 15종에 적용된 모션과, 각 모션을 제어하는 CSS 변수를 
 
 ## 프로젝트 적용 방법 (프론트 전용)
 
+**Tailwind v4**
+
 ```css
 /* App.css */
 @import "tailwindcss";
 @import "@byuckchon-frontend/settings/motion";
+@import "./tokens.css"; /* 디자이너가 넘겨준 override 값 (없으면 생략 가능) */
+```
+
+**Tailwind v3**
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [/* ... */],
+  plugins: [require('@byuckchon-frontend/settings/motion/plugin')],
+};
+```
+
+```css
+/* App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "@byuckchon-frontend/settings/motion/tokens";
 @import "./tokens.css"; /* 디자이너가 넘겨준 override 값 (없으면 생략 가능) */
 ```
 
@@ -93,6 +115,6 @@ basic-ui 15종에 적용된 모션과, 각 모션을 제어하는 CSS 변수를 
 새 프로젝트 세팅 시 체크리스트:
 
 1. `@byuckchon-frontend/settings`를 의존성으로 추가 (`npm install @byuckchon-frontend/settings`)
-2. `App.css`에 `@import "@byuckchon-frontend/settings/motion";` 추가
+2. 프로젝트의 Tailwind 버전에 맞춰 위 적용 방법(v3 / v4) 중 하나로 추가
 3. 디자이너로부터 override 요청이 있다면 프로젝트 `tokens.css`에 해당 변수만 추가
 4. 이 문서(`MOTION_GUIDE.md`)를 디자이너에게 공유해 override 가능한 변수 목록 전달
