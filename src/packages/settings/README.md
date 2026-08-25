@@ -12,14 +12,22 @@ npm install @byuckchon-frontend/settings
 
 | 영역 | 상태 | 내용 |
 |---|---|---|
-| Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v4 `@utility` 클래스 |
+| Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스 |
 | ESLint (자동 코드리뷰) | 🚧 예정 | 사내 공통 lint 규칙 |
 | Font | 🚧 예정 | 기본 폰트 세팅 |
 | Color | 🚧 예정 | 기본 컬러 토큰 |
 
 ## Motion 사용법
 
-Tailwind CSS v4 기반 프로젝트의 진입 CSS(App.css 등)에 import 한 줄만 추가하면 됩니다.
+Tailwind v3와 v4는 커스텀 유틸리티를 만드는 방식이 서로 달라서( v4는 CSS의
+`@utility`, v3는 JS plugin API ) 프로젝트의 Tailwind 버전에 맞는 방법을
+선택해서 적용하면 됩니다. 두 방법 모두 같은 클래스명(`motion-*`)과 같은 CSS
+변수(`--motion-*`)를 사용하므로, override 방법과 [MOTION_GUIDE.md](./MOTION_GUIDE.md)는
+버전에 상관없이 동일하게 적용됩니다.
+
+### Tailwind v4
+
+진입 CSS(App.css 등)에 import 한 줄만 추가하면 됩니다.
 
 ```css
 /* App.css */
@@ -28,9 +36,33 @@ Tailwind CSS v4 기반 프로젝트의 진입 CSS(App.css 등)에 import 한 줄
 @import "./tokens.css"; /* 프로젝트별 override (없으면 생략) */
 ```
 
+### Tailwind v3
+
+`@utility` 문법이 없으므로, `tailwind.config.js`에 plugin을 등록하고
+토큰 CSS는 별도로 import 합니다.
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [/* ... */],
+  plugins: [require('@byuckchon-frontend/settings/motion/plugin')],
+};
+```
+
+```css
+/* App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "@byuckchon-frontend/settings/motion/tokens";
+@import "./tokens.css"; /* 프로젝트별 override (없으면 생략) */
+```
+
 ### 프로젝트별 값 변경 (override)
 
-`motion.tokens.css`나 `motion.utilities.css`를 직접 수정하지 않습니다.
+`motion.tokens.css`나 `motion.utilities.css`(v4) / `motion.plugin.cjs`(v3)를
+직접 수정하지 않습니다.
 디자이너가 전달한 tokens.json을 Style Dictionary로 변환한 프로젝트 `tokens.css`에서
 **변경하고 싶은 변수만** 다시 선언하세요. 뒤에 로드된 값이 우선 적용됩니다.
 
@@ -45,12 +77,13 @@ Tailwind CSS v4 기반 프로젝트의 진입 CSS(App.css 등)에 import 한 줄
 
 ### Export 경로
 
-| 경로 | 내용 |
-|---|---|
-| `@byuckchon-frontend/settings/motion` | tokens + utilities 전체 (일반적으로 이것만 사용) |
-| `@byuckchon-frontend/settings/motion/tokens` | 변수 default 값만 |
-| `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 |
+| 경로 | 내용 | 대상 |
+|---|---|---|
+| `@byuckchon-frontend/settings/motion` | tokens + utilities 전체 (`@import` 한 줄) | Tailwind v4 |
+| `@byuckchon-frontend/settings/motion/tokens` | 변수 default 값만 (CSS) | v3 / v4 공통 |
+| `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 (CSS) | Tailwind v4 |
+| `@byuckchon-frontend/settings/motion/plugin` | 동일한 유틸리티의 plugin 정의 (JS) | Tailwind v3 |
 
 ## 요구사항
 
-- Tailwind CSS v4 이상 (`@utility` 문법 사용)
+- Tailwind CSS v3 이상 (v3: `tailwind.config.js` plugin, v4: `@utility` 문법)

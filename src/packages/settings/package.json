@@ -11,7 +11,8 @@
   "exports": {
     "./motion": "./src/motion/index.css",
     "./motion/tokens": "./src/motion/motion.tokens.css",
-    "./motion/utilities": "./src/motion/motion.utilities.css"
+    "./motion/utilities": "./src/motion/motion.utilities.css",
+    "./motion/plugin": "./src/motion/motion.plugin.cjs"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "tailwindcss": ">=4.0.0"
+    "tailwindcss": "^3.0.0 || ^4.0.0"
   }
 }
