@@ -214,7 +214,7 @@ importers:
   src/packages/settings:
     dependencies:
       tailwindcss:
-        specifier: '>=4.0.0'
+        specifier: '^3.0.0 || ^4.0.0'
         version: 4.1.14
 
   src/packages/utils:
