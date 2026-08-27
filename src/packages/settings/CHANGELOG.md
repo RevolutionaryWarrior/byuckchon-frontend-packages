@@ -1,5 +1,11 @@
 # @byuckchon-frontend/settings
 
+## 1.3.0
+
+### Minor Changes
+
+- 7ea2cec: Tailwind v3 motion plugin can now be imported from TypeScript Tailwind config files without `require`, and the docs include the `tailwind.config.ts` setup.
+
 ## 1.2.0
 
 ### Minor Changes
