@@ -38,14 +38,27 @@ Tailwind v3와 v4는 커스텀 유틸리티를 만드는 방식이 서로 달라
 
 ### Tailwind v3
 
-`@utility` 문법이 없으므로, `tailwind.config.js`에 plugin을 등록하고
+`@utility` 문법이 없으므로, `tailwind.config`에 plugin을 등록하고
 토큰 CSS는 별도로 import 합니다.
 
 ```js
-// tailwind.config.js
+// tailwind.config.js / tailwind.config.cjs
 module.exports = {
   content: [/* ... */],
   plugins: [require('@byuckchon-frontend/settings/motion/plugin')],
+};
+```
+
+TypeScript config(`tailwind.config.ts`)에서는 `require`가
+`@typescript-eslint/no-require-imports`에 걸릴 수 있으므로 import 구문을 사용하세요.
+
+```ts
+// tailwind.config.ts
+import motionPlugin from '@byuckchon-frontend/settings/motion/plugin';
+
+export default {
+  content: [/* ... */],
+  plugins: [motionPlugin],
 };
 ```
 
