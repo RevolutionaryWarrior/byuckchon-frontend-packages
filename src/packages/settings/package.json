@@ -12,7 +12,12 @@
     "./motion": "./src/motion/index.css",
     "./motion/tokens": "./src/motion/motion.tokens.css",
     "./motion/utilities": "./src/motion/motion.utilities.css",
-    "./motion/plugin": "./src/motion/motion.plugin.cjs"
+    "./motion/plugin": {
+      "types": "./src/motion/motion.plugin.d.cts",
+      "import": "./src/motion/motion.plugin.cjs",
+      "require": "./src/motion/motion.plugin.cjs",
+      "default": "./src/motion/motion.plugin.cjs"
+    }
   },
   "repository": {
     "type": "git",

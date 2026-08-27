@@ -85,12 +85,25 @@ basic-ui 15종에 적용된 모션과, 각 모션을 제어하는 CSS 변수를 
 **Tailwind v3**
 
 ```js
-// tailwind.config.js
+// tailwind.config.js / tailwind.config.cjs
 module.exports = {
   content: [/* ... */],
   plugins: [require('@byuckchon-frontend/settings/motion/plugin')],
 };
 ```
+
+```ts
+// tailwind.config.ts
+import motionPlugin from '@byuckchon-frontend/settings/motion/plugin';
+
+export default {
+  content: [/* ... */],
+  plugins: [motionPlugin],
+};
+```
+
+`@marketd/config-eslint`처럼 `@typescript-eslint/no-require-imports`를 사용하는
+TypeScript 프로젝트에서는 위 `import` 예시를 사용하세요.
 
 ```css
 /* App.css */
