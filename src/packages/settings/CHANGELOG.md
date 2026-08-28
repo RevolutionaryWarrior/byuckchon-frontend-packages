@@ -1,5 +1,11 @@
 # @byuckchon-frontend/settings
 
+## 1.4.0
+
+### Minor Changes
+
+- 520f875: 공통 ESLint 컨벤션 플러그인, RDJSON formatter, GitHub PR 리뷰 댓글 게시 CLI를 추가합니다.
+
 ## 1.3.0
 
 ### Minor Changes
