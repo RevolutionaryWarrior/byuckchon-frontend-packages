@@ -6,9 +6,17 @@
   "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, 추후 eslint/font/color 등)",
   "files": [
     "src",
+    "ESLINT_GUIDE.md",
     "MOTION_GUIDE.md"
   ],
+  "bin": {
+    "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs"
+  },
   "exports": {
+    "./eslint/plugin": "./src/eslint/internal-plugin.cjs",
+    "./eslint/formatter": "./src/eslint/internal-rdjson-formatter.js",
+    "./eslint/rules/blocking": "./src/eslint/internal-blocking-conventions.js",
+    "./eslint/rules/warning": "./src/eslint/internal-warning-conventions.js",
     "./motion": "./src/motion/index.css",
     "./motion/tokens": "./src/motion/motion.tokens.css",
     "./motion/utilities": "./src/motion/motion.utilities.css",
@@ -25,6 +33,8 @@
   },
   "keywords": [
     "settings",
+    "eslint",
+    "code-review",
     "motion",
     "tokens",
     "tailwindcss",
