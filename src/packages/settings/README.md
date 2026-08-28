@@ -13,9 +13,22 @@ npm install @byuckchon-frontend/settings
 | 영역 | 상태 | 내용 |
 |---|---|---|
 | Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스 |
-| ESLint (자동 코드리뷰) | 🚧 예정 | 사내 공통 lint 규칙 |
+| ESLint (자동 코드리뷰) | ✅ 제공 중 | 공통 컨벤션 규칙 + PR 인라인 리뷰 도구 |
 | Font | 🚧 예정 | 기본 폰트 세팅 |
 | Color | 🚧 예정 | 기본 컬러 토큰 |
+
+## ESLint 자동 코드리뷰
+
+프로젝트마다 `tools/` 폴더를 복사하지 않고 패키지의 ESLint 플러그인과 PR 댓글
+게시 명령을 사용합니다. ESLint 설정과 GitHub Actions 적용 방법은
+[ESLINT_GUIDE.md](./ESLINT_GUIDE.md)를 참고하세요.
+
+### 프로젝트 환경에 맞게 적용
+
+이 패키지는 `npm`, `pnpm`, `yarn` 중 특정 패키지 매니저를 강제하지 않으며,
+모노레포와 단일 저장소를 모두 지원합니다. 문서의 명령은 예시이므로 사용하는
+프로젝트의 패키지 매니저, workspace 구성, 앱 경로와 script 이름에 맞게 바꿔서
+적용하세요.
 
 ## Motion 사용법
 
