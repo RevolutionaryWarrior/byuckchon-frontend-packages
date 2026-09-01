@@ -1,5 +1,11 @@
 # @byuckchon-frontend/settings
 
+## 1.4.1
+
+### Patch Changes
+
+- 97c6e92: ESLINT_GUIDE 문서 수정 및 규칙 수정
+
 ## 1.4.0
 
 ### Minor Changes
