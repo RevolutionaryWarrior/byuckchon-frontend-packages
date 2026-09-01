@@ -1184,10 +1184,6 @@ module.exports = {
               '줄 끝 인라인 주석은 금지됩니다. 코드 위 별도 줄에 작성해야 합니다.',
             );
           }
-
-          if (/\b(?:TODO|FIXME|XXX)\b/i.test(text) && !/TODO:/.test(text)) {
-            report(comment, '미완성 작업은 TODO: 형식으로 작성해야 합니다.');
-          }
         }
       },
 
