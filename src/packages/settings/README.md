@@ -151,6 +151,7 @@ npm install -D style-dictionary
 |---|---|---|
 | `color` | `@theme`의 `--color-*` | `color.brand.primary` → `--color-brand-primary` |
 | `typography` | `@utility text-*` (Tailwind v4) | `display.7xl.bold` → `@utility text-display-7xl-bold` |
+| `boxShadow` | `@theme`의 `--shadow-*` | `elevation.1` → `--shadow-elevation-1` |
 | 그 외 (motion 포함) | `:root` 변수 | `--motion-toast-duration` → 그대로 |
 
 - 토큰 키를 `--motion-toast-duration`처럼 **CSS 변수명 그대로** 쓰면 그 이름이 그대로 나갑니다.
@@ -158,6 +159,18 @@ npm install -D style-dictionary
 - `duration` / `delay`로 끝나는 토큰의 값이 단위 없는 숫자면 **`ms`를 자동으로 붙입니다.**
   (디자이너가 `250`만 넘겨도 `250ms`로 변환)
 - easing은 `[0.16, 1, 0.3, 1]` 배열을 `cubic-bezier(...)`로 변환합니다.
+
+Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
+
+| Figma 값 | 출력 | 이유 |
+|---|---|---|
+| `letterSpacing: "-1%"` | `letter-spacing: -0.01em` | CSS의 `letter-spacing`은 `%`를 받지 않음 |
+| `fontWeight: "Medium"` | `font-weight: 500` | `Medium` / `Regular`는 CSS 키워드가 아님 |
+| `lineHeight: "AUTO"` | `line-height: normal` | |
+| 토큰명 `tab Bar-active` | `text-tab-bar-active` | 공백·언더스코어가 섞이면 CSS 문법이 깨짐 |
+| boxShadow의 `{shadow.ambient.8}` | `var(--color-shadow-ambient-8)` | 값으로 풀지 않고 변수 참조로 유지 |
+
+`fontFamily`가 숫자거나 `fontSize`가 비어 있는 등 **디자이너가 잘못 입력한 값은 빌드 시 경고**로 알려줍니다.
 - settings에 존재하지 않는 `--motion-*` 이름이 있으면 빌드 시 **경고**를 출력합니다. (오타 방지)
 
 > typography는 Tailwind v4의 `@utility` 문법으로 출력됩니다. v3 프로젝트에서 typography

@@ -58,6 +58,87 @@ function kebab(value) {
     .toLowerCase();
 }
 
+/**
+ * CSS 식별자로 쓸 수 있게 정리한다.
+ * 디자이너가 Figma 레이어 이름을 그대로 토큰명으로 쓰면 공백/언더스코어가 섞여 들어오는데,
+ * 그대로 두면 `@utility text-tab bar-active` 처럼 CSS 문법 자체가 깨진다.
+ */
+function slug(value) {
+  const raw = kebab(value);
+  const lead = raw.startsWith('--') ? '--' : '';
+  return (
+    lead +
+    raw
+      .slice(lead.length)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  );
+}
+
+/** Figma 는 letterSpacing 을 % 로 내보내지만 CSS 의 letter-spacing 은 % 를 받지 않는다. */
+function letterSpacing(value) {
+  const raw = String(value).trim();
+  const pct = raw.match(/^(-?\d+(?:\.\d+)?)%$/);
+  if (pct) return `${Number(pct[1]) / 100}em`;
+  if (BARE_NUMBER.test(raw)) return `${raw}px`;
+  return raw;
+}
+
+const FONT_WEIGHTS = {
+  thin: 100, hairline: 100,
+  extralight: 200, ultralight: 200,
+  light: 300,
+  regular: 400, normal: 400, book: 400,
+  medium: 500,
+  semibold: 600, demibold: 600,
+  bold: 700,
+  extrabold: 800, ultrabold: 800,
+  black: 900, heavy: 900,
+};
+
+/** "Regular" / "Medium" 같은 Figma 굵기 이름을 CSS 숫자로 바꾼다. (CSS 에 없는 키워드라 그냥 두면 무시됨) */
+function fontWeight(value, warn) {
+  const raw = String(value).trim();
+  if (BARE_NUMBER.test(raw)) return raw;
+  const hit = FONT_WEIGHTS[raw.toLowerCase().replace(/[^a-z]/g, '')];
+  if (hit) return String(hit);
+  warn(`굵기 이름을 해석하지 못했습니다: "${raw}"`);
+  return raw;
+}
+
+/** Figma 의 lineHeight "AUTO" 는 CSS 의 normal 에 해당한다. */
+function lineHeight(value) {
+  const raw = String(value).trim();
+  if (/^auto$/i.test(raw)) return 'normal';
+  return isBareNumber(raw) ? `${raw}px` : raw;
+}
+
+/** {group.token} 참조를 같은 토큰의 CSS 변수 참조로 바꾼다. (값으로 풀지 않고 var() 로 남김) */
+function refToVar(raw, byPath) {
+  return String(raw).replace(/\{([^}]+)\}/g, (whole, path) => {
+    const token = byPath.get(path.trim());
+    if (!token) return whole;
+    return `var(${cssVariableName(token, typeOf(token) === 'color' ? 'color-' : '')})`;
+  });
+}
+
+/** boxShadow 토큰(단일 또는 배열)을 CSS box-shadow 값으로 조립한다. */
+function boxShadow(value, original, byPath) {
+  const layers = Array.isArray(value) ? value : [value];
+  const origins = Array.isArray(original) ? original : [original];
+  return layers
+    .map((layer, i) => {
+      if (!layer || typeof layer !== 'object') return null;
+      const src = (origins[i] && typeof origins[i] === 'object' ? origins[i] : layer);
+      const px = (v) => (isBareNumber(v) ? `${v}px` : String(v ?? '0px'));
+      const inset = String(layer.type ?? '') === 'innerShadow' ? 'inset ' : '';
+      const color = refToVar(src.color ?? layer.color ?? 'transparent', byPath);
+      return `${inset}${px(layer.x)} ${px(layer.y)} ${px(layer.blur)} ${px(layer.spread)} ${color}`;
+    })
+    .filter(Boolean)
+    .join(', ');
+}
+
 function lastSegment(token) {
   const segments = token.path ?? [];
   return segments.length ? String(segments[segments.length - 1]) : String(token.name ?? '');
@@ -71,18 +152,17 @@ function lastSegment(token) {
  */
 function cssVariableName(token, prefix = '') {
   const last = lastSegment(token);
-  if (last.startsWith('--')) return kebab(last);
+  if (last.startsWith('--')) return slug(last);
 
   // 디자이너가 "color" 그룹 아래에 색을 넣어두면 --color-color-* 가 되므로 한 번만 붙인다.
-  const name = kebab(token.name ?? (token.path ?? []).join('-'));
+  const name = slug(token.name ?? (token.path ?? []).join('-'));
   if (prefix && name.startsWith(prefix)) return `--${name}`;
   return `--${prefix}${name}`;
 }
 
 /** @utility text-* 이름. typography 그룹 아래에 있으면 그 접두사는 뺀다. */
 function typographyClassName(token) {
-  const name = kebab(token.name ?? lastSegment(token)).replace(/^-+/, '');
-  return name.replace(/^typography-/, '');
+  return slug(token.name ?? lastSegment(token)).replace(/^typography-/, '');
 }
 
 function isBareNumber(value) {
@@ -133,30 +213,53 @@ StyleDictionary.registerFormat({
   format: ({ dictionary }) => {
     const known = knownMotionVariables();
     const unknownMotion = [];
+    const issues = [];
 
-    const colors = [];
+    const theme = [];
     const typography = [];
     const variables = [];
+
+    // {group.token} 참조를 되찾기 위한 경로 → 토큰 색인
+    const byPath = new Map(dictionary.allTokens.map((t) => [(t.path ?? []).join('.'), t]));
 
     dictionary.allTokens.forEach((token) => {
       const type = typeOf(token);
       const value = valueOf(token);
+      const label = (token.path ?? []).join('.') || token.name;
+      const warn = (message) => issues.push(`${label}: ${message}`);
       if (value === undefined || value === null) return;
 
       /* color → Tailwind 유틸리티로 쓰이도록 @theme 에 넣는다 */
       if (type === 'color') {
-        colors.push(`  ${cssVariableName(token, 'color-')}: ${value};`);
+        theme.push(`  ${cssVariableName(token, 'color-')}: ${value};`);
+        return;
+      }
+
+      /* boxShadow → @theme 의 --shadow-* (shadow-* 유틸리티가 생성됨) */
+      if (type === 'boxShadow' || type === 'shadow') {
+        const shadow = boxShadow(value, token.original ? valueOf(token.original) : value, byPath);
+        if (shadow) theme.push(`  ${cssVariableName(token, 'shadow-')}: ${shadow};`);
         return;
       }
 
       /* typography → @utility text-* (Tailwind v4) */
       if (type === 'typography' && typeof value === 'object') {
+        if (!value.fontSize) warn('fontSize 가 없습니다.');
+        if (value.fontFamily && BARE_NUMBER.test(String(value.fontFamily).trim())) {
+          warn(`fontFamily 가 숫자입니다("${value.fontFamily}"). 폰트 이름이 맞는지 확인하세요.`);
+        }
+        const family =
+          value.fontFamily && !BARE_NUMBER.test(String(value.fontFamily).trim())
+            ? value.fontFamily
+            : null;
         const body = [
           value.fontSize && `  font-size: ${withPx(value.fontSize)};`,
-          value.lineHeight && `  line-height: ${withPx(value.lineHeight)};`,
-          value.letterSpacing && `  letter-spacing: ${value.letterSpacing};`,
-          value.fontWeight && `  font-weight: ${value.fontWeight};`,
-          value.fontFamily && `  font-family: ${value.fontFamily};`,
+          value.lineHeight && `  line-height: ${lineHeight(value.lineHeight)};`,
+          value.letterSpacing !== undefined &&
+            value.letterSpacing !== null &&
+            `  letter-spacing: ${letterSpacing(value.letterSpacing)};`,
+          value.fontWeight && `  font-weight: ${fontWeight(value.fontWeight, warn)};`,
+          family && `  font-family: ${family};`,
         ].filter(Boolean);
         typography.push(`@utility text-${typographyClassName(token)} {\n${body.join('\n')}\n}`);
         return;
@@ -179,8 +282,16 @@ StyleDictionary.registerFormat({
       );
     }
 
+    if (issues.length) {
+      console.warn(
+        '\n⚠ 토큰 값에 확인이 필요한 항목이 있습니다. 디자이너에게 전달하세요.\n' +
+          issues.map((line) => `   ${line}`).join('\n') +
+          '\n',
+      );
+    }
+
     const blocks = [];
-    if (colors.length) blocks.push(`@theme {\n${colors.join('\n')}\n}`);
+    if (theme.length) blocks.push(`@theme {\n${theme.join('\n')}\n}`);
     if (typography.length) blocks.push(typography.join('\n\n'));
     if (variables.length) blocks.push(`:root {\n${variables.join('\n')}\n}`);
 
