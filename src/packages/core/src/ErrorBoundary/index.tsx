@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
-  fallback?: ReactNode;
+  fallback?: ReactNode | (() => ReactNode);
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 };
 
@@ -25,7 +25,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render(): ReactNode {
     if (this.state.hasError) {
-      return this.props.fallback;
+      const { fallback } = this.props;
+
+      return typeof fallback === "function" ? fallback() : fallback;
     }
 
     return this.props.children;
