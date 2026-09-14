@@ -61,7 +61,7 @@ module.exports = plugin(function ({ addUtilities }) {
       gridTemplateRows: '0fr',
       transitionProperty: 'grid-template-rows',
       transitionDuration: 'var(--motion-collapse-duration)',
-      transitionTimingFunction: 'ease-out',
+      transitionTimingFunction: 'var(--motion-ease-out)',
       '&[data-open="true"]': {
         gridTemplateRows: '1fr',
       },
@@ -72,7 +72,7 @@ module.exports = plugin(function ({ addUtilities }) {
     '.motion-rotate': {
       transitionProperty: 'transform',
       transitionDuration: 'var(--motion-rotate-duration)',
-      transitionTimingFunction: 'ease-out',
+      transitionTimingFunction: 'var(--motion-ease-out)',
       '&[data-open="true"]': {
         transform: 'rotate(180deg)',
       },
@@ -221,7 +221,7 @@ module.exports = plugin(function ({ addUtilities }) {
       '&[data-ready="true"]': {
         transitionProperty: 'left, width',
         transitionDuration: 'var(--motion-tab-indicator-duration)',
-        transitionTimingFunction: 'ease-out',
+        transitionTimingFunction: 'var(--motion-ease-out)',
       },
     },
   });

@@ -3,11 +3,12 @@
   "version": "1.4.1",
   "private": false,
   "type": "module",
-  "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, 추후 eslint/font/color 등)",
+  "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, tokens, eslint)",
   "files": [
     "src",
     "ESLINT_GUIDE.md",
-    "MOTION_GUIDE.md"
+    "MOTION_GUIDE.md",
+    "MOTION_DESIGN_GUIDE.md"
   ],
   "bin": {
     "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs"
@@ -17,6 +18,7 @@
     "./eslint/formatter": "./src/eslint/internal-rdjson-formatter.js",
     "./eslint/rules/blocking": "./src/eslint/internal-blocking-conventions.js",
     "./eslint/rules/warning": "./src/eslint/internal-warning-conventions.js",
+    "./tokens": "./src/tokens/style-dictionary.js",
     "./motion": "./src/motion/index.css",
     "./motion/tokens": "./src/motion/motion.tokens.css",
     "./motion/utilities": "./src/motion/motion.utilities.css",
@@ -32,13 +34,15 @@
     "url": "git+https://github.com/RevolutionaryWarrior/byuckchon-frontend-packages.git"
   },
   "keywords": [
-    "settings",
-    "eslint",
     "code-review",
+    "design-tokens",
+    "eslint",
+    "frontend",
     "motion",
-    "tokens",
+    "settings",
+    "style-dictionary",
     "tailwindcss",
-    "frontend"
+    "tokens"
   ],
   "author": "Byuckchon Frontend Team",
   "license": "MIT",
@@ -50,6 +54,12 @@
     "access": "public"
   },
   "peerDependencies": {
-    "tailwindcss": "^3.0.0 || ^4.0.0"
+    "tailwindcss": "^3.0.0 || ^4.0.0",
+    "style-dictionary": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "style-dictionary": {
+      "optional": true
+    }
   }
 }
