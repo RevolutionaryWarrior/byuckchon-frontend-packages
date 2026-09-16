@@ -14,6 +14,7 @@ npm install @byuckchon-frontend/settings
 |---|---|---|
 | Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스 |
 | ESLint (자동 코드리뷰) | ✅ 제공 중 | 공통 컨벤션 규칙 + PR 인라인 리뷰 도구 |
+| Design Tokens | ✅ 제공 중 | Figma(Tokens Studio) tokens.json → tokens.css 변환 규칙 (Style Dictionary 프리셋) |
 | Font | 🚧 예정 | 기본 폰트 세팅 |
 | Color | 🚧 예정 | 기본 컬러 토큰 |
 
@@ -101,6 +102,15 @@ export default {
 
 전체 변수 목록과 컴포넌트별 대응 관계는 [MOTION_GUIDE.md](./MOTION_GUIDE.md)를 참고하세요.
 
+### Motion 문서
+
+| 문서 | 대상 | 내용 |
+|---|---|---|
+| [MOTION_DESIGN_GUIDE.md](./MOTION_DESIGN_GUIDE.md) | 디자이너 | 모션 카탈로그(어떻게 움직이는지), 속도 가이드, 변경 가능 범위, Figma 토큰 연동, 수정 요청 템플릿 |
+| [MOTION_GUIDE.md](./MOTION_GUIDE.md) | 프론트엔드 | 컴포넌트별 적용 클래스·변수 대응표, 공유 변수 주의사항, 프로젝트 적용 체크리스트 |
+
+디자이너에게는 `MOTION_DESIGN_GUIDE.md`를 공유하세요.
+
 ### Export 경로
 
 | 경로 | 내용 | 대상 |
@@ -109,7 +119,73 @@ export default {
 | `@byuckchon-frontend/settings/motion/tokens` | 변수 default 값만 (CSS) | v3 / v4 공통 |
 | `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 (CSS) | Tailwind v4 |
 | `@byuckchon-frontend/settings/motion/plugin` | 동일한 유틸리티의 plugin 정의 (JS) | Tailwind v3 |
+| `@byuckchon-frontend/settings/tokens` | Style Dictionary 설정 프리셋 (JS) | tokens.json 사용 프로젝트 |
+
+## Design Tokens
+
+디자이너가 Figma(Tokens Studio)에서 export 한 `tokens.json`을 프로젝트의 `tokens.css`로
+변환하는 Style Dictionary 설정입니다. 변환 규칙을 프로젝트마다 복사해두면 규칙이 바뀔 때
+전 프로젝트를 손으로 고쳐야 하므로, 규칙 자체를 이 패키지가 관리합니다.
+
+```js
+// 프로젝트 루트 token.config.js
+import { defineTokenConfig } from '@byuckchon-frontend/settings/tokens';
+
+export default defineTokenConfig();
+```
+
+```json
+// package.json
+{ "scripts": { "tokens:build": "style-dictionary build --config token.config.js" } }
+```
+
+`style-dictionary`는 optional peerDependency입니다. 토큰을 쓰는 프로젝트에만 설치하세요.
+
+```bash
+npm install -D style-dictionary
+```
+
+### 변환 규칙
+
+| 토큰 `$type` | 출력 | 예 |
+|---|---|---|
+| `color` | `@theme`의 `--color-*` | `color.brand.primary` → `--color-brand-primary` |
+| `typography` | `@utility text-*` (Tailwind v4) | `display.7xl.bold` → `@utility text-display-7xl-bold` |
+| `boxShadow` | `@theme`의 `--shadow-*` | `elevation.1` → `--shadow-elevation-1` |
+| 그 외 (motion 포함) | `:root` 변수 | `--motion-toast-duration` → 그대로 |
+
+- 토큰 키를 `--motion-toast-duration`처럼 **CSS 변수명 그대로** 쓰면 그 이름이 그대로 나갑니다.
+  계층(`motion.toast.duration`)으로 써도 같은 결과가 됩니다.
+- `duration` / `delay`로 끝나는 토큰의 값이 단위 없는 숫자면 **`ms`를 자동으로 붙입니다.**
+  (디자이너가 `250`만 넘겨도 `250ms`로 변환)
+- easing은 `[0.16, 1, 0.3, 1]` 배열을 `cubic-bezier(...)`로 변환합니다.
+
+Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
+
+| Figma 값 | 출력 | 이유 |
+|---|---|---|
+| `letterSpacing: "-1%"` | `letter-spacing: -0.01em` | CSS의 `letter-spacing`은 `%`를 받지 않음 |
+| `fontWeight: "Medium"` | `font-weight: 500` | `Medium` / `Regular`는 CSS 키워드가 아님 |
+| `lineHeight: "AUTO"` | `line-height: normal` | |
+| 토큰명 `tab Bar-active` | `text-tab-bar-active` | 공백·언더스코어가 섞이면 CSS 문법이 깨짐 |
+| boxShadow의 `{shadow.ambient.8}` | `var(--color-shadow-ambient-8)` | 값으로 풀지 않고 변수 참조로 유지 |
+
+`fontFamily`가 숫자거나 `fontSize`가 비어 있는 등 **디자이너가 잘못 입력한 값은 빌드 시 경고**로 알려줍니다.
+- settings에 존재하지 않는 `--motion-*` 이름이 있으면 빌드 시 **경고**를 출력합니다. (오타 방지)
+
+> typography는 Tailwind v4의 `@utility` 문법으로 출력됩니다. v3 프로젝트에서 typography
+> 토큰을 쓰려면 별도 대응이 필요합니다. (color/motion은 v3에서도 그대로 동작)
+
+프로젝트별 예외가 필요하면 인자로 덮어쓸 수 있습니다.
+
+```js
+export default defineTokenConfig({
+  source: ['src/tokens/*.json'],
+  destination: 'design-tokens.css',
+});
+```
 
 ## 요구사항
 
 - Tailwind CSS v3 이상 (v3: `tailwind.config.js` plugin, v4: `@utility` 문법)
+- Design Tokens 사용 시 `style-dictionary` v5 이상
