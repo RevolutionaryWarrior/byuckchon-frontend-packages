@@ -3,7 +3,7 @@
   "version": "1.5.0",
   "private": false,
   "type": "module",
-  "description": "Byuckchon Frontend 프로젝트 기본 세팅 패키지 (motion, tokens, eslint)",
+  "description": "Byuckchon Frontend 프로젝트 공통 세팅 패키지 (eslint, prettier, tsconfig, tokens, motion)",
   "files": [
     "src",
     "ESLINT_GUIDE.md",
@@ -11,13 +11,42 @@
     "MOTION_DESIGN_GUIDE.md"
   ],
   "bin": {
-    "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs"
+    "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs",
+    "byuckchon-settings-sync": "./src/bin/sync.js"
   },
   "exports": {
     "./eslint/plugin": "./src/eslint/internal-plugin.cjs",
     "./eslint/formatter": "./src/eslint/internal-rdjson-formatter.js",
     "./eslint/rules/blocking": "./src/eslint/internal-blocking-conventions.js",
     "./eslint/rules/warning": "./src/eslint/internal-warning-conventions.js",
+    "./eslint/base": "./src/eslint/configs/base.js",
+    "./eslint/react": "./src/eslint/configs/react.js",
+    "./eslint/next": "./src/eslint/configs/next.js",
+    "./eslint/review": "./src/eslint/configs/review.js",
+    "./prettier": "./src/prettier/index.js",
+    "./tsconfig/base": "./src/tsconfig/base.json",
+    "./tsconfig/base.json": "./src/tsconfig/base.json",
+    "./tsconfig/react": "./src/tsconfig/react.json",
+    "./tsconfig/react.json": "./src/tsconfig/react.json",
+    "./tsconfig/next": "./src/tsconfig/next.json",
+    "./tsconfig/next.json": "./src/tsconfig/next.json",
+    "./tsconfig/library": "./src/tsconfig/library.json",
+    "./tsconfig/library.json": "./src/tsconfig/library.json",
+    "./tsconfig/node": "./src/tsconfig/node.json",
+    "./tsconfig/node.json": "./src/tsconfig/node.json",
+    "./vscode": "./src/vscode/settings.json",
+    "./versions": "./src/versions/index.js",
+    "./types/svg-vite": {
+      "types": "./src/types/svg-vite.d.ts",
+      "default": "./src/types/svg-vite.d.ts"
+    },
+    "./types/svg-next": {
+      "types": "./src/types/svg-next.d.ts",
+      "default": "./src/types/svg-next.d.ts"
+    },
+    "./project/nvmrc": "./src/project/nvmrc",
+    "./project/npmrc": "./src/project/npmrc.monorepo",
+    "./project/turbo.json": "./src/project/turbo.json",
     "./tokens": "./src/tokens/style-dictionary.js",
     "./motion": "./src/motion/index.css",
     "./motion/tokens": "./src/motion/motion.tokens.css",
@@ -27,7 +56,8 @@
       "import": "./src/motion/motion.plugin.cjs",
       "require": "./src/motion/motion.plugin.cjs",
       "default": "./src/motion/motion.plugin.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "repository": {
     "type": "git",
@@ -37,12 +67,15 @@
     "code-review",
     "design-tokens",
     "eslint",
+    "eslint-config",
     "frontend",
     "motion",
+    "prettier",
     "settings",
     "style-dictionary",
     "tailwindcss",
-    "tokens"
+    "tokens",
+    "tsconfig"
   ],
   "author": "Byuckchon Frontend Team",
   "license": "MIT",
@@ -54,12 +87,39 @@
     "access": "public"
   },
   "peerDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "style-dictionary": "^5.0.0",
     "tailwindcss": "^3.0.0 || ^4.0.0",
-    "style-dictionary": "^5.0.0"
+    "typescript": ">=5.0.0"
   },
   "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    },
+    "prettier": {
+      "optional": true
+    },
     "style-dictionary": {
       "optional": true
+    },
+    "tailwindcss": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
     }
+  },
+  "dependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "eslint-plugin-unused-imports": "^4.1.0",
+    "globals": "^15.0.0 || ^16.0.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

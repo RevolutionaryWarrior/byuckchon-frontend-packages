@@ -15,6 +15,10 @@ npm install @byuckchon-frontend/settings
 | Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스 |
 | ESLint (자동 코드리뷰) | ✅ 제공 중 | 공통 컨벤션 규칙 + PR 인라인 리뷰 도구 |
 | Design Tokens | ✅ 제공 중 | Figma(Tokens Studio) tokens.json → tokens.css 변환 규칙 (Style Dictionary 프리셋) |
+| ESLint 프리셋 | ✅ 제공 중 | 바로 쓰는 flat config (`base` / `react` / `next` / `review`) |
+| Prettier | ✅ 제공 중 | 포맷 규칙 프리셋 |
+| TypeScript | ✅ 제공 중 | tsconfig 프리셋 (`base` / `react` / `next` / `library` / `node`) |
+| VS Code | ✅ 제공 중 | 에디터 설정 동기화 (`byuckchon-settings-sync`) |
 | Font | 🚧 예정 | 기본 폰트 세팅 |
 | Color | 🚧 예정 | 기본 컬러 토큰 |
 
@@ -120,6 +124,94 @@ export default {
 | `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 (CSS) | Tailwind v4 |
 | `@byuckchon-frontend/settings/motion/plugin` | 동일한 유틸리티의 plugin 정의 (JS) | Tailwind v3 |
 | `@byuckchon-frontend/settings/tokens` | Style Dictionary 설정 프리셋 (JS) | tokens.json 사용 프로젝트 |
+
+## 프로젝트 설정 프리셋
+
+프로젝트는 **참조만** 합니다. 규칙이 바뀌면 settings 버전만 올리면 모든 프로젝트에 반영됩니다.
+
+```js
+// eslint.config.js
+export { default } from '@byuckchon-frontend/settings/eslint/react';
+```
+```js
+// prettier.config.js
+export { default } from '@byuckchon-frontend/settings/prettier';
+```
+```jsonc
+// tsconfig.json
+{ "extends": "@byuckchon-frontend/settings/tsconfig/react.json" }
+```
+
+예외가 필요하면 이어붙이거나 덮어씁니다.
+
+```js
+import byuckchon from '@byuckchon-frontend/settings/eslint/react';
+export default [...byuckchon, { rules: { 'import/order': 'off' } }];
+```
+
+### ESLint
+
+| export | 내용 |
+|---|---|
+| `./eslint/base` | TypeScript · import 정렬 · 미사용 import (프레임워크 무관) |
+| `./eslint/react` | base + React / Hooks / Refresh |
+| `./eslint/next` | base + React + `next/**` import 우선순위 |
+| `./eslint/review` | react + 사내 컨벤션 규칙 (PR 리뷰 워크플로 전용) |
+
+`eslint-config-next`는 포함하지 않습니다. 설치된 next 버전과 짝을 이뤄야 해서
+프로젝트 쪽에서 `FlatCompat`으로 합칩니다. (CLI가 생성하는 `eslint.config.mjs` 참고)
+
+ESLint 플러그인은 이 패키지의 dependencies라 프로젝트가 따로 설치할 필요가 없습니다.
+필요한 것은 `eslint` 본체뿐입니다.
+
+### TypeScript
+
+`base` · `react` · `next` · `library` · `node` 5종. 프로젝트에는 경로 alias처럼
+그 프로젝트에만 해당하는 것만 남깁니다.
+
+### 타입 선언
+
+SVG·이미지 같은 에셋 모듈 선언을 제공합니다. 번들러에 따라 `*.svg`의 default export가
+다르므로(Vite는 URL 문자열, Next+svgr은 컴포넌트) **둘 중 하나만** 참조해야 합니다.
+
+```ts
+// src/global.d.ts — Vite
+/// <reference types="@byuckchon-frontend/settings/types/svg-vite" />
+
+// src/global.d.ts — Next
+/// <reference types="@byuckchon-frontend/settings/types/svg-next" />
+```
+
+### 버전 매트릭스
+
+사내 프로젝트가 함께 쓰는 라이브러리 버전의 단일 출처입니다.
+
+```js
+import { versions } from '@byuckchon-frontend/settings/versions';
+```
+
+### 파일 동기화 (`extends`가 없는 설정들)
+
+`.vscode/settings.json`, `.nvmrc`, `.npmrc`, `turbo.json`은 참조 문법이 없어서 내용 전체가
+프로젝트에 있어야 합니다. 이런 파일은 **동기화 방식**을 씁니다.
+
+```bash
+npx byuckchon-settings-sync           # 프로젝트 유형을 감지해 해당하는 것 전부
+npx byuckchon-settings-sync vscode    # 하나만
+npx byuckchon-settings-sync --check   # 다르면 exit 1 (CI 용)
+npx byuckchon-settings-sync --list    # 대상 목록
+```
+
+| 대상 | 파일 | 적용 범위 |
+|---|---|---|
+| `vscode` | `.vscode/settings.json` | 단일 · 모노레포 |
+| `nvmrc` | `.nvmrc` | 단일 · 모노레포 |
+| `npmrc` | `.npmrc` | 모노레포 |
+| `turbo` | `turbo.json` | 모노레포 |
+
+`pnpm-workspace.yaml` 또는 `turbo.json`이 있으면 모노레포로 판단합니다.
+프로젝트가 값을 바꾸는 것은 자유이고, settings가 정의하지 않은 키는 건드리지 않습니다.
+되돌리고 싶을 때 다시 실행하면 됩니다.
 
 ## Design Tokens
 
