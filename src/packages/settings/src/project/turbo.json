@@ -1,0 +1,63 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "ui": "tui",
+  "globalDependencies": [
+    "tsconfig.base.json",
+    ".env",
+    ".env.*",
+    "!.env*.local"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        "build/**",
+        ".next/**",
+        "!.next/cache/**",
+        "out/**"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.md",
+        "!**/*.test.ts",
+        "!**/*.test.tsx",
+        "!**/*.spec.ts",
+        "!**/*.spec.tsx"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".tsbuildinfo",
+        "**/*.tsbuildinfo"
+      ]
+    },
+    "tokens:build": {
+      "outputs": [
+        "src/tokens.css"
+      ]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
