@@ -22,7 +22,7 @@ import { reactRules } from './react.js';
 
 export const nextConfig = [
   ...baseConfig,
-  reactRules,
+  ...reactRules,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
