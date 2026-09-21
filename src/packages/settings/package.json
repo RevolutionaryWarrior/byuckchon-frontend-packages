@@ -12,7 +12,8 @@
   ],
   "bin": {
     "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs",
-    "byuckchon-settings-sync": "./src/bin/sync.js"
+    "byuckchon-settings-sync": "./src/bin/sync.js",
+    "byuckchon-pr-description": "./src/bin/pr-description.js"
   },
   "exports": {
     "./eslint/plugin": "./src/eslint/internal-plugin.cjs",

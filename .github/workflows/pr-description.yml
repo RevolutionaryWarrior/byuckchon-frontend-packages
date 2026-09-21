@@ -1,0 +1,45 @@
+# PR 본문에 커밋 내역을 자동으로 채워 넣습니다.
+#
+# 사람이 쓴 내용은 건드리지 않고, 아래 마커 사이만 갱신합니다.
+#   <!-- byuckchon:commits:start --> ~ <!-- byuckchon:commits:end -->
+# 마커가 없으면 본문 끝에 한 번 덧붙입니다.
+#
+# 이 저장소는 스크립트 원본을 갖고 있으므로 설치 없이 소스로 직접 실행합니다.
+
+name: PR Description
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+concurrency:
+  group: pr-description-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  describe:
+    name: 커밋 내역 반영
+    # changeset 릴리즈 PR 처럼 봇이 연 PR 은 본문을 그대로 둔다.
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: PR 본문 갱신
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node src/packages/settings/src/bin/pr-description.js
