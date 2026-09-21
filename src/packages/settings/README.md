@@ -10,17 +10,18 @@ npm install @byuckchon-frontend/settings
 
 ## 제공하는 것
 
-| 영역 | 상태 | 내용 |
-|---|---|---|
-| Motion | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스 |
-| ESLint (자동 코드리뷰) | ✅ 제공 중 | 공통 컨벤션 규칙 + PR 인라인 리뷰 도구 |
-| Design Tokens | ✅ 제공 중 | Figma(Tokens Studio) tokens.json → tokens.css 변환 규칙 (Style Dictionary 프리셋) |
-| ESLint 프리셋 | ✅ 제공 중 | 바로 쓰는 flat config (`base` / `react` / `next` / `review`) |
-| Prettier | ✅ 제공 중 | 포맷 규칙 프리셋 |
-| TypeScript | ✅ 제공 중 | tsconfig 프리셋 (`base` / `react` / `next` / `library` / `node`) |
-| VS Code | ✅ 제공 중 | 에디터 설정 동기화 (`byuckchon-settings-sync`) |
-| Font | 🚧 예정 | 기본 폰트 세팅 |
-| Color | 🚧 예정 | 기본 컬러 토큰 |
+| 영역                   | 상태       | 내용                                                                              |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------- |
+| Motion                 | ✅ 제공 중 | 사내 기본 모션 토큰 + Tailwind v3 / v4 유틸리티 클래스                            |
+| ESLint (자동 코드리뷰) | ✅ 제공 중 | 공통 컨벤션 규칙 + PR 인라인 리뷰 도구                                            |
+| Design Tokens          | ✅ 제공 중 | Figma(Tokens Studio) tokens.json → tokens.css 변환 규칙 (Style Dictionary 프리셋) |
+| ESLint 프리셋          | ✅ 제공 중 | 바로 쓰는 flat config (`base` / `react` / `next` / `review`)                      |
+| Prettier               | ✅ 제공 중 | 포맷 규칙 프리셋                                                                  |
+| TypeScript             | ✅ 제공 중 | tsconfig 프리셋 (`base` / `react` / `next` / `library` / `node`)                  |
+| VS Code                | ✅ 제공 중 | 에디터 설정 동기화 (`byuckchon-settings-sync`)                                    |
+| PR 본문 자동화         | ✅ 제공 중 | 커밋 내역을 타입별로 묶어 PR description 에 반영 (`byuckchon-pr-description`)     |
+| Font                   | 🚧 예정    | 기본 폰트 세팅                                                                    |
+| Color                  | 🚧 예정    | 기본 컬러 토큰                                                                    |
 
 ## ESLint 자동 코드리뷰
 
@@ -63,7 +64,7 @@ Tailwind v3와 v4는 커스텀 유틸리티를 만드는 방식이 서로 달라
 // tailwind.config.js / tailwind.config.cjs
 module.exports = {
   content: [/* ... */],
-  plugins: [require('@byuckchon-frontend/settings/motion/plugin')],
+  plugins: [require("@byuckchon-frontend/settings/motion/plugin")],
 };
 ```
 
@@ -72,7 +73,7 @@ TypeScript config(`tailwind.config.ts`)에서는 `require`가
 
 ```ts
 // tailwind.config.ts
-import motionPlugin from '@byuckchon-frontend/settings/motion/plugin';
+import motionPlugin from "@byuckchon-frontend/settings/motion/plugin";
 
 export default {
   content: [/* ... */],
@@ -108,22 +109,22 @@ export default {
 
 ### Motion 문서
 
-| 문서 | 대상 | 내용 |
-|---|---|---|
-| [MOTION_DESIGN_GUIDE.md](./MOTION_DESIGN_GUIDE.md) | 디자이너 | 모션 카탈로그(어떻게 움직이는지), 속도 가이드, 변경 가능 범위, Figma 토큰 연동, 수정 요청 템플릿 |
-| [MOTION_GUIDE.md](./MOTION_GUIDE.md) | 프론트엔드 | 컴포넌트별 적용 클래스·변수 대응표, 공유 변수 주의사항, 프로젝트 적용 체크리스트 |
+| 문서                                               | 대상       | 내용                                                                                             |
+| -------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------ |
+| [MOTION_DESIGN_GUIDE.md](./MOTION_DESIGN_GUIDE.md) | 디자이너   | 모션 카탈로그(어떻게 움직이는지), 속도 가이드, 변경 가능 범위, Figma 토큰 연동, 수정 요청 템플릿 |
+| [MOTION_GUIDE.md](./MOTION_GUIDE.md)               | 프론트엔드 | 컴포넌트별 적용 클래스·변수 대응표, 공유 변수 주의사항, 프로젝트 적용 체크리스트                 |
 
 디자이너에게는 `MOTION_DESIGN_GUIDE.md`를 공유하세요.
 
 ### Export 경로
 
-| 경로 | 내용 | 대상 |
-|---|---|---|
-| `@byuckchon-frontend/settings/motion` | tokens + utilities 전체 (`@import` 한 줄) | Tailwind v4 |
-| `@byuckchon-frontend/settings/motion/tokens` | 변수 default 값만 (CSS) | v3 / v4 공통 |
-| `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 (CSS) | Tailwind v4 |
-| `@byuckchon-frontend/settings/motion/plugin` | 동일한 유틸리티의 plugin 정의 (JS) | Tailwind v3 |
-| `@byuckchon-frontend/settings/tokens` | Style Dictionary 설정 프리셋 (JS) | tokens.json 사용 프로젝트 |
+| 경로                                            | 내용                                      | 대상                      |
+| ----------------------------------------------- | ----------------------------------------- | ------------------------- |
+| `@byuckchon-frontend/settings/motion`           | tokens + utilities 전체 (`@import` 한 줄) | Tailwind v4               |
+| `@byuckchon-frontend/settings/motion/tokens`    | 변수 default 값만 (CSS)                   | v3 / v4 공통              |
+| `@byuckchon-frontend/settings/motion/utilities` | `@utility` 정의만 (CSS)                   | Tailwind v4               |
+| `@byuckchon-frontend/settings/motion/plugin`    | 동일한 유틸리티의 plugin 정의 (JS)        | Tailwind v3               |
+| `@byuckchon-frontend/settings/tokens`           | Style Dictionary 설정 프리셋 (JS)         | tokens.json 사용 프로젝트 |
 
 ## 프로젝트 설정 프리셋
 
@@ -131,12 +132,14 @@ export default {
 
 ```js
 // eslint.config.js
-export { default } from '@byuckchon-frontend/settings/eslint/react';
+export { default } from "@byuckchon-frontend/settings/eslint/react";
 ```
+
 ```js
 // prettier.config.js
-export { default } from '@byuckchon-frontend/settings/prettier';
+export { default } from "@byuckchon-frontend/settings/prettier";
 ```
+
 ```jsonc
 // tsconfig.json
 { "extends": "@byuckchon-frontend/settings/tsconfig/react.json" }
@@ -145,18 +148,18 @@ export { default } from '@byuckchon-frontend/settings/prettier';
 예외가 필요하면 이어붙이거나 덮어씁니다.
 
 ```js
-import byuckchon from '@byuckchon-frontend/settings/eslint/react';
-export default [...byuckchon, { rules: { 'import/order': 'off' } }];
+import byuckchon from "@byuckchon-frontend/settings/eslint/react";
+export default [...byuckchon, { rules: { "import/order": "off" } }];
 ```
 
 ### ESLint
 
-| export | 내용 |
-|---|---|
-| `./eslint/base` | TypeScript · import 정렬 · 미사용 import (프레임워크 무관) |
-| `./eslint/react` | base + React / Hooks / Refresh |
-| `./eslint/next` | base + React + `next/**` import 우선순위 |
-| `./eslint/review` | react + 사내 컨벤션 규칙 (PR 리뷰 워크플로 전용) |
+| export            | 내용                                                       |
+| ----------------- | ---------------------------------------------------------- |
+| `./eslint/base`   | TypeScript · import 정렬 · 미사용 import (프레임워크 무관) |
+| `./eslint/react`  | base + React / Hooks / Refresh                             |
+| `./eslint/next`   | base + React + `next/**` import 우선순위                   |
+| `./eslint/review` | react + 사내 컨벤션 규칙 (PR 리뷰 워크플로 전용)           |
 
 `eslint-config-next`는 포함하지 않습니다. 설치된 next 버전과 짝을 이뤄야 해서
 프로젝트 쪽에서 `FlatCompat`으로 합칩니다. (CLI가 생성하는 `eslint.config.mjs` 참고)
@@ -187,7 +190,7 @@ SVG·이미지 같은 에셋 모듈 선언을 제공합니다. 번들러에 따�
 사내 프로젝트가 함께 쓰는 라이브러리 버전의 단일 출처입니다.
 
 ```js
-import { versions } from '@byuckchon-frontend/settings/versions';
+import { versions } from "@byuckchon-frontend/settings/versions";
 ```
 
 ### 파일 동기화 (`extends`가 없는 설정들)
@@ -202,12 +205,12 @@ npx byuckchon-settings-sync --check   # 다르면 exit 1 (CI 용)
 npx byuckchon-settings-sync --list    # 대상 목록
 ```
 
-| 대상 | 파일 | 적용 범위 |
-|---|---|---|
+| 대상     | 파일                    | 적용 범위       |
+| -------- | ----------------------- | --------------- |
 | `vscode` | `.vscode/settings.json` | 단일 · 모노레포 |
-| `nvmrc` | `.nvmrc` | 단일 · 모노레포 |
-| `npmrc` | `.npmrc` | 모노레포 |
-| `turbo` | `turbo.json` | 모노레포 |
+| `nvmrc`  | `.nvmrc`                | 단일 · 모노레포 |
+| `npmrc`  | `.npmrc`                | 모노레포        |
+| `turbo`  | `turbo.json`            | 모노레포        |
 
 `pnpm-workspace.yaml` 또는 `turbo.json`이 있으면 모노레포로 판단합니다.
 프로젝트가 값을 바꾸는 것은 자유이고, settings가 정의하지 않은 키는 건드리지 않습니다.
@@ -221,14 +224,18 @@ npx byuckchon-settings-sync --list    # 대상 목록
 
 ```js
 // 프로젝트 루트 token.config.js
-import { defineTokenConfig } from '@byuckchon-frontend/settings/tokens';
+import { defineTokenConfig } from "@byuckchon-frontend/settings/tokens";
 
 export default defineTokenConfig();
 ```
 
 ```json
 // package.json
-{ "scripts": { "tokens:build": "style-dictionary build --config token.config.js" } }
+{
+  "scripts": {
+    "tokens:build": "style-dictionary build --config token.config.js"
+  }
+}
 ```
 
 `style-dictionary`는 optional peerDependency입니다. 토큰을 쓰는 프로젝트에만 설치하세요.
@@ -239,12 +246,12 @@ npm install -D style-dictionary
 
 ### 변환 규칙
 
-| 토큰 `$type` | 출력 | 예 |
-|---|---|---|
-| `color` | `@theme`의 `--color-*` | `color.brand.primary` → `--color-brand-primary` |
-| `typography` | `@utility text-*` (Tailwind v4) | `display.7xl.bold` → `@utility text-display-7xl-bold` |
-| `boxShadow` | `@theme`의 `--shadow-*` | `elevation.1` → `--shadow-elevation-1` |
-| 그 외 (motion 포함) | `:root` 변수 | `--motion-toast-duration` → 그대로 |
+| 토큰 `$type`        | 출력                            | 예                                                    |
+| ------------------- | ------------------------------- | ----------------------------------------------------- |
+| `color`             | `@theme`의 `--color-*`          | `color.brand.primary` → `--color-brand-primary`       |
+| `typography`        | `@utility text-*` (Tailwind v4) | `display.7xl.bold` → `@utility text-display-7xl-bold` |
+| `boxShadow`         | `@theme`의 `--shadow-*`         | `elevation.1` → `--shadow-elevation-1`                |
+| 그 외 (motion 포함) | `:root` 변수                    | `--motion-toast-duration` → 그대로                    |
 
 - 토큰 키를 `--motion-toast-duration`처럼 **CSS 변수명 그대로** 쓰면 그 이름이 그대로 나갑니다.
   계층(`motion.toast.duration`)으로 써도 같은 결과가 됩니다.
@@ -254,15 +261,16 @@ npm install -D style-dictionary
 
 Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
 
-| Figma 값 | 출력 | 이유 |
-|---|---|---|
-| `letterSpacing: "-1%"` | `letter-spacing: -0.01em` | CSS의 `letter-spacing`은 `%`를 받지 않음 |
-| `fontWeight: "Medium"` | `font-weight: 500` | `Medium` / `Regular`는 CSS 키워드가 아님 |
-| `lineHeight: "AUTO"` | `line-height: normal` | |
-| 토큰명 `tab Bar-active` | `text-tab-bar-active` | 공백·언더스코어가 섞이면 CSS 문법이 깨짐 |
-| boxShadow의 `{shadow.ambient.8}` | `var(--color-shadow-ambient-8)` | 값으로 풀지 않고 변수 참조로 유지 |
+| Figma 값                         | 출력                            | 이유                                     |
+| -------------------------------- | ------------------------------- | ---------------------------------------- |
+| `letterSpacing: "-1%"`           | `letter-spacing: -0.01em`       | CSS의 `letter-spacing`은 `%`를 받지 않음 |
+| `fontWeight: "Medium"`           | `font-weight: 500`              | `Medium` / `Regular`는 CSS 키워드가 아님 |
+| `lineHeight: "AUTO"`             | `line-height: normal`           |                                          |
+| 토큰명 `tab Bar-active`          | `text-tab-bar-active`           | 공백·언더스코어가 섞이면 CSS 문법이 깨짐 |
+| boxShadow의 `{shadow.ambient.8}` | `var(--color-shadow-ambient-8)` | 값으로 풀지 않고 변수 참조로 유지        |
 
 `fontFamily`가 숫자거나 `fontSize`가 비어 있는 등 **디자이너가 잘못 입력한 값은 빌드 시 경고**로 알려줍니다.
+
 - settings에 존재하지 않는 `--motion-*` 이름이 있으면 빌드 시 **경고**를 출력합니다. (오타 방지)
 
 > typography는 Tailwind v4의 `@utility` 문법으로 출력됩니다. v3 프로젝트에서 typography
@@ -272,10 +280,47 @@ Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
 
 ```js
 export default defineTokenConfig({
-  source: ['src/tokens/*.json'],
-  destination: 'design-tokens.css',
+  source: ["src/tokens/*.json"],
+  destination: "design-tokens.css",
 });
 ```
+
+## PR 본문 자동화
+
+PR 의 커밋을 타입별로 묶어 description 에 채워 넣습니다.
+사람이 쓴 내용은 건드리지 않고 마커 사이만 갱신하며, 여러 번 실행해도 안전합니다.
+
+```bash
+GH_TOKEN=... REPO=owner/repo PR_NUMBER=12 npx byuckchon-pr-description
+```
+
+`bc init` / `bc adopt` 가 만들어주는 `pr-description.yml` 워크플로가 이 명령을 실행합니다.
+
+```markdown
+<!-- byuckchon:commits:start -->
+
+## 커밋 내역
+
+### ✨ 기능
+
+- **settings** — tsconfig 프리셋 추가 (a1b2c3d)
+
+### 🐛 수정
+
+- letterSpacing % → em 변환 (b2c3d4e)
+
+### 📦 분류 없음
+
+- 리뷰 반영 (d4e5f60)
+
+<!-- byuckchon:commits:end -->
+```
+
+- 머지 커밋은 제외합니다.
+- `feat(settings):` 처럼 scope 를 쓰면 함께 표시됩니다.
+- `feat!:` 는 상단에 Breaking Changes 로 따로 모읍니다.
+- 컨벤션을 안 지킨 커밋은 버리지 않고 "분류 없음"에 모읍니다.
+- 마커가 없으면 본문 끝에 덧붙이므로 PR 템플릿이 없어도 동작합니다.
 
 ## 요구사항
 
