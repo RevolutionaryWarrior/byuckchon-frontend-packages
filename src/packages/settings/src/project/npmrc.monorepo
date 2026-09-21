@@ -1,0 +1,14 @@
+# pnpm 동작 설정
+# React 버전 통일 및 (향후 Expo/RN 도입 대비) hoisted linker 사용.
+node-linker=hoisted
+
+public-hoist-pattern[]=*react*
+public-hoist-pattern[]=*@types/*
+public-hoist-pattern[]=*eslint*
+public-hoist-pattern[]=*prettier*
+
+strict-peer-dependencies=false
+auto-install-peers=true
+save-exact=false
+save-prefix=^
+prefer-frozen-lockfile=true
