@@ -39,7 +39,9 @@ export function importOrderRule(before = ['react']) {
       ],
       pathGroupsExcludedImportTypes: ['react'],
       alphabetize: { order: 'asc', caseInsensitive: true },
-      'newlines-between': 'always',
+      // prettier 가 그룹 사이 빈 줄을 넣지 않으므로 여기서도 요구하지 않는다.
+      // (요구하면 저장할 때마다 빨간 줄이 뜬다)
+      'newlines-between': 'never',
     },
   ];
 }
