@@ -259,6 +259,36 @@ npm install -D style-dictionary
   (디자이너가 `250`만 넘겨도 `250ms`로 변환)
 - easing은 `[0.16, 1, 0.3, 1]` 배열을 `cubic-bezier(...)`로 변환합니다.
 
+### 그림자(boxShadow)
+
+단일 레이어와 여러 레이어(배열)를 모두 지원합니다.
+
+```jsonc
+{
+  "zz": {
+    "$type": "boxShadow",
+    "$value": {
+      "x": "20", "y": "30", "blur": "0", "spread": "0",
+      "color": "#000000", "type": "innerShadow"
+    }
+  }
+}
+```
+
+```css
+@theme {
+  --shadow-zz: inset 20px 30px 0px 0px #000000;
+}
+```
+
+Tailwind가 `shadow-zz` 유틸리티를 만들어 줍니다.
+
+- `type: "innerShadow"` → `inset`을 붙입니다. (`dropShadow`이거나 생략하면 일반 그림자)
+- 단위 없는 숫자에는 `px`를 붙이고, 빠진 값은 `0px`로 둡니다.
+- 여러 레이어는 배열로 주면 쉼표로 이어 붙입니다. (`elevation.1` → `--shadow-elevation-1`)
+- 색상이 `{shadow.ambient.8}` 같은 참조면 값으로 풀지 않고 변수 참조로 유지합니다.
+- `@theme` 블록에는 색상 변수를 먼저, 그림자 변수를 나중에 출력합니다.
+
 Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
 
 | Figma 값                         | 출력                            | 이유                                     |
