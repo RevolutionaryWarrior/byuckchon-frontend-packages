@@ -215,7 +215,8 @@ StyleDictionary.registerFormat({
     const unknownMotion = [];
     const issues = [];
 
-    const theme = [];
+    const themeColors = [];
+    const themeShadows = [];
     const typography = [];
     const variables = [];
 
@@ -231,14 +232,14 @@ StyleDictionary.registerFormat({
 
       /* color → Tailwind 유틸리티로 쓰이도록 @theme 에 넣는다 */
       if (type === 'color') {
-        theme.push(`  ${cssVariableName(token, 'color-')}: ${value};`);
+        themeColors.push(`  ${cssVariableName(token, 'color-')}: ${value};`);
         return;
       }
 
       /* boxShadow → @theme 의 --shadow-* (shadow-* 유틸리티가 생성됨) */
       if (type === 'boxShadow' || type === 'shadow') {
         const shadow = boxShadow(value, token.original ? valueOf(token.original) : value, byPath);
-        if (shadow) theme.push(`  ${cssVariableName(token, 'shadow-')}: ${shadow};`);
+        if (shadow) themeShadows.push(`  ${cssVariableName(token, 'shadow-')}: ${shadow};`);
         return;
       }
 
@@ -291,6 +292,8 @@ StyleDictionary.registerFormat({
     }
 
     const blocks = [];
+    // 그림자가 색상 변수를 참조할 수 있으므로 색상을 먼저 적어 읽기 쉽게 둔다.
+    const theme = [...themeColors, ...themeShadows];
     if (theme.length) blocks.push(`@theme {\n${theme.join('\n')}\n}`);
     if (typography.length) blocks.push(typography.join('\n\n'));
     if (variables.length) blocks.push(`:root {\n${variables.join('\n')}\n}`);
