@@ -21,6 +21,8 @@ import { fileURLToPath } from 'node:url';
 
 const START = '<!-- byuckchon:commits:start -->';
 const END = '<!-- byuckchon:commits:end -->';
+const NOTE_START = '<!-- byuckchon:notes:start -->';
+const NOTE_END = '<!-- byuckchon:notes:end -->';
 
 /** 커밋 타입별 표시 순서와 제목. 목록에 없는 타입은 "기타"로 모은다. */
 const TYPES = [
@@ -99,7 +101,7 @@ export function parseNotes(message) {
  * 사람이 쓴 제목은 그대로 두고 앞에만 붙인다. 이미 대괄호가 있으면 건드리지 않는다.
  * 제목이 브랜치명 그대로면(제목을 안 쓴 경우) 브랜치 가운데 토막으로 대신 만든다.
  */
-export function buildTitle(currentTitle, branch) {
+export function buildTitle(currentTitle, branch, commits = []) {
   const title = (currentTitle ?? '').trim();
   const segments = String(branch ?? '').split('/').filter(Boolean);
 
@@ -108,11 +110,27 @@ export function buildTitle(currentTitle, branch) {
 
   const type = segments[0];
   // 마지막 토막은 작업자 이름이라 제외한다.
-  const summary = segments.slice(1, -1).join(' ').replace(/[-_]+/g, ' ').trim();
-  const body = title && title !== branch ? title : summary;
+  const branchSummary = segments.slice(1, -1).join(' ').replace(/[-_]+/g, ' ').trim();
+
+  // GitHub 은 제목을 비워두면 커밋 제목이나 브랜치명으로 채운다.
+  // 어느 쪽이든 첫 커밋에서 타입 접두사를 뗀 문장이 제일 읽기 좋다.
+  const firstCommit = commits.length
+    ? parseCommit(commits[0].message).subject
+    : '';
+
+  const body =
+    stripPrefix(title) && title !== branch
+      ? stripPrefix(title)
+      : firstCommit || branchSummary;
 
   if (!body) return title || null;
   return `[${type}] ${body}`;
+}
+
+/** "feat: 드롭다운 속도 수정" → "드롭다운 속도 수정" */
+function stripPrefix(text) {
+  const matched = CONVENTIONAL.exec(String(text ?? '').trim());
+  return matched ? matched.groups.subject.trim() : String(text ?? '').trim();
 }
 
 /** 머지 커밋은 제외한다. (부모가 2개 이상) */
@@ -169,23 +187,49 @@ export function renderNoteSection(commits) {
   }
 
   if (!lines.length) return '';
-  return ['## ⚠️ 리뷰 포인트', '', ...lines].join('\n');
+  return lines.join('\n');
 }
 
 /** 본문의 마커 구간만 교체한다. 마커가 없으면 끝에 덧붙인다. */
-export function applyToBody(body, section, noteSection = '') {
-  const parts = [`## 커밋 내역`, '', section];
-  if (noteSection) parts.push('', noteSection);
-  const block = `${START}\n${parts.join('\n')}\n${END}`;
-  const current = body ?? '';
-  const startIndex = current.indexOf(START);
-  const endIndex = current.indexOf(END);
+/** 마커 구간을 내용으로 교체한다. 마커가 없으면 null 을 돌려준다. */
+function replaceRegion(body, start, end, content) {
+  const startIndex = body.indexOf(start);
+  const endIndex = body.indexOf(end);
+  if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) return null;
 
-  if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-    return current.slice(0, startIndex) + block + current.slice(endIndex + END.length);
+  const block = `${start}\n${content}\n${end}`;
+  return body.slice(0, startIndex) + block + body.slice(endIndex + end.length);
+}
+
+/**
+ * 본문의 마커 구간만 교체한다.
+ *
+ * 커밋 내역과 리뷰 포인트는 각각 다른 구간에 들어간다.
+ * (작업 내용 ← 커밋 내역 / 확인 사항 ← 리뷰 포인트)
+ *
+ * notes 마커가 없는 오래된 템플릿에서는 둘을 한 구간에 함께 넣는다.
+ */
+export function applyToBody(body, section, noteSection = '') {
+  let next = body ?? '';
+  const hasNoteRegion = next.includes(NOTE_START) && next.includes(NOTE_END);
+
+  if (hasNoteRegion) {
+    next = replaceRegion(next, START, END, section) ?? next;
+    next = replaceRegion(next, NOTE_START, NOTE_END, noteSection || '_없음_') ?? next;
+    return next;
   }
 
-  return current.trim() ? `${current.trimEnd()}\n\n${block}\n` : `${block}\n`;
+  // 구버전 템플릿(마커 1벌)에서는 두 내용을 한 구간에 넣는다.
+  // 이때는 섹션 제목이 템플릿에 없으므로 여기서 붙인다.
+  const parts = ['## 커밋 내역', '', section];
+  if (noteSection) parts.push('', '## ⚠️ 리뷰 포인트', '', noteSection);
+  const merged = parts.join('\n');
+
+  const replaced = replaceRegion(next, START, END, merged);
+  if (replaced !== null) return replaced;
+
+  const block = `${START}\n${merged}\n${END}`;
+  return next.trim() ? `${next.trimEnd()}\n\n${block}\n` : `${block}\n`;
 }
 
 /* ============================================================
@@ -253,7 +297,7 @@ async function main() {
     renderCommitSection(commits),
     renderNoteSection(commits),
   );
-  const nextTitle = buildTitle(pullRequest.title, pullRequest.head?.ref);
+  const nextTitle = buildTitle(pullRequest.title, pullRequest.head?.ref, commits);
 
   const patch = {};
   if (nextBody !== (pullRequest.body ?? '')) patch.body = nextBody;

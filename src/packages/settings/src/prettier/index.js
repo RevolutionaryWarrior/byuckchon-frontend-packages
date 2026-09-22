@@ -26,8 +26,11 @@ const config = {
   useTabs: false,
   printWidth: 80,
   plugins: ['@trivago/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
-  importOrder: ['^@core/(.*)$', '^@server/(.*)$', '^@ui/(.*)$', '^[./]'],
-  importOrderSeparation: true,
+  // ESLint 의 import/order 와 같은 순서로 맞춘다. (react → next → 외부 → @/ → 상대경로)
+  // 둘의 기준이 다르면 저장할 때마다 prettier 와 ESLint 가 서로 다른 모양을 요구한다.
+  importOrder: ['^react$', '^next(/.*)?$', '<THIRD_PARTY_MODULES>', '^@/(.*)$', '^[./]'],
+  // 그룹 사이 빈 줄을 넣지 않는다. (ESLint 의 newlines-between: 'never' 와 짝)
+  importOrderSeparation: false,
   importOrderSortSpecifiers: true,
 };
 
