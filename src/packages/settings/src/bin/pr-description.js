@@ -78,7 +78,56 @@ export function parseCommit(message) {
  *   NOTE: 응답 스키마 미확정이라 any 가 남아 있습니다
  *   TODO: 에러 처리 미구현
  */
-const NOTE_LINE = /^[\s>*-]*(NOTE|TODO)\s*:\s*(.+)$/i;
+const NOTE_LINE = /^[\s>*/-]*(NOTE|TODO)\s*:\s*(.+)$/i;
+
+/**
+ * 코드 주석에서 뽑을 때 쓰는 패턴.
+ * 줄 맨 앞이거나 주석 기호 뒤에 와야 한다. (문자열 안의 우연한 일치를 줄인다)
+ *
+ *   // TODO: 에러 처리 미구현
+ *   const x = 1; // NOTE: 임시값
+ */
+const CODE_NOTE = /(?:^|\/\/+|\/\*+|\*+|#+|<!--)\s*(NOTE|TODO)\s*:\s*(.+)$/i;
+
+/** 한 줄에서 NOTE/TODO 를 뽑는다. 주석 닫는 기호는 떼어낸다. */
+function matchCodeNote(line) {
+  const matched = CODE_NOTE.exec(line);
+  if (!matched) return null;
+
+  const text = matched[2].replace(/\s*(\*\/|-->|\})\s*$/g, '').trim();
+  return text ? { kind: matched[1].toUpperCase(), text } : null;
+}
+
+/**
+ * PR diff 에서 **새로 추가된 줄**의 NOTE/TODO 만 모은다.
+ *
+ * 기존 코드에 쌓여 있던 것까지 끌어오면 노이즈가 되므로 추가된 줄(`+`)만 본다.
+ *
+ * @param {string} patch    unified diff (GitHub files[].patch)
+ * @param {string} filename 파일 경로
+ */
+export function parseAddedNotes(patch, filename) {
+  const found = [];
+  let lineNumber = 0;
+
+  for (const raw of String(patch ?? '').split('\n')) {
+    const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(raw);
+    if (hunk) {
+      lineNumber = Number(hunk[1]);
+      continue;
+    }
+    if (raw.startsWith('+++') || raw.startsWith('---')) continue;
+    if (raw.startsWith('-')) continue;
+
+    if (raw.startsWith('+')) {
+      const note = matchCodeNote(raw.slice(1));
+      if (note) found.push({ ...note, file: filename, line: lineNumber });
+    }
+    lineNumber += 1;
+  }
+
+  return found;
+}
 
 export function parseNotes(message) {
   return String(message)
@@ -177,13 +226,30 @@ export function renderCommitSection(commits) {
 }
 
 /** 리뷰 포인트 섹션. 없으면 빈 문자열. */
-export function renderNoteSection(commits) {
+export function renderNoteSection(commits, codeNotes = []) {
   const lines = [];
+  const seen = new Set();
+
+  const push = (key, text) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    lines.push(text);
+  };
 
   for (const commit of commits) {
     for (const note of parseNotes(commit.message)) {
-      lines.push(`- \`${note.kind}\` ${note.text} (${commit.sha.slice(0, 7)})`);
+      push(
+        `${note.kind}:${note.text}`,
+        `- \`${note.kind}\` ${note.text} (${commit.sha.slice(0, 7)})`,
+      );
     }
+  }
+
+  for (const note of codeNotes) {
+    push(
+      `${note.kind}:${note.text}`,
+      `- \`${note.kind}\` ${note.text} — \`${note.file}:${note.line}\``,
+    );
   }
 
   if (!lines.length) return '';
@@ -286,16 +352,37 @@ async function fetchCommits(env) {
     .map((commit) => ({ sha: commit.sha, message: commit.commit.message }));
 }
 
+/** PR 에서 바뀐 파일의 diff 를 가져와 새로 추가된 NOTE/TODO 를 모은다. */
+async function fetchCodeNotes(env) {
+  const notes = [];
+
+  for (let page = 1; page <= 3; page += 1) {
+    const files = await api('GET', `/pulls/${env.prNumber}/files?per_page=100&page=${page}`, env);
+
+    for (const file of files) {
+      // 바이너리·대용량 파일은 patch 가 없다.
+      if (!file.patch || file.status === 'removed') continue;
+      notes.push(...parseAddedNotes(file.patch, file.filename));
+    }
+
+    if (files.length < 100) break;
+  }
+
+  // 너무 많으면 본문이 읽기 어려워진다.
+  return notes.slice(0, 50);
+}
+
 async function main() {
   const env = requireEnv();
   const commits = await fetchCommits(env);
+  const codeNotes = await fetchCodeNotes(env);
 
   const pullRequest = await api('GET', `/pulls/${env.prNumber}`, env);
 
   const nextBody = applyToBody(
     pullRequest.body,
     renderCommitSection(commits),
-    renderNoteSection(commits),
+    renderNoteSection(commits, codeNotes),
   );
   const nextTitle = buildTitle(pullRequest.title, pullRequest.head?.ref, commits);
 
