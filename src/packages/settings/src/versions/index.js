@@ -17,7 +17,7 @@ export const versions = {
   'react-dom': '^18.3.1',
   'next-react': '^19.2.1',
   'next-react-dom': '^19.2.1',
-  next: '15.1.9',
+  next: '~15.5.27',
 
   // Build tool (React only)
   vite: '^6.0.0',
@@ -51,7 +51,7 @@ export const versions = {
   //   - @eslint/eslintrc: next 설정을 flat config 로 감싸는 FlatCompat 용
   eslint: '^9.18.0',
   '@eslint/eslintrc': '^3.2.0',
-  'eslint-config-next': '^15.0.0',
+  'eslint-config-next': '~15.5.27',
 
   // Formatting & Tokens
   prettier: '^3.3.0',
