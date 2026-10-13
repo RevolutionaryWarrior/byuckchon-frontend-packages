@@ -1,6 +1,6 @@
 {
   "name": "@byuckchon-frontend/settings",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": false,
   "type": "module",
   "description": "Byuckchon Frontend 프로젝트 공통 세팅 패키지 (eslint, prettier, tsconfig, tokens, motion)",
