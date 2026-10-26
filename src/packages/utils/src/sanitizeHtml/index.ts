@@ -47,11 +47,20 @@ const toAttrMap = (
   return map;
 };
 
+type BrowserWindow = Window & typeof globalThis;
+
+/**
+ * DOM 이 있는 환경이면 window 를, 서버(SSR)·Node 처럼 DOM 이 없으면 null 을 돌려준다.
+ * DOMPurify 는 DOM 없이 초기화되면 sanitize 가 없는 빈 인스턴스가 되므로 미리 걸러야 한다.
+ */
+const getBrowserWindow = (): BrowserWindow | null =>
+  typeof window === "undefined" || !window.document ? null : window;
+
 let defaultPurifier: ReturnType<typeof dompurify> | null = null;
 
 /** 설정 없이 DOMPurify 가 기본으로 허용하는 속성인지 확인한다. */
-const isDefaultAllowedAttr = (attr: string): boolean => {
-  defaultPurifier ??= dompurify(window);
+const isDefaultAllowedAttr = (win: BrowserWindow, attr: string): boolean => {
+  defaultPurifier ??= dompurify(win);
   return defaultPurifier.isValidAttribute("div", attr, "");
 };
 
@@ -65,8 +74,8 @@ const isDefaultAllowedAttr = (attr: string): boolean => {
  * 훅이 다른 호출에 섞이지 않도록 호출마다 새 인스턴스를 만든다.
  * 허용 여부만 훅에서 거르고 URI 검사(javascript: 등)는 DOMPurify 가 그대로 수행한다.
  */
-const createPurifier = (config: SanitizeHtmlConfig) => {
-  const purifier = dompurify(window);
+const createPurifier = (win: BrowserWindow, config: SanitizeHtmlConfig) => {
+  const purifier = dompurify(win);
   const allowMap = toAttrMap(config.allowAttributes);
   const dropMap = toAttrMap(config.dropAttributes);
 
@@ -74,7 +83,7 @@ const createPurifier = (config: SanitizeHtmlConfig) => {
   const addedAttrs = new Set<string>();
   allowMap.forEach((attrs) => {
     attrs.forEach((attr) => {
-      if (!isDefaultAllowedAttr(attr)) addedAttrs.add(attr);
+      if (!isDefaultAllowedAttr(win, attr)) addedAttrs.add(attr);
     });
   });
 
@@ -125,12 +134,16 @@ const buildDompurifyConfig = (
  * @param {string} props.content - sanitize할 HTML 문자열
  * @param {SanitizeHtmlConfig} [props.config] - HTML sanitization 설정 옵션
  *
- * @returns {string} sanitize된 HTML 문자열
+ * @returns {string} sanitize된 HTML 문자열. DOM 이 없는 환경(SSR, Node)에서는 빈 문자열
  */
 
 export const SanitizeHtml = ({ content, config }: SanitizeHtmlProps) => {
+  const win = getBrowserWindow();
+  // DOM 이 없으면 sanitize 할 수 없다. 검증되지 않은 HTML 을 그대로 내보내지 않도록 빈 문자열을 돌려준다.
+  if (!win) return "";
+
   const sanitizeConfig = { ...DefaultConfig, ...config };
-  const { purifier, addedAttrs } = createPurifier(sanitizeConfig);
+  const { purifier, addedAttrs } = createPurifier(win, sanitizeConfig);
 
   return purifier.sanitize(
     content,
