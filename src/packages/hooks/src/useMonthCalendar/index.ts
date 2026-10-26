@@ -42,7 +42,20 @@ const useMonthCalendar = ({
 
   const moveMonth = (delta: number) => {
     const newDate = new Date(currentDate);
+    const day = currentDate.getDate();
+
+    // 1일로 먼저 옮긴 뒤 달을 바꿔야 1/31 → 2/31(=3/3) 처럼 넘치지 않는다.
+    newDate.setDate(1);
     newDate.setMonth(month + delta);
+
+    // 원래 날짜가 대상 달에 없으면(31일 → 2월 등) 그 달의 마지막 날로 맞춘다.
+    const lastDateOfMonth = new Date(
+      newDate.getFullYear(),
+      newDate.getMonth() + 1,
+      0
+    ).getDate();
+    newDate.setDate(Math.min(day, lastDateOfMonth));
+
     setCurrentDate(newDate);
   };
 
