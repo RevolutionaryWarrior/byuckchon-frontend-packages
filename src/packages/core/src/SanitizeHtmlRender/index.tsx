@@ -7,9 +7,9 @@ import dompurify, { type Config } from "dompurify";
  * @interface SanitizeHtmlConfig
  * @property {string[]} [addElements] - 기본 허용 태그에 추가할 HTML 태그 목록. allowElements가 있으면 무시됨
  * @property {string[]} [allowElements] - 허용할 HTML 태그 목록. 비어있으면 기본 DOMPurify 허용 태그 사용
- * @property {Record<string, string[]>} [allowAttributes] - 태그별 허용할 속성 목록.
+ * @property {Record<string, string[]>} [allowAttributes] - 태그별로 추가 허용할 속성 목록. 기본 허용 속성(href, src, title 등)은 그대로 두고 지정한 속성을 더 허용한다. 기본 목록에 없는 속성은 지정한 태그에서만 허용된다.
  * @property {string[]} [dropElements] - 제거할 HTML 태그 목록
- * @property {Record<string, string[]>} [dropAttributes] - 태그별 제거할 속성 목록
+ * @property {Record<string, string[]>} [dropAttributes] - 태그별 제거할 속성 목록. 지정한 태그에서만 제거한다.
  */
 export interface SanitizeHtmlConfig {
   addElements?: string[];
@@ -34,9 +34,88 @@ const DefaultConfig: SanitizeHtmlConfig = {
   dropAttributes: {},
 };
 
-const getAttrs = (attrMap: Record<string, string[]> | undefined): string[] => {
-  if (!attrMap) return [];
-  return Array.from(new Set(Object.values(attrMap).flat()));
+/** { a: ['Title'] } → Map { 'a' => Set { 'title' } } (DOMPurify 는 태그·속성명을 소문자로 비교한다) */
+const toAttrMap = (
+  attrMap: Record<string, string[]> | undefined
+): Map<string, Set<string>> => {
+  const map = new Map<string, Set<string>>();
+  if (!attrMap) return map;
+
+  Object.entries(attrMap).forEach(([tag, attrs]) => {
+    map.set(
+      tag.toLowerCase(),
+      new Set(attrs.map((attr) => attr.toLowerCase()))
+    );
+  });
+  return map;
+};
+
+let defaultPurifier: ReturnType<typeof dompurify> | null = null;
+
+/** 설정 없이 DOMPurify 가 기본으로 허용하는 속성인지 확인한다. */
+const isDefaultAllowedAttr = (attr: string): boolean => {
+  defaultPurifier ??= dompurify(window);
+  return defaultPurifier.isValidAttribute("div", attr, "");
+};
+
+/**
+ * 태그별 allowAttributes / dropAttributes 를 적용한 DOMPurify 인스턴스를 만든다.
+ *
+ * - allowAttributes: 기본 허용 속성은 유지하고 지정한 속성을 추가로 허용한다.
+ *   기본 목록에 없는 속성(예: a 에만 지정한 foo)은 지정한 태그에서만 살리고 다른 태그에서는 제거한다.
+ * - dropAttributes 에 지정한 태그: 지정한 속성만 제거한다.
+ *
+ * 훅이 다른 호출에 섞이지 않도록 호출마다 새 인스턴스를 만든다.
+ * 허용 여부만 훅에서 거르고 URI 검사(javascript: 등)는 DOMPurify 가 그대로 수행한다.
+ */
+const createPurifier = (config: SanitizeHtmlConfig) => {
+  const purifier = dompurify(window);
+  const allowMap = toAttrMap(config.allowAttributes);
+  const dropMap = toAttrMap(config.dropAttributes);
+
+  // 기본 허용 목록에 없는 속성은 ADD_ATTR 로 열어주되, 지정한 태그에서만 살린다.
+  const addedAttrs = new Set<string>();
+  allowMap.forEach((attrs) => {
+    attrs.forEach((attr) => {
+      if (!isDefaultAllowedAttr(attr)) addedAttrs.add(attr);
+    });
+  });
+
+  if (addedAttrs.size > 0 || dropMap.size > 0) {
+    purifier.addHook("uponSanitizeAttribute", (node, data) => {
+      const tag = node.nodeName.toLowerCase();
+      const attr = data.attrName;
+
+      if (dropMap.get(tag)?.has(attr)) {
+        data.keepAttr = false;
+        return;
+      }
+
+      // 기본 목록에 없던 속성은 allowAttributes 로 지정한 태그에서만 살린다.
+      if (addedAttrs.has(attr) && !allowMap.get(tag)?.has(attr)) {
+        data.keepAttr = false;
+      }
+    });
+  }
+
+  return { purifier, addedAttrs: [...addedAttrs] };
+};
+
+const buildDompurifyConfig = (
+  config: SanitizeHtmlConfig,
+  addedAttrs: string[]
+): Config => {
+  const hasAllowElements = !!config.allowElements?.length;
+
+  return {
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    ...(config.addElements?.length && !hasAllowElements
+      ? { ADD_TAGS: config.addElements }
+      : {}),
+    ...(hasAllowElements ? { ALLOWED_TAGS: config.allowElements } : {}),
+    ...(addedAttrs.length > 0 ? { ADD_ATTR: addedAttrs } : {}),
+    ...(config.dropElements?.length ? { FORBID_TAGS: config.dropElements } : {}),
+  };
 };
 
 /**
@@ -61,56 +140,16 @@ export const SanitizeHtmlRender = ({
   className,
 }: SanitizeHtmlProps) => {
   const sanitizeConfig = { ...DefaultConfig, ...config };
-
-  // 1. ALLOWED_ATTR 계산
-  const allowedAttrs = getAttrs(sanitizeConfig.allowAttributes);
-  const allowedAttrsConfig =
-    allowedAttrs.length > 0
-      ? {
-          ALLOWED_ATTR: [...new Set([...allowedAttrs, "class", "id", "style"])],
-        }
-      : {};
-
-  // 2. FORBID_ATTR 계산
-  const forbiddenAttrs = getAttrs(sanitizeConfig.dropAttributes);
-  const forbiddenAttrsConfig =
-    forbiddenAttrs.length > 0 ? { FORBID_ATTR: forbiddenAttrs } : {};
-
-  // 3. ADD_TAGS 계산
-  const addTagsConfig =
-    sanitizeConfig.addElements &&
-    sanitizeConfig.addElements.length > 0 &&
-    !(sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0)
-      ? { ADD_TAGS: sanitizeConfig.addElements }
-      : {};
-
-  // 4. ALLOWED_TAGS 계산
-  const allowedTagsConfig =
-    sanitizeConfig.allowElements && sanitizeConfig.allowElements.length > 0
-      ? { ALLOWED_TAGS: sanitizeConfig.allowElements }
-      : {};
-
-  // 5. FORBID_TAGS 계산
-  const forbidTagsConfig =
-    sanitizeConfig.dropElements && sanitizeConfig.dropElements.length > 0
-      ? { FORBID_TAGS: sanitizeConfig.dropElements }
-      : {};
-
-  const dompurifyConfig: Config = {
-    ALLOW_UNKNOWN_PROTOCOLS: false,
-
-    ...addTagsConfig,
-    ...allowedTagsConfig,
-    ...forbiddenAttrsConfig,
-    ...allowedAttrsConfig,
-    ...forbidTagsConfig,
-  };
+  const { purifier, addedAttrs } = createPurifier(sanitizeConfig);
 
   return (
     <Component
       className={className}
       dangerouslySetInnerHTML={{
-        __html: dompurify.sanitize(content, dompurifyConfig),
+        __html: purifier.sanitize(
+          content,
+          buildDompurifyConfig(sanitizeConfig, addedAttrs)
+        ),
       }}
     />
   );
