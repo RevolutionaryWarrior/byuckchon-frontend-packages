@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import type { ElementRefObject } from "../types";
 
 type Params = {
   multiple?: boolean;
@@ -7,7 +8,8 @@ type Params = {
 };
 
 const useFileUpload = ({ multiple = false, maxSizeMb = 50, accept = [".pdf", ".jpg", ".jpeg", ".png"] }: Params) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef: ElementRefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<File | File[] | null>(null);
 
   const onValidate = (file: File) => {

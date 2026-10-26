@@ -1,5 +1,5 @@
-import type { RefObject } from "react";
 import { useCallback, useEffect, useRef } from "react";
+import type { ElementRefObject } from "../types";
 
 type ScrollDirection = "horizontal" | "vertical" | "both";
 
@@ -10,8 +10,8 @@ interface UseScrollToSelectedItemOptions {
 }
 
 interface UseScrollToSelectedItemReturn<T extends HTMLElement> {
-  containerRef: RefObject<HTMLDivElement | null>;
-  selectedItemRef: RefObject<T | null>;
+  containerRef: ElementRefObject<HTMLDivElement>;
+  selectedItemRef: ElementRefObject<T>;
   scrollToSelected: () => void;
 }
 

@@ -18,11 +18,12 @@
  * @param {number} [options.areaThreshold=0.5] 노출 비율 threshold (0~1)
  * @param {number} [options.timeThreshold=300] 유지 시간 threshold(ms)
  *
- * @returns {{ ref: React.RefObject<Element> }} 감지 대상 ref
+ * @returns {{ ref: ElementRefObject<Element> }} 감지 대상 ref
  */
 
 
 import { useCallback, useEffect, useRef } from "react";
+import type { ElementRefObject } from "../types";
 import useVisibilityEvent from "../useVisibilityEvent";
 
 type Options = {
@@ -42,7 +43,7 @@ export default function useImpressionRef<Element extends HTMLElement>({
   areaThreshold = 0.5,
   timeThreshold = 300,
 }: Options) {
-  const ref = useRef<Element | null>(null);
+  const ref: ElementRefObject<Element> = useRef<Element | null>(null);
 
   const startCallbackRef = useRef<() => void>(onImpressionStart);
   const endCallbackRef = useRef<() => void>(onImpressionEnd);
