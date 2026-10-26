@@ -149,20 +149,25 @@ export { default } from "@byuckchon-frontend/settings/prettier";
 
 ```js
 import byuckchon from "@byuckchon-frontend/settings/eslint/react";
-export default [...byuckchon, { rules: { "import/order": "off" } }];
+export default [...byuckchon, { rules: { "@typescript-eslint/no-explicit-any": "off" } }];
 ```
 
 ### ESLint
 
 | export            | 내용                                                       |
 | ----------------- | ---------------------------------------------------------- |
-| `./eslint/base`   | TypeScript · import 정렬 · 미사용 import (프레임워크 무관) |
+| `./eslint/base`   | TypeScript · 미사용 import (프레임워크 무관)               |
 | `./eslint/react`  | base + React / Hooks / Refresh                             |
-| `./eslint/next`   | base + React + `next/**` import 우선순위                   |
+| `./eslint/next`   | base + React                                               |
 | `./eslint/review` | react + 사내 컨벤션 규칙 (PR 리뷰 워크플로 전용)           |
 
 `eslint-config-next`는 포함하지 않습니다. 설치된 next 버전과 짝을 이뤄야 해서
 프로젝트 쪽에서 `FlatCompat`으로 합칩니다. (CLI가 생성하는 `eslint.config.mjs` 참고)
+
+import 순서는 ESLint(`import/order`)가 아닌 Prettier 정렬 플러그인(`@trivago/prettier-plugin-sort-imports`)이
+정합니다. 두 도구가 각자 정렬하면 `next` / `next/server`, 대소문자만 다른 경로, `-` 와 `/` 가 섞인 경로에서
+서로 반대 순서를 요구해 `prettier --check` 와 `eslint` 를 동시에 통과할 수 없기 때문입니다.
+lint-staged 를 쓴다면 `eslint --fix` → `prettier --write` 순서로 두어 최종 포맷을 Prettier 가 정하게 합니다.
 
 ESLint 플러그인은 이 패키지의 dependencies라 프로젝트가 따로 설치할 필요가 없습니다.
 필요한 것은 `eslint` 본체뿐입니다.

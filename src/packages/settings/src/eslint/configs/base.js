@@ -1,7 +1,8 @@
 /**
  * @byuckchon-frontend/settings — ESLint 공통 flat config
  * -----------------------------------------------------------------------
- * 프레임워크와 무관한 규칙만 담는다. (TypeScript, import 정렬, 미사용 import)
+ * 프레임워크와 무관한 규칙만 담는다. (TypeScript, 미사용 import)
+ * import 순서는 ESLint 가 아니라 Prettier(@trivago/prettier-plugin-sort-imports)가 정한다.
  * React 프로젝트는 ./react, Next 프로젝트는 ./next 를 사용한다.
  * -----------------------------------------------------------------------
  */
@@ -25,8 +26,14 @@ export const ignores = [
 ];
 
 /**
- * import 정렬 규칙.
- * @param {string[]} [before] external 그룹보다 앞에 둘 패턴 (예: ['react', 'next/**'])
+ * import/order 규칙 옵션.
+ *
+ * @deprecated 기본 설정에서는 사용하지 않는다. import 순서는 Prettier 정렬 플러그인이 정하고
+ * ESLint 의 import/order 는 끈다. (아래 'import/order': 'off' 참고)
+ * 프로젝트에서 굳이 다시 켜야 할 때를 위해 Prettier 와 최대한 같은 기준으로 맞춰 남겨 둔다.
+ * 단, '-' 와 '/' 가 섞인 경로(quill-image… / quill/…)는 두 도구의 비교 방식이 달라 옵션으로 맞출 수 없다.
+ *
+ * @param {string[]} [before] external 그룹보다 앞에 둘 패턴 (예: ['react', 'next', 'next/**'])
  */
 export function importOrderRule(before = ['react']) {
   return [
@@ -38,7 +45,8 @@ export function importOrderRule(before = ['react']) {
         { pattern: '@/**', group: 'internal' },
       ],
       pathGroupsExcludedImportTypes: ['react'],
-      alphabetize: { order: 'asc', caseInsensitive: true },
+      // Prettier 정렬 플러그인 기본값(importOrderCaseInsensitive: false)과 맞춘다.
+      alphabetize: { order: 'asc', caseInsensitive: false },
       // prettier 가 그룹 사이 빈 줄을 넣지 않으므로 여기서도 요구하지 않는다.
       // (요구하면 저장할 때마다 빨간 줄이 뜬다)
       'newlines-between': 'never',
@@ -75,7 +83,11 @@ export const baseConfig = [
     },
     rules: {
       ...unusedImportsRules,
-      'import/order': importOrderRule(),
+      // import 순서는 포맷이므로 Prettier 정렬 플러그인에만 맡긴다. (eslint-config-prettier 와 같은 원칙)
+      // 두 도구가 각자 정렬하면 next / next/server, 대소문자만 다른 경로, '-' 와 '/' 가 섞인 경로에서
+      // 서로 반대 순서를 요구해 prettier --check 와 eslint 를 동시에 통과할 수 없다.
+      // 순서 검사는 CI 의 prettier --check 가 대신한다.
+      'import/order': 'off',
       // 미사용 변수는 unused-imports 쪽에서 더 정교하게 잡으므로 중복 경고를 끈다.
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',

@@ -8,7 +8,7 @@
  *
  * 프로젝트 예외를 더할 때는 뒤에 이어붙인다:
  *
- *   export default [...byuckchon, { rules: { 'import/order': 'off' } }];
+ *   export default [...byuckchon, { rules: { '@typescript-eslint/no-explicit-any': 'off' } }];
  * -----------------------------------------------------------------------
  */
 

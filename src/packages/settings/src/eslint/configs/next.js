@@ -17,19 +17,13 @@
  * -----------------------------------------------------------------------
  */
 
-import { baseConfig, importOrderRule } from './base.js';
+import { baseConfig } from './base.js';
 import { reactRules } from './react.js';
 
 export const nextConfig = [
   ...baseConfig,
   ...reactRules,
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    rules: {
-      // next/** 도 react 와 함께 최상단으로 올린다.
-      'import/order': importOrderRule(['react', 'next/**']),
-    },
-  },
+  // import 순서(react → next → 외부 → @/ → 상대경로)는 Prettier 정렬 플러그인이 정한다. (base.js 참고)
   {
     ignores: ['**/next-env.d.ts', '**/.next/**', '**/out/**'],
   },
