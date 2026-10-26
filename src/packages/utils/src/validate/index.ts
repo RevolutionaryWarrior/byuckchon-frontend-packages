@@ -6,9 +6,8 @@ const phoneRegex = /^010(\d{4})(\d{4})$/;
 // 한국의 지역번호 (02, 031~033, 041~044, 051~055, 061~064) + 인터넷전화(070~072)
 const homePhoneRegex =
   /^(02|031|032|033|041|042|043|044|051|052|053|054|055|061|062|063|064|070|071|072)[0-9]{3,4}[0-9]{4}$/;
-const birthRegex6 = /([0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[1,2][0-9]|3[0,1]))/;
-const birthRegex8 =
-  /^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/;
+const birthRegex6 = /^(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/;
+const birthRegex8 = /^(19\d{2}|20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/;
 // 영문(대소문자) + 숫자 + 특수문자가 각 1회 이상 입력되어 있고 10자리 이상
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/\\]).{10,}$/;
@@ -22,6 +21,19 @@ const urlRegex =
   /^https?:\/\/(?:[-\w.])+(?:\.[a-zA-Z]{2,})+(?::\d+)?(?:\/[^\s]*)?$/i;
 const defaultFileExtensionRegex =
   /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar)$/i;
+
+/**
+ * 실제로 존재하는 날짜인지 확인합니다. (2/30, 4/31, 평년 2/29 등 거부)
+ * @param month - 1~12
+ */
+function isExistingDate(year: number, month: number, day: number): boolean {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
 
 /**
  * 이메일 형식을 검증합니다.
@@ -69,9 +81,16 @@ function validateHomePhone(homePhone: string): boolean {
  * @example
  * validateBirth6('990101') // true
  * validateBirth6('001231') // true
+ * validateBirth6('990230') // false (존재하지 않는 날짜)
+ * validateBirth6('a990101') // false
  */
 function validateBirth6(birth: string): boolean {
-  return birthRegex6.test(birth);
+  const match = birthRegex6.exec(birth);
+  if (!match) return false;
+
+  const [, yy, mm, dd] = match;
+  // 세기를 알 수 없으므로 2000년대 기준으로 윤년을 판단한다. (00년은 2000년으로 보아 2/29 허용)
+  return isExistingDate(2000 + Number(yy), Number(mm), Number(dd));
 }
 
 /**
@@ -81,9 +100,15 @@ function validateBirth6(birth: string): boolean {
  * @example
  * validateBirth8('19990101') // true
  * validateBirth8('20001231') // true
+ * validateBirth8('19990001') // false (00월)
+ * validateBirth8('20230229') // false (평년 2/29)
  */
 function validateBirth8(birth: string): boolean {
-  return birthRegex8.test(birth);
+  const match = birthRegex8.exec(birth);
+  if (!match) return false;
+
+  const [, yyyy, mm, dd] = match;
+  return isExistingDate(Number(yyyy), Number(mm), Number(dd));
 }
 
 /**
