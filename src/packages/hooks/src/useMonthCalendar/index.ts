@@ -21,8 +21,9 @@ const useMonthCalendar = ({
     return new Date();
   });
 
-  const year = currentDate.getUTCFullYear();
-  const month = currentDate.getUTCMonth();
+  // 사용자가 보는 달력은 로컬 시간 기준이다. UTC 로 읽으면 KST 0~9시(자정 포함)가 전날로 계산돼 달이 밀린다.
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
   const calendarMatrix = useMemo(() => {
     return createCalendarMatrix(year, month, includeAdjacentMonths);
@@ -41,7 +42,7 @@ const useMonthCalendar = ({
 
   const moveMonth = (delta: number) => {
     const newDate = new Date(currentDate);
-    newDate.setUTCMonth(month + delta);
+    newDate.setMonth(month + delta);
     setCurrentDate(newDate);
   };
 
