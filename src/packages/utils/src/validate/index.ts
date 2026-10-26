@@ -19,8 +19,26 @@ const juminRegexAfter2020 =
   /^(?:[0-9]{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[1,2][0-9]|3[0,1]))-[1-8][0-9]{6}$/;
 const urlRegex =
   /^https?:\/\/(?:[-\w.])+(?:\.[a-zA-Z]{2,})+(?::\d+)?(?:\/[^\s]*)?$/i;
-const defaultFileExtensionRegex =
-  /\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|zip|rar)$/i;
+/** validate.file 의 기본 허용 확장자 */
+export const DEFAULT_FILE_EXTENSIONS = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "heic",
+  "heif",
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+  "txt",
+  "zip",
+  "rar",
+] as const;
 
 /**
  * 실제로 존재하는 날짜인지 확인합니다. (2/30, 4/31, 평년 2/29 등 거부)
@@ -199,22 +217,38 @@ function validateUrl(url: string): boolean {
 
 /**
  * 파일의 확장자와 크기를 검증합니다.
- * 지원 확장자: jpg, jpeg, png, gif, pdf, doc, docx, xls, xlsx, ppt, pptx, txt, zip, rar
+ * 기본 지원 확장자: jpg, jpeg, png, gif, webp, heic, heif, pdf, doc, docx, xls, xlsx, ppt, pptx, txt, zip, rar
  * @param file - 검증할 File 객체 또는 파일명 문자열
  * @param maxSizeInMB - 최대 파일 크기 (MB 단위, 기본값: 10MB)
+ * @param allowedExtensions - 허용할 확장자 목록. 지정하면 기본 목록 대신 사용합니다. (대소문자·앞의 점 무시)
  * @returns 유효한 파일이면 true, 아니면 false
  * @example
  * validateFile(new File(['content'], 'document.pdf'), 5) // true (5MB 이하)
  * validateFile('image.jpg', 10) // true (확장자 검증만)
+ * validateFile('photo.webp') // true
+ * validateFile('model.glb', 10, ['glb', '.gltf']) // true (확장자 직접 지정)
+ * validateFile('photo.jpg', 10, [...DEFAULT_FILE_EXTENSIONS, 'svg']) // 기본 목록에 추가
  */
-function validateFile(file: File | string, maxSizeInMB: number = 10): boolean {
+function validateFile(
+  file: File | string,
+  maxSizeInMB: number = 10,
+  allowedExtensions: readonly string[] = DEFAULT_FILE_EXTENSIONS
+): boolean {
   const fileName = typeof file === "string" ? file : file.name;
-
-  if (!defaultFileExtensionRegex.test(fileName)) {
+  const dotIndex = fileName.lastIndexOf(".");
+  if (dotIndex < 0) {
     return false;
   }
 
-  if (file instanceof File) {
+  const extension = fileName.slice(dotIndex + 1).toLowerCase();
+  const isAllowedExtension = allowedExtensions.some(
+    (allowed) => allowed.replace(/^\./, "").toLowerCase() === extension
+  );
+  if (!extension || !isAllowedExtension) {
+    return false;
+  }
+
+  if (typeof File !== "undefined" && file instanceof File) {
     const fileSizeInMB = file.size / (1024 * 1024);
     if (fileSizeInMB > maxSizeInMB) {
       return false;
