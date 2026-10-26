@@ -3,9 +3,9 @@ const emailRegex =
   /^[A-Za-z0-9]([A-Za-z0-9_.+-]*[A-Za-z0-9])?@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 // 하이픈 없는 010으로 시작하는 11자리 숫자
 const phoneRegex = /^010(\d{4})(\d{4})$/;
-// 한국의 모든 지역번호 (070, 02, 031~039, 041~043, 051~055, 061~064, 070~072)
+// 한국의 지역번호 (02, 031~033, 041~044, 051~055, 061~064) + 인터넷전화(070~072)
 const homePhoneRegex =
-  /^(070|02|031|032|033|034|035|036|037|038|039|041|042|043|051|052|053|054|055|061|062|063|064|070|071|072)[0-9]{3,4}[0-9]{4}$/;
+  /^(02|031|032|033|041|042|043|044|051|052|053|054|055|061|062|063|064|070|071|072)[0-9]{3,4}[0-9]{4}$/;
 const birthRegex6 = /([0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[1,2][0-9]|3[0,1]))/;
 const birthRegex8 =
   /^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/;
@@ -55,6 +55,8 @@ function validatePhone(phone: string): boolean {
  * @example
  * validateHomePhone('0212345678') // true
  * validateHomePhone('03112345678') // true
+ * validateHomePhone('0441234567') // true (세종)
+ * validateHomePhone('0341234567') // false (없는 지역번호)
  */
 function validateHomePhone(homePhone: string): boolean {
   return homePhoneRegex.test(homePhone);
