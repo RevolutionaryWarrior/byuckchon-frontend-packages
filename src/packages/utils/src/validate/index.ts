@@ -1,5 +1,6 @@
+// 도메인은 라벨(영문/숫자/하이픈, 양끝 하이픈 불가)을 점으로 여러 번 이을 수 있다. (a.co.kr, mail.example.com)
 const emailRegex =
-  /^[A-Za-z0-9]([A-Za-z0-9_.+-]*[A-Za-z0-9])?@[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\.[A-Za-z]{2,}$/;
+  /^[A-Za-z0-9]([A-Za-z0-9_.+-]*[A-Za-z0-9])?@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 // 하이픈 없는 010으로 시작하는 11자리 숫자
 const phoneRegex = /^010(\d{4})(\d{4})$/;
 // 한국의 모든 지역번호 (070, 02, 031~039, 041~043, 051~055, 061~064, 070~072)
@@ -28,6 +29,7 @@ const defaultFileExtensionRegex =
  * @returns 유효한 이메일 형식이면 true, 아니면 false
  * @example
  * validateEmail('test@example.com') // true
+ * validateEmail('user@mail.co.kr') // true
  * validateEmail('invalid-email') // false
  */
 function validateEmail(email: string): boolean {
