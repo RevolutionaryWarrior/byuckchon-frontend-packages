@@ -20,18 +20,27 @@ export default function useTimer({
   const [isRunning, setIsRunning] = useState<boolean>(
     autoStart && initialMs > 0
   );
+  // 같은 핸들러 안에서 onReset() 직후 onStart() 를 불러도 리셋된 값을 볼 수 있도록 최신 남은 시간을 ref 로도 들고 있는다.
+  // (state 만 보면 onStart 가 리셋 전 값(만료 후 0)을 읽어 시작하지 않는다)
+  const remainingMsRef = useRef<number>(remainingMs);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
+  const updateRemainingMs = (ms: number) => {
+    const next = Math.max(ms, 0);
+    remainingMsRef.current = next;
+    setRemainingMs(next);
+  };
+
   const onReset = () => {
     setIsRunning(false);
-    setRemainingMs(Math.max(initialMs, 0));
+    updateRemainingMs(initialMs);
   };
 
   const setTime = (ms: number) => {
-    setRemainingMs(Math.max(ms, 0));
+    updateRemainingMs(ms);
   };
 
   const isFinished = remainingMs <= 0;
@@ -42,7 +51,7 @@ export default function useTimer({
     }
 
     intervalRef.current = setInterval(() => {
-      setRemainingMs((prev) => Math.max(prev - interval, 0));
+      updateRemainingMs(remainingMsRef.current - interval);
     }, interval);
 
     return () => {
@@ -67,7 +76,7 @@ export default function useTimer({
     timeMs: remainingMs,
     isRunning,
     onStart: () => {
-      if (remainingMs > 0) setIsRunning(true);
+      if (remainingMsRef.current > 0) setIsRunning(true);
     },
     onPause: () => setIsRunning(false),
     onReset,
