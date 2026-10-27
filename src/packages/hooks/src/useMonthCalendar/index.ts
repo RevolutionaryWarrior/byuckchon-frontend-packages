@@ -64,7 +64,11 @@ const useMonthCalendar = ({
   };
 
   return {
-    currentDate: currentDate.toISOString(),
+    // monthCalendar 의 날짜 문자열과 같은 형식(로컬 날짜의 UTC 자정 ISO)으로 맞춘다.
+    // toISOString() 을 그대로 쓰면 KST 0~9시가 전날(UTC)로 찍혀 달력 칸과 하루가 어긋난다.
+    currentDate: new Date(
+      Date.UTC(year, month, currentDate.getDate())
+    ).toISOString(),
     setCurrentDate,
     monthCalendar,
     moveToNext: () => moveMonth(1),
