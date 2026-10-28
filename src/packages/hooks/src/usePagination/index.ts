@@ -16,15 +16,15 @@ const usePagination = (props: Props) => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
-  const handlePageChange = (step: number, checkLogic: (page: number) => boolean) => {
-    const selectedStep = currentPage + step;
-    const limitPage = onPageChange(selectedStep < 1 ? 1 : totalCount);
+  // 목표 페이지를 1 ~ totalCount 로 맞춘 뒤 한 번만 onPageChange 를 호출한다.
+  // 이미 그 페이지면(첫/마지막 페이지에서 이전/다음) 호출하지 않는다.
+  const handlePageChange = (step: number) => {
+    const lastPage = Math.max(totalCount, 1);
+    const targetPage = Math.min(Math.max(currentPage + step, 1), lastPage);
 
-    if (checkLogic(selectedStep)) {
-      return onPageChange(selectedStep);
-    }
+    if (targetPage === currentPage) return;
 
-    return limitPage;
+    onPageChange(targetPage);
   };
 
   const actions = () => {
@@ -32,10 +32,10 @@ const usePagination = (props: Props) => {
     const step = isDefaultMode ? 10 : 1;
 
     return {
-      onPrev: () => handlePageChange(-step, (page) => page >= 1),
-      onNext: () => handlePageChange(step, (page) => page < totalCount),
-      onDeepPrev: () => handlePageChange(isDefaultMode ? -totalCount : -renderCount, (page) => page >= 1),
-      onDeepNext: () => handlePageChange(isDefaultMode ? totalCount : renderCount, (page) => page < totalCount),
+      onPrev: () => handlePageChange(-step),
+      onNext: () => handlePageChange(step),
+      onDeepPrev: () => handlePageChange(isDefaultMode ? -totalCount : -renderCount),
+      onDeepNext: () => handlePageChange(isDefaultMode ? totalCount : renderCount),
     };
   };
 

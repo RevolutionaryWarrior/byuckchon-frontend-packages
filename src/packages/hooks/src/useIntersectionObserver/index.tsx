@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type State = {
   isIntersecting: boolean;
@@ -28,9 +28,13 @@ type IntersectionReturn = [(node?: Element | null) => void, boolean] & {
  * @param options.freezeOnceVisible - 한 번 보이면 더 이상 관찰하지 않음 (기본값: false)
  * @param options.initialIsIntersecting - 초기 교차 상태 (기본값: false)
  *
- * @returns 교차 상태와 ref 함수를 포함한 객체 또는 배열
+ * @returns 교차 상태와 ref 함수. 배열·객체 구조분해 모두 가능
  * @returns ref - 요소에 연결할 ref 함수
  * @returns isIntersecting - 현재 교차 상태 (boolean)
+ *
+ * @example
+ * const [ref, isIntersecting] = useIntersectionObserver();
+ * const { ref, isIntersecting } = useIntersectionObserver();
  **/
 
 const useIntersectionObserver = ({
@@ -46,6 +50,10 @@ const useIntersectionObserver = ({
   }));
 
   const frozen = state.entry?.isIntersecting && freezeOnceVisible;
+
+  const refCallback = useCallback((node?: Element | null) => {
+    setRef(node ?? null);
+  }, []);
 
   useEffect(() => {
     // ref가 있는지 확인
@@ -102,12 +110,13 @@ const useIntersectionObserver = ({
     freezeOnceVisible,
   ]);
 
-  const result = {
-    ref: setRef,
-    isIntersecting: !!state.isIntersecting,
-  };
+  // 배열 구조분해([ref, isIntersecting])와 객체 구조분해({ ref, isIntersecting })를 모두 지원한다.
+  const isIntersecting = !!state.isIntersecting;
+  const result = [refCallback, isIntersecting] as IntersectionReturn;
+  result.ref = refCallback;
+  result.isIntersecting = isIntersecting;
 
-  return result as IntersectionReturn;
+  return result;
 };
 
 export default useIntersectionObserver;

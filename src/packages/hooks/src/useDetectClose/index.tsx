@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import type { ElementRefObject } from "../types";
 
 export default function useDetectClose() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref: ElementRefObject<HTMLDivElement> = useRef<HTMLDivElement | null>(
+    null
+  );
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { ElementRefObject } from "../types";
 
 type Props = {
   scrollThreshold?: number;
@@ -15,7 +16,8 @@ export default function useScrollTop({
   scrollToTopOption,
 }: Props) {
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef: ElementRefObject<HTMLDivElement> =
+    useRef<HTMLDivElement | null>(null);
 
   const finalScrollOption = { ...baseOption, ...scrollToTopOption };
 
