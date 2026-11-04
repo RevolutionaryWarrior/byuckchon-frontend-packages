@@ -1,9 +1,25 @@
 import react from "@vitejs/plugin-react";
 import * as path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { patchCssModules } from "vite-css-modules";
 import dts from "vite-plugin-dts";
 import libCss from "vite-plugin-libcss";
+
+/**
+ * 훅·컴포넌트는 모두 클라이언트 전용이다. Next App Router 의 서버 컴포넌트에서
+ * import 해도 에러가 나지 않도록 번들(es · umd) 맨 위에 "use client" 를 붙인다.
+ * output.banner 는 UMD 를 minify 할 때 지워지므로 번들이 확정된 뒤(generateBundle)에 붙인다.
+ */
+const clientDirectivePlugin = (): Plugin => ({
+  name: "byuckchon:use-client",
+  generateBundle(_, bundle) {
+    for (const chunk of Object.values(bundle)) {
+      if (chunk.type === "chunk" && !chunk.code.startsWith('"use client"')) {
+        chunk.code = `"use client";\n${chunk.code}`;
+      }
+    }
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,6 +45,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    clientDirectivePlugin(),
     react({
       jsxRuntime: "automatic",
     }),
