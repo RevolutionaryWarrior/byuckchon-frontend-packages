@@ -10,6 +10,13 @@
  *
  *   export default defineTokenConfig();
  *
+ * 라이트/다크 테마 (tokens.json 이 Tokens Studio 세트로 나뉘어 있을 때):
+ *
+ *   export default defineTokenConfig({ themes: { default: 'light', dark: 'dark' } });
+ *
+ *   → default 세트의 색은 @theme 에, 나머지는 [data-theme="dark"] { … } 에 출력된다.
+ *     화면은 bg-bg-default 하나만 쓰고 dark: 변형을 쓰지 않는다.
+ *
  * 변환 규칙을 바꿔야 할 일이 생기면 프로젝트가 아니라 이 파일을 고칩니다.
  * 각 프로젝트는 settings 버전을 올리는 것만으로 최신 규칙을 따라옵니다.
  *
@@ -199,6 +206,59 @@ function valueOf(token) {
 }
 
 /* ============================================================
+   테마 (themes 옵션을 줬을 때만 사용)
+============================================================ */
+
+/**
+ * themes: { default: 'light', dark: 'dark' }
+ *   키   = 출력 모드 이름 (default 는 @theme, 나머지는 [data-theme="<키>"])
+ *   값   = tokens.json 의 최상위 세트 이름
+ */
+function themeModes(themes) {
+  if (!themes || typeof themes !== 'object') return null;
+  if (!themes.default) {
+    throw new Error('[tokens] themes.default 에 기본 세트 이름을 지정해주세요. 예: { default: "light", dark: "dark" }');
+  }
+  const bySet = new Map();
+  const byKey = new Map();
+  Object.entries(themes).forEach(([mode, set]) => {
+    bySet.set(String(set), mode);
+    byKey.set(mode, mode);
+  });
+  return {
+    modes: Object.keys(themes),
+    sets: Object.values(themes).map(String),
+    /** 토큰이 속한 세트 → 모드. 테마 세트가 아니면(primitive 등) default 로 본다. */
+    modeOfSet: (set) => bySet.get(set) ?? 'default',
+    /** 토큰 단위 모드 키("light" 처럼 세트 이름 또는 "dark" 처럼 모드 이름) → 모드 */
+    modeOfKey: (key) => bySet.get(key) ?? byKey.get(key) ?? null,
+  };
+}
+
+/**
+ * themes 를 쓰면 tokens.json 최상위 키는 Tokens Studio 의 "세트 이름"이다.
+ * 세트 이름은 디자이너가 파일을 나눈 단위일 뿐 토큰의 의미가 아니므로 변수명에서 뺀다.
+ *   primitive.gray.100 → --color-gray-100
+ *   light.bg.default   → --color-bg-default (dark.bg.default 도 같은 이름 → 모드별로 덮어씀)
+ */
+function withoutSetName(token) {
+  const [set, ...rest] = token.path ?? [];
+  if (!rest.length) return { ...token, set: null };
+  return { ...token, set: String(set), path: rest, name: kebab(rest.join('-')) };
+}
+
+/** 토큰 단위 모드 값인지: { light: "{gray.100}", dark: "{gray.900}" } */
+function isModeValue(value, theme) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0 &&
+    Object.keys(value).every((key) => theme.modeOfKey(key))
+  );
+}
+
+/* ============================================================
    등록
 ============================================================ */
 
@@ -210,7 +270,8 @@ StyleDictionary.registerTransform({
 
 StyleDictionary.registerFormat({
   name: 'css/byuckchon',
-  format: ({ dictionary }) => {
+  format: ({ dictionary, options }) => {
+    const theme = themeModes(options?.themes);
     const known = knownMotionVariables();
     const unknownMotion = [];
     const issues = [];
@@ -219,11 +280,36 @@ StyleDictionary.registerFormat({
     const themeShadows = [];
     const typography = [];
     const variables = [];
+    // 모드별 덮어쓰기: dark → ['  --color-bg-default: var(--color-gray-900);', …]
+    const overrides = new Map(theme ? theme.modes.filter((m) => m !== 'default').map((m) => [m, []]) : []);
+
+    // themes 에 지정한 세트가 최상위에 있을 때만 세트로 나뉜 파일로 본다.
+    // (세트 없이 color/display 같은 그룹이 최상위인 파일에서 그룹 이름을 지우면 안 되므로)
+    const splitBySet =
+      !!theme && dictionary.allTokens.some((t) => theme.sets.includes(String(t.path?.[0])));
+    // 세트 이름을 뺀 토큰으로 바꿔서 이후 규칙을 그대로 태운다.
+    const tokens = splitBySet ? dictionary.allTokens.map(withoutSetName) : dictionary.allTokens;
 
     // {group.token} 참조를 되찾기 위한 경로 → 토큰 색인
-    const byPath = new Map(dictionary.allTokens.map((t) => [(t.path ?? []).join('.'), t]));
+    const byPath = new Map(dictionary.allTokens.map((t, i) => [(t.path ?? []).join('.'), tokens[i]]));
+    if (theme) {
+      // Tokens Studio 는 세트 이름 없이 {gray.100} 으로 참조하기도 한다. 이름이 겹치면 먼저 나온 것을 쓴다.
+      tokens.forEach((t) => {
+        const key = (t.path ?? []).join('.');
+        if (!byPath.has(key)) byPath.set(key, t);
+      });
+    }
 
-    dictionary.allTokens.forEach((token) => {
+    /** 참조는 resolve 된 값 대신 var(--color-…) 로 남긴다. 못 찾으면 resolve 된 값을 쓴다. */
+    const colorRef = (raw, resolved) => {
+      if (typeof raw !== 'string') return String(resolved);
+      const out = refToVar(raw, byPath);
+      return out.includes('{') ? String(resolved) : out;
+    };
+
+    let usesModeValue = false;
+
+    tokens.forEach((token) => {
       const type = typeOf(token);
       const value = valueOf(token);
       const label = (token.path ?? []).join('.') || token.name;
@@ -231,8 +317,47 @@ StyleDictionary.registerFormat({
       if (value === undefined || value === null) return;
 
       /* color → Tailwind 유틸리티로 쓰이도록 @theme 에 넣는다 */
-      if (type === 'color') {
+      if (type === 'color' && !theme) {
         themeColors.push(`  ${cssVariableName(token, 'color-')}: ${value};`);
+        return;
+      }
+
+      /*
+       * themes 모드의 color
+       *   default 세트 / primitive → @theme, 그 외 세트 → [data-theme="<모드>"]
+       *   값은 참조를 살려 var(--color-…) 로 출력한다. (모드가 바뀌면 참조 대상만 바뀌도록)
+       */
+      if (type === 'color') {
+        const name = cssVariableName(token, 'color-');
+        const original = token.original ? valueOf(token.original) : value;
+        const push = (mode, line) =>
+          mode === 'default' ? themeColors.push(line) : overrides.get(mode)?.push(line);
+
+        // 토큰 단위 모드: "default": { "$value": { "light": "{gray.100}", "dark": "{gray.900}" } }
+        if (isModeValue(value, theme)) {
+          usesModeValue = true;
+          Object.keys(value).forEach((key) => {
+            const raw = original && typeof original === 'object' ? original[key] : value[key];
+            push(theme.modeOfKey(key), `  ${name}: ${colorRef(raw, value[key])};`);
+          });
+          if (!Object.keys(value).some((key) => theme.modeOfKey(key) === 'default')) {
+            warn('default 모드 값이 없습니다. @theme 에 없는 색은 Tailwind 유틸리티가 생기지 않습니다.');
+          }
+          return;
+        }
+
+        push(theme.modeOfSet(token.set), `  ${name}: ${colorRef(original, value)};`);
+        return;
+      }
+
+      /* themes 모드에서 default 가 아닌 세트는 color / boxShadow 만 덮어쓴다 */
+      if (theme && theme.modeOfSet(token.set) !== 'default') {
+        if (type === 'boxShadow' || type === 'shadow') {
+          const shadow = boxShadow(value, token.original ? valueOf(token.original) : value, byPath);
+          if (shadow) overrides.get(theme.modeOfSet(token.set)).push(`  ${cssVariableName(token, 'shadow-')}: ${shadow};`);
+        } else {
+          warn(`"${token.set}" 세트에서는 color / boxShadow 만 테마별로 바뀝니다. 이 토큰은 무시됩니다.`);
+        }
         return;
       }
 
@@ -274,6 +399,29 @@ StyleDictionary.registerFormat({
       variables.push(`  ${name}: ${cssValue(name, value)};`);
     });
 
+    if (theme) {
+      const present = new Set(tokens.map((t) => t.set));
+      if (splitBySet && !usesModeValue) {
+        // 토큰 단위 모드를 쓰면 일부 세트가 없어도 정상이다.
+        theme.sets
+          .filter((set) => !present.has(set))
+          .forEach((set) => issues.push(`themes: tokens.json 에 "${set}" 세트가 없습니다.`));
+      } else if (!usesModeValue && tokens.length) {
+        // 디자이너가 아직 세트를 나누지 않은 경우. 토큰 단위 모드도 없으면 단일 테마로 나간다.
+        issues.push(`themes: tokens.json 에 ${theme.sets.map((s) => `"${s}"`).join(' / ')} 세트가 없어 테마 없이 출력합니다.`);
+      }
+      // 기본값 없이 특정 모드에만 있는 변수는 Tailwind 유틸리티가 만들어지지 않는다.
+      const defined = new Set([...themeColors, ...themeShadows].map((line) => line.trim().split(':')[0]));
+      overrides.forEach((lines, mode) => {
+        lines
+          .map((line) => line.trim().split(':')[0])
+          .filter((name) => !defined.has(name))
+          .forEach((name) =>
+            issues.push(`${name}: "${mode}" 에만 있고 default 값이 없습니다. (bg-* 같은 유틸리티가 생기지 않음)`),
+          );
+      });
+    }
+
     if (unknownMotion.length) {
       console.warn(
         '\n⚠ settings 에 존재하지 않는 motion 변수입니다. 오타가 아닌지 확인하세요.\n' +
@@ -293,8 +441,11 @@ StyleDictionary.registerFormat({
 
     const blocks = [];
     // 그림자가 색상 변수를 참조할 수 있으므로 색상을 먼저 적어 읽기 쉽게 둔다.
-    const theme = [...themeColors, ...themeShadows];
-    if (theme.length) blocks.push(`@theme {\n${theme.join('\n')}\n}`);
+    const themeBlock = [...themeColors, ...themeShadows];
+    if (themeBlock.length) blocks.push(`@theme {\n${themeBlock.join('\n')}\n}`);
+    overrides.forEach((lines, mode) => {
+      if (lines.length) blocks.push(`[data-theme="${mode}"] {\n${lines.join('\n')}\n}`);
+    });
     if (typography.length) blocks.push(typography.join('\n\n'));
     if (variables.length) blocks.push(`:root {\n${variables.join('\n')}\n}`);
 
@@ -311,10 +462,14 @@ StyleDictionary.registerFormat({
  * 프로젝트 token.config.js 에서 사용하는 기본 설정.
  *
  * @param {object} [overrides] 프로젝트별 예외. source/platforms 를 덮어쓸 수 있다.
+ * @param {Record<string, string>} [overrides.themes]
+ *   라이트/다크 테마. 키는 출력 모드, 값은 tokens.json 의 세트 이름.
+ *   예: { default: 'light', dark: 'dark' } → @theme + [data-theme="dark"]
+ *   생략하면 지금과 같은 출력(세트 이름이 변수명에 들어감)을 유지한다.
  * @returns {object} Style Dictionary config
  */
 export function defineTokenConfig(overrides = {}) {
-  const { source, buildPath = 'src/', destination = 'tokens.css', ...rest } = overrides;
+  const { source, buildPath = 'src/', destination = 'tokens.css', themes, ...rest } = overrides;
 
   return {
     source: source ?? ['src/tokens.json'],
@@ -322,7 +477,7 @@ export function defineTokenConfig(overrides = {}) {
       css: {
         transforms: ['name/kebab'],
         buildPath,
-        files: [{ destination, format: 'css/byuckchon' }],
+        files: [{ destination, format: 'css/byuckchon', ...(themes && { options: { themes } }) }],
       },
     },
     ...rest,

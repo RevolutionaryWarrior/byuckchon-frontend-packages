@@ -311,6 +311,61 @@ Figma가 내보내는 값이 CSS와 다른 부분은 자동으로 맞춥니다.
 > typography는 Tailwind v4의 `@utility` 문법으로 출력됩니다. v3 프로젝트에서 typography
 > 토큰을 쓰려면 별도 대응이 필요합니다. (color/motion은 v3에서도 그대로 동작)
 
+### 라이트/다크 테마 (`themes`)
+
+디자이너가 Tokens Studio에서 `primitive` / `light` / `dark` 세트로 나눠 export 하면,
+옵션 없이 변환할 때는 `--color-light-bg-default`, `--color-dark-bg-default`처럼 **이름이 둘로
+갈라져** 화면마다 `bg-light-bg-default dark:bg-dark-bg-default`를 써야 합니다.
+`themes`를 주면 같은 이름 하나로 묶고 모드별로 값만 바꿉니다.
+
+```js
+// token.config.js
+export default defineTokenConfig({
+  themes: { default: "light", dark: "dark" }, // 키 = 출력 모드, 값 = tokens.json 세트 이름
+});
+```
+
+```jsonc
+{
+  "primitive": { "gray": { "100": { "$type": "color", "$value": "#f4f6f8" },
+                           "900": { "$type": "color", "$value": "#1c1e21" } } },
+  "light": { "bg": { "default": { "$type": "color", "$value": "{primitive.gray.100}" } } },
+  "dark":  { "bg": { "default": { "$type": "color", "$value": "{primitive.gray.900}" } } }
+}
+```
+
+```css
+@theme {
+  --color-gray-100: #f4f6f8;
+  --color-gray-900: #1c1e21;
+  --color-bg-default: var(--color-gray-100);
+}
+
+[data-theme="dark"] {
+  --color-bg-default: var(--color-gray-900);
+}
+```
+
+화면에서는 `bg-bg-default` 하나만 씁니다. `dark:` 변형은 쓰지 않고, `<html data-theme="dark">`가
+붙으면 변수 값만 바뀝니다. (CLI로 만든 프로젝트는 `useTheme()`이 이 속성을 관리합니다)
+
+- `default` 세트(와 `primitive`처럼 themes에 없는 세트)의 토큰은 `@theme`에, 나머지 세트는
+  `[data-theme="<모드>"]`에 출력됩니다.
+- **최상위 세트 이름은 변수명에서 뺍니다.** (`primitive.gray.100` → `--color-gray-100`,
+  `light.bg.default` / `dark.bg.default` → 둘 다 `--color-bg-default`)
+  themes에 지정한 세트가 tokens.json 최상위에 하나도 없으면 세트로 나뉜 파일이 아니라고 보고 이름을 그대로 둡니다.
+- 색상 참조는 값으로 풀지 않고 `var(--color-…)`로 남깁니다. 모드가 바뀌면 참조 대상만 바뀝니다.
+- default가 아닌 세트에서는 `color` / `boxShadow`만 모드별로 덮어씁니다. 그 외 타입은 경고 후 무시합니다.
+- default 값 없이 특정 모드에만 있는 색은 Tailwind 유틸리티가 생기지 않으므로 경고합니다.
+- 세트를 나누지 않고 토큰 하나에 모드별 값을 줄 수도 있습니다. (키는 세트 이름 또는 모드 이름)
+
+  ```jsonc
+  "bg": { "default": { "$type": "color",
+                       "$value": { "light": "{primitive.gray.100}", "dark": "{primitive.gray.900}" } } }
+  ```
+
+`themes`를 주지 않으면 출력은 이전과 완전히 같습니다. (세트 이름이 변수명에 그대로 들어감)
+
 프로젝트별 예외가 필요하면 인자로 덮어쓸 수 있습니다.
 
 ```js
