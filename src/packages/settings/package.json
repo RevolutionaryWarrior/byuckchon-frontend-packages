@@ -13,7 +13,8 @@
   "bin": {
     "byuckchon-eslint-review-comments": "./src/eslint/post-eslint-review-comments.cjs",
     "byuckchon-settings-sync": "./src/bin/sync.js",
-    "byuckchon-pr-description": "./src/bin/pr-description.js"
+    "byuckchon-pr-description": "./src/bin/pr-description.js",
+    "byuckchon-release-notes": "./src/bin/release-notes.js"
   },
   "exports": {
     "./eslint/plugin": "./src/eslint/internal-plugin.cjs",

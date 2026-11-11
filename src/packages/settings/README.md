@@ -20,6 +20,7 @@ npm install @byuckchon-frontend/settings
 | TypeScript             | ✅ 제공 중 | tsconfig 프리셋 (`base` / `react` / `next` / `library` / `node`)                  |
 | VS Code                | ✅ 제공 중 | 에디터 설정 동기화 (`byuckchon-settings-sync`)                                    |
 | PR 본문 자동화         | ✅ 제공 중 | 커밋 내역을 타입별로 묶어 PR description 에 반영 (`byuckchon-pr-description`)     |
+| 릴리즈 노트            | 🧪 시험 중 | 배포 성공 시 태그 · GitHub Release 노트 생성 (`byuckchon-release-notes`)          |
 | Font                   | 🚧 예정    | 기본 폰트 세팅                                                                    |
 | Color                  | 🚧 예정    | 기본 컬러 토큰                                                                    |
 
@@ -356,6 +357,39 @@ GH_TOKEN=... REPO=owner/repo PR_NUMBER=12 npx byuckchon-pr-description
 - `feat!:` 는 상단에 Breaking Changes 로 따로 모읍니다.
 - 컨벤션을 안 지킨 커밋은 버리지 않고 "분류 없음"에 모읍니다.
 - 마커가 없으면 본문 끝에 덧붙이므로 PR 템플릿이 없어도 동작합니다.
+
+## 릴리즈 노트 (프로토타입)
+
+배포가 **성공한 뒤에만** 태그와 GitHub Release 를 남깁니다.
+`bc deploy` 가 만드는 `deploy.yml` 의 `release` job(`needs: deploy`)이 실행합니다.
+
+```bash
+# 이전 web@* 태그 이후 커밋 → notes.md, $GITHUB_OUTPUT 에 tag=...
+npx byuckchon-release-notes --prefix "web@" --version date
+
+# SLACK_WEBHOOK_URL 이 있으면 배포 완료 알림
+npx byuckchon-release-notes --slack notes.md
+```
+
+```markdown
+## web@2026.11.05
+
+✨ 기능 2 · 🐛 수정 1
+
+### ✨ 기능
+- 주문 내역 다크모드 지원 (#123)
+
+### 🐛 수정
+- 결제 취소 건이 완료로 보이던 문제 (#125)
+
+<sub>이전 web@2026.10.28 이후 커밋 7개</sub>
+```
+
+- 버전은 한국 시간 기준 날짜입니다. 같은 날 다시 배포하면 `.2`, `.3` 이 붙습니다.
+- `feat` / `fix` 만 남기고 나머지 타입은 뺍니다. 분류 기준은 PR 본문 자동화와 같습니다.
+- 커밋 기록이 필요하므로 checkout 에 `fetch-depth: 0` 이 있어야 합니다.
+- 태그는 만들지 않습니다. 다음 step 의 `gh release create` 가 만듭니다.
+- SemVer 모드(`--version semver`)는 아직 지원하지 않습니다.
 
 ## 요구사항
 

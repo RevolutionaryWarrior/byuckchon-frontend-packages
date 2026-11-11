@@ -19,53 +19,19 @@
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { CONVENTIONAL, SECTION_ORDER, labelOf, parseCommit } from './lib/commits.js';
+
 const START = '<!-- byuckchon:commits:start -->';
 const END = '<!-- byuckchon:commits:end -->';
 const NOTE_START = '<!-- byuckchon:notes:start -->';
 const NOTE_END = '<!-- byuckchon:notes:end -->';
 
-/** 커밋 타입별 표시 순서와 제목. 목록에 없는 타입은 "기타"로 모은다. */
-const TYPES = [
-  ['feat', '✨ 기능'],
-  ['fix', '🐛 수정'],
-  ['refactor', '♻️ 리팩터'],
-  ['perf', '⚡ 성능'],
-  ['style', '💄 스타일'],
-  ['design', '💄 스타일'],
-  ['docs', '📝 문서'],
-  ['test', '✅ 테스트'],
-  ['chore', '🔧 기타'],
-  ['build', '🔧 기타'],
-  ['ci', '🔧 기타'],
-  ['config', '🔧 기타'],
-];
-
-const TYPE_LABEL = new Map(TYPES);
-const SECTION_ORDER = [...new Set(TYPES.map(([, label]) => label)), '📦 분류 없음'];
-
-const CONVENTIONAL = /^(?<type>[a-z]+)(?:\((?<scope>[^)]*)\))?(?<breaking>!)?:\s*(?<subject>.+)$/;
-
 /* ============================================================
    순수 로직 (테스트 가능)
 ============================================================ */
 
-/** 커밋 메시지 첫 줄을 파싱한다. 컨벤션을 안 지켰으면 type 이 null. */
-export function parseCommit(message) {
-  const subjectLine = String(message).split('\n')[0].trim();
-  const matched = CONVENTIONAL.exec(subjectLine);
-
-  if (!matched) return { type: null, scope: null, breaking: false, subject: subjectLine };
-
-  const { type, scope, breaking, subject } = matched.groups;
-  return {
-    type: TYPE_LABEL.has(type) ? type : null,
-    scope: scope || null,
-    breaking: Boolean(breaking),
-    subject: subject.trim(),
-    // 컨벤션 형태지만 모르는 타입이면 원문을 그대로 보여준다.
-    fallback: TYPE_LABEL.has(type) ? null : subjectLine,
-  };
-}
+// 커밋 분류는 release-notes 와 공유한다. (기존 import 경로 호환을 위해 다시 내보낸다)
+export { parseCommit };
 
 /**
  * 커밋 본문에서 리뷰 포인트를 뽑는다.
@@ -199,7 +165,7 @@ export function renderCommitSection(commits) {
 
   for (const commit of commits) {
     const parsed = parseCommit(commit.message);
-    const label = parsed.type ? TYPE_LABEL.get(parsed.type) : '📦 분류 없음';
+    const label = labelOf(parsed);
     const short = commit.sha.slice(0, 7);
     const scope = parsed.scope ? `**${parsed.scope}** — ` : '';
     const text = parsed.fallback ?? parsed.subject;
