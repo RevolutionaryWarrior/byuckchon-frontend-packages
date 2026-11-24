@@ -24,7 +24,6 @@ export const reviewConfig = [
     rules: {
       'internal/blocking-conventions': 'error',
       'internal/warning-conventions': 'warn',
-      'react/self-closing-comp': 'warn',
     },
   },
 ];
